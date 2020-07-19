@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:piano_tile/views/home.dart';
-
+import 'package:piano_tile/views/music_list.dart';
 void main() {
   runApp(MyApp());
 }
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget  {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         primaryColor: Colors.blue
       ),
-      home: Home(),
+      home: MusicList(),
     );
   }
 }
