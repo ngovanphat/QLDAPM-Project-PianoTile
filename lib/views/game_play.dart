@@ -7,14 +7,13 @@ import 'package:piano_tile/model/note.dart';
 import 'package:piano_tile/model/line_divider.dart';
 import 'package:piano_tile/model/line.dart';
 
-
-
 class GamePlay extends StatefulWidget {
   @override
   _GamePlayState createState() => _GamePlayState();
 }
 
-class _GamePlayState extends State<GamePlay> with SingleTickerProviderStateMixin {
+class _GamePlayState extends State<GamePlay>
+    with SingleTickerProviderStateMixin {
   AudioCache player = AudioCache();
   List<Note> notes = initNotes();
   AnimationController animationController;
@@ -23,27 +22,26 @@ class _GamePlayState extends State<GamePlay> with SingleTickerProviderStateMixin
   bool hasStarted = false;
   bool isPlaying = true;
 
-
   @override
   void initState() {
     super.initState();
-    animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+
+    animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
 
     animationController.addStatusListener((status) {
-      if(status == AnimationStatus.completed && isPlaying ){
-        if(notes[currentNoteIndex].state != NoteState.tapped) {
+      if (status == AnimationStatus.completed && isPlaying) {
+        if (notes[currentNoteIndex].state != NoteState.tapped) {
           // end game
           setState(() {
             isPlaying = false;
             notes[currentNoteIndex].state = NoteState.missed;
           });
           animationController.reverse().then((_) => _showFinishDialog());
-        }
-        else if (currentNoteIndex == notes.length - 5 ){
+        } else if (currentNoteIndex == notes.length - 5) {
           // song finished
           _showFinishDialog();
-        }
-        else{
+        } else {
           setState(() {
             ++currentNoteIndex;
           });
@@ -51,10 +49,7 @@ class _GamePlayState extends State<GamePlay> with SingleTickerProviderStateMixin
         }
       }
     });
-
-
   }
-
 
   @override
   void dispose() {
@@ -92,7 +87,7 @@ class _GamePlayState extends State<GamePlay> with SingleTickerProviderStateMixin
   void _restart() {
     setState(() {
       hasStarted = false;
-      isPlaying =  true;
+      isPlaying = true;
       notes = initNotes();
       points = 0;
       currentNoteIndex = 0;
@@ -117,12 +112,14 @@ class _GamePlayState extends State<GamePlay> with SingleTickerProviderStateMixin
     ).then((_) => _restart());
   }
 
-  void _onTap(Note note){
-    bool areAllPreviousTapped = notes.sublist(0, note.orderNumber).every((n) => n.state == NoteState.tapped);
-    if(areAllPreviousTapped){
-      if(!hasStarted){
+  void _onTap(Note note) {
+    bool areAllPreviousTapped = notes
+        .sublist(0, note.orderNumber)
+        .every((n) => n.state == NoteState.tapped);
+    if (areAllPreviousTapped) {
+      if (!hasStarted) {
         setState(() {
-          hasStarted =  true;
+          hasStarted = true;
         });
         animationController.forward();
       }
@@ -134,12 +131,11 @@ class _GamePlayState extends State<GamePlay> with SingleTickerProviderStateMixin
     }
   }
 
-
-  _drawLine(int lineNumber){
+  _drawLine(int lineNumber) {
     return Expanded(
       child: Line(
         lineNumber: lineNumber,
-        currentNote: notes.sublist(currentNoteIndex, currentNoteIndex + 5 ),
+        currentNote: notes.sublist(currentNoteIndex, currentNoteIndex + 5),
         onTileTap: _onTap,
         animation: animationController,
       ),
@@ -151,7 +147,7 @@ class _GamePlayState extends State<GamePlay> with SingleTickerProviderStateMixin
       alignment: Alignment.topCenter,
       child: Padding(
         padding: const EdgeInsets.only(
-          top:  32,
+          top: 32,
         ),
         child: Text(
           "$points",
@@ -164,7 +160,7 @@ class _GamePlayState extends State<GamePlay> with SingleTickerProviderStateMixin
     );
   }
 
-  _playNote(Note note){
+  _playNote(Note note) {
     switch (note.line) {
       case 0:
         player.play('a.wav');
