@@ -28,6 +28,7 @@ class _GamePlayState extends State<GamePlay> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+
     animationController.addStatusListener((status) {
       if(status == AnimationStatus.completed && isPlaying ){
         if(notes[currentNoteIndex].state != NoteState.tapped) {
