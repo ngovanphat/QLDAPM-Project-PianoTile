@@ -4,6 +4,7 @@ import 'package:piano_tile/helper/song_provider.dart';
 import 'package:piano_tile/model/note.dart';
 import 'package:piano_tile/model/line_divider.dart';
 import 'package:piano_tile/model/line.dart';
+import 'package:piano_tile/model/pause_button.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -80,7 +81,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               _drawLine(3)
             ],
           ),
-          _drawPoints()
+          _drawPoints(),
+          _pauseButton(),
         ],
       ),
     );
@@ -131,6 +133,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     }
   }
 
+  _pauseButton(){
+    return Align(
+      alignment: Alignment.topRight,
+      child:PauseButton(
+
+      ),
+    );
+  }
 
   _drawLine(int lineNumber){
     return Expanded(
