@@ -1,9 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audio_cache.dart';
-import 'package:piano_tile/helper/song_provider.dart';
-import 'package:piano_tile/model/note.dart';
-import 'package:piano_tile/model/line_divider.dart';
-import 'package:piano_tile/model/line.dart';
+import 'package:piano_tile/model/widget.dart';
+import 'package:piano_tile/views/game_play.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -12,169 +10,95 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
-
-  AudioCache player = AudioCache();
-  List<Note> notes = initNotes();
-  AnimationController animationController;
-  int currentNoteIndex = 0;
-  int points = 0;
-  bool hasStarted = false;
-  bool isPlaying = true;
-
+  AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
-    animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 300));
-    animationController.addStatusListener((status) {
-      if(status == AnimationStatus.completed && isPlaying ){
-        if(notes[currentNoteIndex].state != NoteState.tapped) {
-          // end game
-          setState(() {
-            isPlaying = false;
-            notes[currentNoteIndex].state = NoteState.missed;
-          });
-          animationController.reverse().then((_) => _showFinishDialog());
-        }
-        else if (currentNoteIndex == notes.length - 5 ){
-          // song finished
-          _showFinishDialog();
-        }
-        else{
-          setState(() {
-            ++currentNoteIndex;
-          });
-          animationController.forward(from: 0);
-        }
-      }
-    });
-
-
-  }
-
-
-  @override
-  void dispose() {
-    animationController.dispose();
-    super.dispose();
+    _animationController = new AnimationController(vsync: this, duration: Duration(seconds: 5))..repeat();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Stack(
-        fit: StackFit.passthrough,
-        children: <Widget>[
-          Image.asset(
-            'assets/images/background.jpg',
-            fit: BoxFit.cover,
-          ),
-          Row(
-            children: <Widget>[
-              _drawLine(0),
-              LineDivider(),
-              _drawLine(1),
-              LineDivider(),
-              _drawLine(2),
-              LineDivider(),
-              _drawLine(3)
-            ],
-          ),
-          _drawPoints()
-        ],
-      ),
-    );
-  }
+    return SafeArea(
+      child: Material(
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: <Widget>[
+            Image.asset('assets/images/background.jpg',
+                fit: BoxFit.cover
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 16,horizontal: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  PointRowTop(context, 0, 'assets/images/one.png'),
+                  PointRowTop(context, 0, 'assets/images/heart.png'),
+                  PointRowTop(context, 0, 'assets/images/note.png'),
+                 PointRowTop(context, 0, 'assets/images/gems.png'),
+                ],
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 100),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                   AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (_, child){
+                        return  Transform.rotate(
+                            angle: _animationController.value*1 * 3.14,
+                            child: child,
+                        );
+                      },
+                      child: Image.asset('assets/images/disk.png'),
+                    ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10),
+                    child: Text(
+                      '1. BigCity Boi',
+                      style: TextStyle(
+                        fontSize: 30,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 200,
+                    height: 70,
+                    margin: EdgeInsets.only(top: 20),
+                    child: FlatButton(
+                      onPressed: (){
+                        Navigator.pushReplacement(context, MaterialPageRoute(
+                          builder: (context) => GamePlay()
+                        ));
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(70),
+                        side: BorderSide(color: Colors.white,width: 3)
+                      ),
+                      child: Text(
+                        'Play',
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: Colors.white
+                        ),
+                      ),color: Colors.white24,
+                    ),
+                  ),
 
-  void _restart() {
-    setState(() {
-      hasStarted = false;
-      isPlaying =  true;
-      notes = initNotes();
-      points = 0;
-      currentNoteIndex = 0;
-    });
-    animationController.reset();
-  }
-
-  void _showFinishDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Score: $points"),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text("Restart"),
+                ]
+              ),
             )
           ],
-        );
-      },
-    ).then((_) => _restart());
-  }
-
-  void _onTap(Note note){
-    bool areAllPreviousTapped = notes.sublist(0, note.orderNumber).every((n) => n.state == NoteState.tapped);
-    if(areAllPreviousTapped){
-      if(!hasStarted){
-        setState(() {
-          hasStarted =  true;
-        });
-        animationController.forward();
-      }
-      _playNote(note);
-      setState(() {
-        note.state = NoteState.tapped;
-        ++points;
-      });
-    }
-  }
-
-
-  _drawLine(int lineNumber){
-    return Expanded(
-      child: Line(
-        lineNumber: lineNumber,
-        currentNote: notes.sublist(currentNoteIndex, currentNoteIndex + 5 ),
-        onTileTap: _onTap,
-        animation: animationController,
-      ),
-    );
-  }
-
-  _drawPoints() {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top:  32,
-        ),
-        child: Text(
-          "$points",
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 60,
-          ),
         ),
       ),
     );
   }
 
-  _playNote(Note note){
-    switch (note.line) {
-      case 0:
-        player.play('a.wav');
-        return;
-      case 1:
-        player.play('c.wav');
-        return;
-      case 2:
-        player.play('e.wav');
-        return;
-      case 3:
-        player.play('f.wav');
-        return;
-    }
-  }
 }
