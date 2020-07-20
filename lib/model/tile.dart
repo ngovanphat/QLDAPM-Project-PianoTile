@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:piano_tile/model/note.dart';
 
 class Tile extends StatelessWidget {
-
   final NoteState state;
   final double height;
   final VoidCallback onTap;
 
-  const Tile({Key key, this.height, this.state, this.onTap}):super(key: key);
-
-
+  const Tile({Key key, this.height, this.state, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +15,14 @@ class Tile extends StatelessWidget {
       height: height,
       child: GestureDetector(
         onTapDown: (_) => onTap(),
-        child: Container( color: color,),
+        child: Container(
+          color: color,
+        ),
       ),
     );
   }
 
-
-  Color get color{
+  Color get color {
     switch (state) {
       case NoteState.ready:
         return Colors.black;
