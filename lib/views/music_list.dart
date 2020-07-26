@@ -134,7 +134,12 @@ Widget songsListView(BuildContext context,tabIndex) {
                 isThreeLine: true,
                 leading:Container(
                     height: double.infinity,
-                    child:Icon(icons[index], size:40)),
+                    child:ImageIcon(
+                      AssetImage('assets/images/music-note.png'),
+                      size: 50,
+                      color: Color(0xFF3A5A98),
+                    ),//replaced by image if available
+                ),
                 title: Text(titles[index]),
                 subtitle:  Container(
                   child: Row(
@@ -154,7 +159,7 @@ Widget songsListView(BuildContext context,tabIndex) {
                       flex: 3,
                       child:SmoothStarRating(
                         rating: difficulties[index],
-                        size: 15,
+                        size: 18,
                         filledIconData: Icons.music_note,
                         defaultIconData: null,
                         starCount: 5,
@@ -217,9 +222,55 @@ List getSongs(tabIndex){
   return [titles,artists,icons,difficulties];
 }
 class Song{
+  //Thông tin chung của bài nhạc
   String id;
   String name;
-  String bpm;
   List<String> artists;
   int difficulty;
+  String image;//đường dẫn tới file ảnh local/database
+
+  //Thông tin hỗ trợ cho trò chơi
+  String music_dir;//đường dẫn tới file âm thanh
+  String notes_dir;//đường dẫn tới file map các notes của bài nhạc
+  String highscore;//mặc định =0
+  Song(id,name,artists,difficulty,image,music_dir,notes_dir){
+    this.id=id;
+    this.name=name;
+    this.artists=artists;
+    this.difficulty=difficulty;
+    this.image=image;
+    this.music_dir=music_dir;
+    this.notes_dir=notes_dir;
+  }
+  Song.fromJson(this.id, Map data) {
+    name = data['name'];
+    artists=data['artists'];
+    difficulty=data['difficulty'];
+    image=data['image'];
+    music_dir=data['music_dir'];
+    notes_dir=data['notes_dir'];
+    if (name == null) {
+      name = '';
+    }
+    if(artists==null){
+      artists=='';
+    }
+    if(difficulty==null){
+      difficulty==1;
+    }
+    if(image==null){
+      image=='';
+    }
+    if(music_dir==null){
+      music_dir=='';
+    }
+    if(notes_dir==null){
+      notes_dir=='';
+    }
+
+  }
+  void getHighscore(userID){
+    //TODO get highscore from database
+  }
+
 }
