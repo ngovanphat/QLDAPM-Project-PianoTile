@@ -7,6 +7,7 @@ import 'package:piano_tile/model/note.dart';
 import 'package:piano_tile/model/line_divider.dart';
 import 'package:piano_tile/model/line.dart';
 import 'package:piano_tile/model/pause_menu.dart';
+
 class GamePlay extends StatefulWidget {
   @override
   _GamePlayState createState() => _GamePlayState();
@@ -160,12 +161,10 @@ class _GamePlayState extends State<GamePlay>
     );
   }
 
-  _pauseButton(){
+  _pauseButton() {
     return Align(
       alignment: Alignment.topRight,
-      child:PauseButton(
-
-      ),
+      child: PauseButton(),
     );
   }
 

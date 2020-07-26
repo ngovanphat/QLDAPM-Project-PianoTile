@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:piano_tile/views/home.dart';
 import 'package:piano_tile/views/game_play.dart';
 
