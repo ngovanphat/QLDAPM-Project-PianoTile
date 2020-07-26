@@ -3,6 +3,8 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piano_tile/views/home.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:marquee_flutter/marquee_flutter.dart';
 
 class MusicList extends StatelessWidget {
   @override
@@ -112,6 +114,7 @@ Widget songsListView(BuildContext context,tabIndex) {
   final titles= data[0];
   final artists= data[1];
   final icons= data[2];
+  final List<double> difficulties=data[3];
   //final beatRate=data[3];
   //final difficulty=data[4];
   return NotificationListener<OverscrollIndicatorNotification>(// tắt hiệu ứng glow khi cuộn tới cuối list/ đầu list
@@ -128,12 +131,39 @@ Widget songsListView(BuildContext context,tabIndex) {
             },
             child:Card(
               child: ListTile(
+                isThreeLine: true,
                 leading:Container(
                     height: double.infinity,
                     child:Icon(icons[index], size:40)),
                 title: Text(titles[index]),
-                subtitle: Text(artists[index]+"\n"+'BPM:'),
-                isThreeLine: true,
+                subtitle:  Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Flexible(
+                      flex:3,
+                      child:Container(
+                        height: 30,
+                        child: new MarqueeWidget(
+                        text:artists[index],
+                          textStyle: new TextStyle(fontSize: 16.0),
+                        scrollAxis: Axis.horizontal,),
+                    //Text(,overflow: TextOverflow.ellipsis,),
+                    ),),
+                    Flexible(
+                      flex: 3,
+                      child:SmoothStarRating(
+                        rating: difficulties[index],
+                        size: 15,
+                        filledIconData: Icons.music_note,
+                        defaultIconData: null,
+                        starCount: 5,
+                        isReadOnly: true,
+                      ),
+                    )
+                  ],
+                  ),
+                ),
                 trailing:  RaisedButton(
                   color: Colors.amber,
                   child: Text("Chơi"),
@@ -183,13 +213,13 @@ List getSongs(tabIndex){
   //icons sẽ được thay bằng hình nhạc sau
   final icons = [Icons.music_note, Icons.music_note,Icons.music_note,Icons.music_note,
     Icons.music_note,Icons.music_note,Icons.music_note,Icons.music_note,Icons.music_note];
-  return [titles,artists,icons];
+  final List<double> difficulties=[1,1,1,2,3,4,4,5,5];
+  return [titles,artists,icons,difficulties];
 }
 class Song{
   String id;
   String name;
   String bpm;
   List<String> artists;
-  double difficulty;
-
+  int difficulty;
 }
