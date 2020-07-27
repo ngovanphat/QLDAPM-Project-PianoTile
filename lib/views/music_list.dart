@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:piano_tile/model/Song.dart';
 import 'package:piano_tile/views/home.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:marquee_flutter/marquee_flutter.dart';
@@ -110,11 +111,8 @@ class BottomNavLayout extends StatelessWidget{
 
 Widget songsListView(BuildContext context,tabIndex) {
   //tên bài hát
-  final data = getSongs(tabIndex);
-  final titles= data[0];
-  final artists= data[1];
-  final icons= data[2];
-  final List<double> difficulties=data[3];
+  List<Song> songs = getSongs(tabIndex);
+
   //final beatRate=data[3];
   //final difficulty=data[4];
   return NotificationListener<OverscrollIndicatorNotification>(// tắt hiệu ứng glow khi cuộn tới cuối list/ đầu list
@@ -122,11 +120,11 @@ Widget songsListView(BuildContext context,tabIndex) {
       overscroll.disallowGlow(); return true;
     },
     child: ListView.builder(
-      itemCount: titles.length,
+      itemCount: songs.length,
       itemBuilder: (context, index) {
         return GestureDetector(
             onTap: () {
-              final snackBar = SnackBar(content: Text(titles[index]));
+              final snackBar = SnackBar(content: Text(songs[index].getName()));//phát bài nhạc để nghe thử khi nhấn vào/show thành tích
               Scaffold.of(context).showSnackBar(snackBar);
             },
             child:Card(
@@ -140,7 +138,7 @@ Widget songsListView(BuildContext context,tabIndex) {
                       color: Color(0xFF3A5A98),
                     ),//replaced by image if available
                 ),
-                title: Text(titles[index]),
+                title: Text(songs[index].getName()),
                 subtitle:  Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,7 +148,7 @@ Widget songsListView(BuildContext context,tabIndex) {
                       child:Container(
                         height: 30,
                         child: new MarqueeWidget(
-                        text:artists[index],
+                        text:songs[index].getArtists().join('-'),
                           textStyle: new TextStyle(fontSize: 16.0),
                         scrollAxis: Axis.horizontal,),
                     //Text(,overflow: TextOverflow.ellipsis,),
@@ -158,7 +156,7 @@ Widget songsListView(BuildContext context,tabIndex) {
                     Flexible(
                       flex: 3,
                       child:SmoothStarRating(
-                        rating: difficulties[index],
+                        rating: songs[index].getDifficulty().toDouble(),
                         size: 18,
                         filledIconData: Icons.music_note,
                         defaultIconData: null,
@@ -216,61 +214,13 @@ List getSongs(tabIndex){
   final artists=['English Folk Music', 'James Lord Pierpont', 'Johann Pachelbel', 'French Folk Music',
     'Johann Strauss II', 'English Folk Music', 'Ferdinand Beyer', 'Congfei Wei', 'Claude Debussy'];
   //icons sẽ được thay bằng hình nhạc sau
-  final icons = [Icons.music_note, Icons.music_note,Icons.music_note,Icons.music_note,
-    Icons.music_note,Icons.music_note,Icons.music_note,Icons.music_note,Icons.music_note];
-  final List<double> difficulties=[1,1,1,2,3,4,4,5,5];
-  return [titles,artists,icons,difficulties];
-}
-class Song{
-  //Thông tin chung của bài nhạc
-  String id;
-  String name;
-  List<String> artists;
-  int difficulty;
-  String image;//đường dẫn tới file ảnh local/database
+  final images = ['assets/images/music-note.png','assets/images/music-note.png','assets/images/music-note.png','assets/images/music-note.png','assets/images/music-note.png',
+    'assets/images/music-note.png','assets/images/music-note.png','assets/images/music-note.png','assets/images/music-note.png'];
+  final List<int> difficulties=[1,1,1,2,3,4,4,5,5];
 
-  //Thông tin hỗ trợ cho trò chơi
-  String music_dir;//đường dẫn tới file âm thanh
-  String notes_dir;//đường dẫn tới file map các notes của bài nhạc
-  String highscore;//mặc định =0
-  Song(id,name,artists,difficulty,image,music_dir,notes_dir){
-    this.id=id;
-    this.name=name;
-    this.artists=artists;
-    this.difficulty=difficulty;
-    this.image=image;
-    this.music_dir=music_dir;
-    this.notes_dir=notes_dir;
+  final List<Song> musicList=[];
+  for (var i = 0; i < titles.length; i++){
+    musicList.add(new Song(i.toString(),titles[i],[artists[i]],difficulties[i],images[i]));
   }
-  Song.fromJson(this.id, Map data) {
-    name = data['name'];
-    artists=data['artists'];
-    difficulty=data['difficulty'];
-    image=data['image'];
-    music_dir=data['music_dir'];
-    notes_dir=data['notes_dir'];
-    if (name == null) {
-      name = '';
-    }
-    if(artists==null){
-      artists=='';
-    }
-    if(difficulty==null){
-      difficulty==1;
-    }
-    if(image==null){
-      image=='';
-    }
-    if(music_dir==null){
-      music_dir=='';
-    }
-    if(notes_dir==null){
-      notes_dir=='';
-    }
-
-  }
-  void getHighscore(userID){
-    //TODO get highscore from database
-  }
-
+    return musicList;
 }
