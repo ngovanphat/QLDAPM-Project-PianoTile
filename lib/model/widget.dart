@@ -24,7 +24,7 @@ Widget PointRowTop(BuildContext context, int point, String image) {
                 alignment: Alignment.center,
                 child: Text(
                   '$point',
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(fontSize: 20, color: Colors.black),
                 ))
           ],
         ),
