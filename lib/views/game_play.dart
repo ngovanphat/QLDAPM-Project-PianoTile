@@ -7,6 +7,8 @@ import 'package:piano_tile/model/note.dart';
 import 'package:piano_tile/model/line_divider.dart';
 import 'package:piano_tile/model/line.dart';
 import 'package:piano_tile/model/pause_menu.dart';
+import 'package:flutter_midi/flutter_midi.dart';
+import 'package:flutter/services.dart';
 
 class GamePlay extends StatefulWidget {
   @override
@@ -23,12 +25,23 @@ class _GamePlayState extends State<GamePlay>
   bool hasStarted = false;
   bool isPlaying = true;
 
+  // midi player
+  FlutterMidi midi = new FlutterMidi();
+
   @override
   void initState() {
     super.initState();
 
+    // init midi player with sound font
+    midi.unmute();
+    rootBundle.load("assets/audio/piano.sf2").then((sf2) {
+      midi.prepare(sf2: sf2, name: "piano.sf2");
+    });
+
     animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+
     animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed && isPlaying) {
         if (notes[currentNoteIndex].state != NoteState.tapped) {
@@ -169,6 +182,9 @@ class _GamePlayState extends State<GamePlay>
   }
 
   _playNote(Note note) {
+    midi.playMidiNote(midi: note.midi1);
+    midi.playMidiNote(midi: note.midi2);
+    return;
     switch (note.line) {
       case 0:
         player.play('audio/a.wav');

@@ -6,6 +6,7 @@ import 'package:piano_tile/model/Song.dart';
 import 'package:piano_tile/views/home.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:marquee_flutter/marquee_flutter.dart';
+import 'package:piano_tile/model/widget.dart';
 
 class MusicList extends StatelessWidget {
   @override
@@ -27,18 +28,10 @@ class MusicList extends StatelessWidget {
             resizeToAvoidBottomInset: false,
             backgroundColor:  Color(0xFF373737),
             appBar: PreferredSize(
-              preferredSize: Size.fromHeight(60.0), // here the desired height
+              preferredSize: Size.fromHeight(125.0), // here the desired height
               child:AppBar(// bỏ comment để hiện thanh tài nguyên trên cùng màn hình
-                /*title:Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  PointRowTop(context, 0, 'assets/images/one.png'),
-                  PointRowTop(context, 0, 'assets/images/heart.png'),
-                  PointRowTop(context, 0, 'assets/images/note.png'),
-                  PointRowTop(context, 0, 'assets/images/gems.png'),
-                ],
-              ),*/
+                title:RowOnTop(context,0, 0),
+
                 bottom: TabBar(
                   labelStyle: TextStyle(
                     fontWeight: FontWeight.w900,
@@ -85,7 +78,7 @@ class MusicList extends StatelessWidget {
                     child:BodyLayout(0)),
               ],
             ),
-            bottomNavigationBar: BottomNavLayout()
+
         ),
       ),
       ),);

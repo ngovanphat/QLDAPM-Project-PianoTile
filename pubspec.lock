@@ -83,6 +83,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_midi:
+    dependency: "direct main"
+    description:
+      name: flutter_midi
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
+  flutter_midi_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_midi_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -252,6 +266,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.15"
+  tonic:
+    dependency: transitive
+    description:
+      name: tonic
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
   typed_data:
     dependency: transitive
     description:

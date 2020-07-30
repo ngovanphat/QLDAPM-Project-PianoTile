@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play.dart';
 import 'package:piano_tile/views/profile.dart';
+import 'package:piano_tile/views/music_list.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -88,7 +89,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               ],
             ),
           ),
-          Profile(),
+          MusicList(),
           Profile(),
         ]),
       ),
