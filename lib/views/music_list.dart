@@ -28,7 +28,7 @@ class MusicList extends StatelessWidget {
             resizeToAvoidBottomInset: false,
             backgroundColor:  Color(0xFF373737),
             appBar: PreferredSize(
-              preferredSize: Size.fromHeight(125.0), // here the desired height
+              preferredSize: Size.fromHeight(130.0), // here the desired height
               child:AppBar(// bỏ comment để hiện thanh tài nguyên trên cùng màn hình
                 title:RowOnTop(context,0, 0),
 
