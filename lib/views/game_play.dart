@@ -165,7 +165,18 @@ class _GamePlayState extends State<GamePlay>
   _pauseButton() {
     return Align(
       alignment: Alignment.topRight,
-      child: PauseButton(),
+      child: PauseButton(
+        pauseCallback: (){
+          setState(() {
+            isPlaying = false;
+          });
+        },
+        onResumePressed: (bool resume){
+          setState(() {
+            isPlaying = resume;
+          });
+        },
+      ),
     );
   }
 
