@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piano_tile/model/Song.dart';
@@ -28,8 +29,9 @@ class MusicList extends StatelessWidget {
             resizeToAvoidBottomInset: false,
             backgroundColor:  Color(0xFF373737),
             appBar: PreferredSize(
-              preferredSize: Size.fromHeight(130.0), // here the desired height
+              preferredSize: Size.fromHeight(100), // here the desired height
               child:AppBar(// bỏ comment để hiện thanh tài nguyên trên cùng màn hình
+                
                 title:RowOnTop(context,0, 0),
 
                 bottom: TabBar(
