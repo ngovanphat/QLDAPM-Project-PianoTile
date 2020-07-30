@@ -35,19 +35,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               fit: StackFit.passthrough,
               children: [
                 Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      PointRowTop(context, 0, 'assets/images/one.png'),
-                      PointRowTop(context, 0, 'assets/images/heart.png'),
-                      PointRowTop(context, 0, 'assets/images/note.png'),
-                      PointRowTop(context, 0, 'assets/images/gems.png'),
-                    ],
-                  ),
-                ),
+                RowOnTop(context, 0, 0),
                 Container(
                     margin: EdgeInsets.only(top: 100),
                     child: Column(

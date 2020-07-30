@@ -29,7 +29,6 @@ class _GamePlayState extends State<GamePlay>
 
     animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
-
     animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed && isPlaying) {
         if (notes[currentNoteIndex].state != NoteState.tapped) {
@@ -183,16 +182,16 @@ class _GamePlayState extends State<GamePlay>
   _playNote(Note note) {
     switch (note.line) {
       case 0:
-        player.play('a.wav');
+        player.play('audio/a.wav');
         return;
       case 1:
-        player.play('c.wav');
+        player.play('audio/c.wav');
         return;
       case 2:
-        player.play('e.wav');
+        player.play('audio/e.wav');
         return;
       case 3:
-        player.play('f.wav');
+        player.play('audio/f.wav');
         return;
     }
   }
