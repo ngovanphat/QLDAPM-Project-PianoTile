@@ -105,7 +105,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         }).toList(),
         iconSize: 32,
         selectedItemColor: Colors.white,
-        backgroundColor: Colors.lightBlue[900],
+        backgroundColor: const Color(0xff004466),
       ),
     );
   }
@@ -119,6 +119,6 @@ class Destination {
 
 const List<Destination> allDestinations = <Destination>[
   Destination('Home', Icons.home),
-  Destination('Battle', Icons.shuffle),
+  Destination('Songs', Icons.music_note),
   Destination('Profile', Icons.person),
 ];
