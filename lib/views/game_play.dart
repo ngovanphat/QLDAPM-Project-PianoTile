@@ -39,7 +39,6 @@ class _GamePlayState extends State<GamePlay>
     });
 
     animationController =
-
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
 
     animationController.addStatusListener((status) {

@@ -8,9 +8,7 @@ Widget PointRowTop(BuildContext context, int point, String image) {
         width: 120,
         height: 40,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white
-        ),
+            borderRadius: BorderRadius.circular(20), color: Colors.white),
         child: Row(
           children: <Widget>[
             Container(
@@ -22,7 +20,7 @@ Widget PointRowTop(BuildContext context, int point, String image) {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 alignment: Alignment.center,
                 child: Text(
                   '$point',
@@ -35,8 +33,7 @@ Widget PointRowTop(BuildContext context, int point, String image) {
   );
 }
 
-
-Widget RowOnTop(BuildContext context, int level, int gems){
+Widget RowOnTop(BuildContext context, int level, int gems) {
   return Container(
     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
     child: Row(

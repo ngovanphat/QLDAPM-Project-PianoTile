@@ -26,9 +26,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: IndexedStack(
-            index: _currentIndex,
-            children: [
+        child: IndexedStack(index: _currentIndex, children: [
           Container(
             height: double.infinity,
             width: double.infinity,
@@ -64,46 +62,48 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             ),
                           ),
                           Container(
-                              width: 350,
-                              height: 70,
-                              margin: EdgeInsets.only(top: 20),
-                              child: FlatButton(
-                                onPressed: () {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => GamePlay()));
-                                },
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(70),
-                                    side: BorderSide(
-                                        color: Colors.white, width: 3)),
-                                child: Text(
-                                  'Play',
-                                  style: TextStyle(
-                                      fontSize: 25, color: Colors.white),
-                                ),
-                                color: Colors.white24,
-                              ),),
+                            width: 350,
+                            height: 70,
+                            margin: EdgeInsets.only(top: 20),
+                            child: FlatButton(
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => GamePlay()));
+                              },
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(70),
+                                  side: BorderSide(
+                                      color: Colors.white, width: 3)),
+                              child: Text(
+                                'Play',
+                                style: TextStyle(
+                                    fontSize: 25, color: Colors.white),
+                              ),
+                              color: Colors.white24,
+                            ),
+                          ),
                           Container(
-                              width: 350,
-                              height: 70,
-                              margin: EdgeInsets.only(top: 20),
-                              child: FlatButton(
-                                onPressed: () {
-                                 print("click here to create room");
-                                },
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(70),
-                                    side: BorderSide(
-                                        color: Colors.white, width: 3)),
-                                child: Text(
-                                  'Create Room',
-                                  style: TextStyle(
-                                      fontSize: 25, color: Colors.white),
-                                ),
-                                color: Colors.white24,
-                          ),)
+                            width: 350,
+                            height: 70,
+                            margin: EdgeInsets.only(top: 20),
+                            child: FlatButton(
+                              onPressed: () {
+                                print("click here to create room");
+                              },
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(70),
+                                  side: BorderSide(
+                                      color: Colors.white, width: 3)),
+                              child: Text(
+                                'Create Room',
+                                style: TextStyle(
+                                    fontSize: 25, color: Colors.white),
+                              ),
+                              color: Colors.white24,
+                            ),
+                          )
                         ]))
               ],
             ),
