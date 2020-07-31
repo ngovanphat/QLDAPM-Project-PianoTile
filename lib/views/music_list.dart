@@ -9,17 +9,18 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:marquee_flutter/marquee_flutter.dart';
 import 'package:piano_tile/model/widget.dart';
 
-class MusicList extends StatelessWidget {
+import 'game_play.dart';
+
+class MusicList extends StatefulWidget {
+  @override
+  _MusicListState createState() => _MusicListState();
+}
+
+class _MusicListState extends State<MusicList> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([]);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ListViews',
-      theme: ThemeData(
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          primaryColor: Colors.blue),
-      home: NotificationListener<OverscrollIndicatorNotification>(
+    return NotificationListener<OverscrollIndicatorNotification>(
         // để che hiệu ứng glow khi cuộn ở 2 đầu
         onNotification: (OverscrollIndicatorNotification overscroll) {
           overscroll.disallowGlow();
@@ -95,8 +96,7 @@ class MusicList extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -146,7 +146,7 @@ Widget songsListView(BuildContext context, tabIndex) {
                 leading: Container(
                   height: double.infinity,
                   child: ImageIcon(
-                    AssetImage('assets/images/music-note.png'),
+                    AssetImage(songs[index].getImage()),
                     size: 50,
                     color: Color(0xFF3A5A98),
                   ), //replaced by image if available
@@ -188,8 +188,8 @@ Widget songsListView(BuildContext context, tabIndex) {
                   shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
                   onPressed: () => {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Home()))
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => GamePlay()))
                   },
                 ),
               ),
