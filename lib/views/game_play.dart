@@ -22,6 +22,7 @@ class _GamePlayState extends State<GamePlay>
   int points = 0;
   bool hasStarted = false;
   bool isPlaying = true;
+  bool ispause = false;
 
   @override
   void initState() {

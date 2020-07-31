@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piano_tile/views/home.dart';
 
 class PauseButton extends StatelessWidget {
   final VoidCallback pauseCallback;
@@ -78,7 +79,10 @@ class PauseButton extends StatelessWidget {
                                   ],
                                 ),
                                 onPressed: () {
-                                  Navigator.of(context).pop();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => Home()),
+                                  );
                                 }),
                           ]),
                     ),
