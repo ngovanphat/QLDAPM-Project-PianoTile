@@ -39,21 +39,32 @@ class _ProfileState extends State<Profile> {
                         onPressed: () {},
                         child: Row(
                           children: [
-                            Image.asset('assets/images/facebook.png',
+                            Image.asset('assets/images/google.png',
                                 fit: BoxFit.cover),
                             Container(
                               margin: EdgeInsets.only(left: 20),
-                              width: 5,
+                              width: 3,
+                              height: double.infinity,
+                              color: const Color(0xffff1a1a),
+                            ),
+                            Container(
+                              width: 3,
+                              height: double.infinity,
+                              color: const Color(0xffffd11a),
+                            ),
+
+                            Container(
+                              width: 3,
+                              height: double.infinity,
+                              color: const Color(0xff00e600),
+                            ),
+                            Container(
+                              width: 3,
                               height: double.infinity,
                               color: const Color(0xff33ccff),
                             ),
                             Container(
-                              width: 5,
-                              height: double.infinity,
-                              color: const Color(0xff00bfff),
-                            ),
-                            Container(
-                              width: 5,
+                              width: 3,
                               height: double.infinity,
                               color: const Color(0xff0099cc),
                             ),
@@ -66,7 +77,7 @@ class _ProfileState extends State<Profile> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "LOG IN FACEBOOK TO:",
+                                        "LOG IN GOOGLE TO:",
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
@@ -161,6 +172,128 @@ class _ProfileState extends State<Profile> {
                       height: 5,
                       color: const Color(0xff004466),
                     ),
+                    Container(
+                      width: double.infinity,
+                      height: 90,
+                      child: FlatButton(
+                        onPressed: () {},
+                        child: Row(
+                          children: [
+                            Image.asset('assets/images/friends.png',
+                                fit: BoxFit.cover),
+                            Container(
+                              margin: EdgeInsets.only(left: 20),
+                              width: 5,
+                              height: double.infinity,
+                              color: const Color(0xff33ccff),
+                            ),
+                            Container(
+                              width: 5,
+                              height: double.infinity,
+                              color: const Color(0xff0099cc),
+                            ),
+                            Container(
+                              width: 5,
+                              height: double.infinity,
+                              color: const Color(0xff0086b3),
+                            ),
+                            Expanded(
+                              child: Container(
+                                margin: EdgeInsets.only(left: 5),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "FRIENDS LIST",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      Text(
+                                        "More friends more fun",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 5,
+                      color: const Color(0xff004466),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 90,
+                      child: FlatButton(
+                        onPressed: () {},
+                        child: Row(
+                          children: [
+                            Image.asset('assets/images/hearts.png',
+                                fit: BoxFit.cover),
+                            Container(
+                              margin: EdgeInsets.only(left: 20),
+                              width: 5,
+                              height: double.infinity,
+                              color: const Color(0xffff4d4d),
+                            ),
+                            Container(
+                              width: 5,
+                              height: double.infinity,
+                              color: const Color(0xffff1a1a),
+                            ),
+                            Container(
+                              width: 5,
+                              height: double.infinity,
+                              color: const Color(0xffe60000),
+                            ),
+                            Expanded(
+                              child: Container(
+                                margin: EdgeInsets.only(left: 5),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "FAVORITE SONGS",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Save the songs you love",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 5,
+                      color: const Color(0xff004466),
+                    ),
                   ],
                 ),
               )
@@ -171,3 +304,4 @@ class _ProfileState extends State<Profile> {
     );
   }
 }
+
