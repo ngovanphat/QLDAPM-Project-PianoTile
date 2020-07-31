@@ -1,42 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:piano_tile/views/home.dart';
 
-class PauseButton extends StatefulWidget {
-  @override
-  _PressedState createState() => _PressedState();
-}
+class PauseButton extends StatelessWidget {
+  final VoidCallback pauseCallback;
+  final Function(bool) onResumePressed;
+  PauseButton({@required this.onResumePressed, this.pauseCallback});
 
-class _PressedState extends State<PauseButton> {
   Color _iconColor = Colors.lightBlue;
-
-  bool _pressed = false;
-
-  void triggered() {
-    setState(() {
-      if (_pressed) {
-        _iconColor = Colors.blueAccent;
-      } else {
-        _iconColor = Colors.lightBlue;
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-        onPointerDown: (details) {
-          _pressed = !_pressed;
-          triggered();
-        },
-        onPointerUp: (details) {
-          _pressed = false;
-          triggered();
-        },
-        child: Container(
+    return Container(
             padding: const EdgeInsets.only(top: 20),
             child: IconButton(
               icon: Icon(Icons.pause, color: _iconColor),
               iconSize: 50,
               onPressed: () {
+                pauseCallback();
                 showDialog(
                   context: context,
                   builder: (_) => Material(
@@ -62,6 +42,7 @@ class _PressedState extends State<PauseButton> {
                                   ],
                                 ),
                                 onPressed: () {
+                                  onResumePressed(true);
                                   Navigator.of(context).pop();
                                 }),
                             Padding(padding: const EdgeInsets.only(top: 30)),
@@ -98,13 +79,16 @@ class _PressedState extends State<PauseButton> {
                                   ],
                                 ),
                                 onPressed: () {
-                                  Navigator.of(context).pop();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => Home()),
+                                  );
                                 }),
                           ]),
                     ),
                   ),
                 );
               },
-            )));
+            ));
   }
 }

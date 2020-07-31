@@ -24,6 +24,7 @@ class _GamePlayState extends State<GamePlay>
   int points = 0;
   bool hasStarted = false;
   bool isPlaying = true;
+  bool ispause = false;
 
   // midi player
   FlutterMidi midi = new FlutterMidi();
@@ -176,7 +177,18 @@ class _GamePlayState extends State<GamePlay>
   _pauseButton() {
     return Align(
       alignment: Alignment.topRight,
-      child: PauseButton(),
+      child: PauseButton(
+        pauseCallback: (){
+          setState(() {
+            isPlaying = true;
+          });
+        },
+        onResumePressed: (bool resume){
+          setState(() {
+            isPlaying = resume;
+          });
+        },
+      ),
     );
   }
 
