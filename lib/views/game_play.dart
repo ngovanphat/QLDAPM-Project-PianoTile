@@ -180,7 +180,7 @@ class _GamePlayState extends State<GamePlay>
       child: PauseButton(
         pauseCallback: (){
           setState(() {
-            isPlaying = false;
+            isPlaying = true;
           });
         },
         onResumePressed: (bool resume){
