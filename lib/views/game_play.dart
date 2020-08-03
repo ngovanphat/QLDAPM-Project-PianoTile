@@ -39,6 +39,7 @@ class _GamePlayState extends State<GamePlay>
       notes = value;
       setState(() {});
       print('success loading notes');
+      print('length: ${notes.length}');
     });
 
     // init midi player with sound font
@@ -59,14 +60,25 @@ class _GamePlayState extends State<GamePlay>
             notes[currentNoteIndex].state = NoteState.missed;
           });
           animationController.reverse().then((_) => _showFinishDialog());
-        } else if (currentNoteIndex == notes.length - 5) {
-          // song finished
-          _showFinishDialog();
-        } else {
+        }
+//        else if (currentNoteIndex == notes.length) {
+//          // song finished
+//          _showFinishDialog();
+//        }
+        else {
           setState(() {
             ++currentNoteIndex;
           });
-          animationController.forward(from: 0);
+
+          if(currentNoteIndex >= notes.length){
+            // song finished here
+            _showFinishDialog();
+          }
+          else{
+            animationController.forward(from: 0);
+          }
+
+
         }
       }
     });
@@ -159,10 +171,16 @@ class _GamePlayState extends State<GamePlay>
   }
 
   _drawLine(int lineNumber) {
+    int end = currentNoteIndex + 5;
+    if(end > notes.length){
+      // this means notes mostly run out
+      end = notes.length;
+    }
+
     return Expanded(
       child: Line(
         lineNumber: lineNumber,
-        currentNote: notes.sublist(currentNoteIndex, currentNoteIndex + 5),
+        currentNote: notes.sublist(currentNoteIndex, end),
         onTileTap: _onTap,
         animation: animationController,
       ),

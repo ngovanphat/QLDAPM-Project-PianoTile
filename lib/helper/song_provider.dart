@@ -9,7 +9,7 @@ import 'dart:math';
 Future<List<Note>> initNotes() async{
 
   // read file data
-  String content = await loadAsset('assets/audio/notes.txt');
+  String content = await loadAsset('assets/song/jingle_bells.mid.txt');
 
   // convert data to list of notes
   return await convertToNotes(content);
@@ -90,6 +90,8 @@ Future<List<Note>> convertToNotes(String fileContent) async{
 
     // end of for
   }
+
+
 
   return notes;
   // end of function
