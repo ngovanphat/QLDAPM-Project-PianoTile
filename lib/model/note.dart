@@ -1,11 +1,25 @@
 class Note {
+  // values for GUI
   final int orderNumber;
   final int line;
-  final midi1;
-  final midi2;
   NoteState state = NoteState.ready;
 
-  Note(this.orderNumber, this.line, this.midi1, this.midi2);
+  // values for playing sound
+  int tickValue;
+  List<int> midiValue;
+  List<int> velocityValue;
+
+  // constructor
+  Note({this.orderNumber,
+      this.line,
+      this.tickValue,
+      this.midiValue,
+      this.velocityValue});
+
+  // reset method
+  void reset(){
+    this.state = NoteState.ready;
+  }
 }
 
 enum NoteState { ready, tapped, missed }

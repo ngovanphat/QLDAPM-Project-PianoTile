@@ -18,7 +18,7 @@ class GamePlay extends StatefulWidget {
 class _GamePlayState extends State<GamePlay>
     with SingleTickerProviderStateMixin {
   AudioCache player = AudioCache();
-  List<Note> notes = initNotes();
+  List<Note> notes;
   AnimationController animationController;
   int currentNoteIndex = 0;
   int points = 0;
@@ -29,9 +29,17 @@ class _GamePlayState extends State<GamePlay>
   // midi player
   FlutterMidi midi = new FlutterMidi();
 
+
   @override
   void initState() {
     super.initState();
+
+    // init notes
+    initNotes().then((value) {
+      notes = value;
+      setState(() {});
+      print('success loading notes');
+    });
 
     // init midi player with sound font
     midi.unmute();
@@ -102,7 +110,11 @@ class _GamePlayState extends State<GamePlay>
     setState(() {
       hasStarted = false;
       isPlaying = true;
-      notes = initNotes();
+//      notes = initNotes();
+      notes.forEach((note) {
+        note.reset();
+      });
+
       points = 0;
       currentNoteIndex = 0;
     });
@@ -143,6 +155,7 @@ class _GamePlayState extends State<GamePlay>
         ++points;
       });
     }
+
   }
 
   _drawLine(int lineNumber) {
@@ -193,22 +206,13 @@ class _GamePlayState extends State<GamePlay>
   }
 
   _playNote(Note note) {
-    midi.playMidiNote(midi: note.midi1);
-    midi.playMidiNote(midi: note.midi2);
-    return;
-    switch (note.line) {
-      case 0:
-        player.play('audio/a.wav');
-        return;
-      case 1:
-        player.play('audio/c.wav');
-        return;
-      case 2:
-        player.play('audio/e.wav');
-        return;
-      case 3:
-        player.play('audio/f.wav');
-        return;
-    }
+
+    // note may contain multiple midi values
+    // which can be played at the same time
+    note.midiValue.forEach((value) {
+      midi.playMidiNote(midi: value);
+    });
+
   }
+
 }

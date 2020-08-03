@@ -1,115 +1,107 @@
 import 'package:piano_tile/model/note.dart';
 
-List<Note> initNotes() {
-  return [
-//    Note(orderNumber: 0, line: 0),
-//    Note(orderNumber: 1, line: 1),
-//    Note(orderNumber: 2, line: 2),
-//    Note(orderNumber: 3, line: 1),
-//    Note(orderNumber: 4, line: 3),
-//    Note(orderNumber: 5, line: 0),
-//    Note(orderNumber: 6, line: 1),
-//    Note(orderNumber: 7, line: 2),
-//    Note(orderNumber: 8, line: 3),
-//    Note(orderNumber: 9, line: 2),
-//    Note(orderNumber: 10, line: 3),
-//    Note(orderNumber: 11, line: 0),
-//    Note(orderNumber: 12, line: 2),
-//    Note(orderNumber: 13, line: 1),
-//    Note(orderNumber: 14, line: 3),
-//    Note(orderNumber: 15, line: 0),
-//    Note(orderNumber: 16, line: 1),
-//    Note(orderNumber: 17, line: 2),
-//    Note(orderNumber: 18, line: 3),
-//    Note(orderNumber: 19, line: 2),
-//    Note(orderNumber: 20, line: 3),
-//    Note(orderNumber: 21, line: 1),
-//    Note(orderNumber: 22, line: 2),
-//    Note(orderNumber: 23, line: 1),
-//    Note(orderNumber: 24, line: 3),
-//    Note(orderNumber: 25, line: 0),
-//    Note(orderNumber: 26, line: 1),
-//    Note(orderNumber: 27, line: 2),
-//    Note(orderNumber: 28, line: 3),
-//    Note(orderNumber: 29, line: 2),
-//    Note(orderNumber: 30, line: 3),
-//    Note(orderNumber: 31, line: 1),
-//    Note(orderNumber: 32, line: 2),
-//    Note(orderNumber: 33, line: 1),
-//    Note(orderNumber: 34, line: 3),
-//    Note(orderNumber: 35, line: 0),
-//    Note(orderNumber: 36, line: 1),
-//    Note(orderNumber: 37, line: 2),
-//    Note(orderNumber: 38, line: 3),
-//    Note(orderNumber: 39, line: 2),
-//    Note(orderNumber: 40, line: 3),
-//    Note(orderNumber: 41, line: -1),
-//    Note(orderNumber: 42, line: -1),
-//    Note(orderNumber: 43, line: -1),
-//    Note(orderNumber: 44, line: -1),
+import 'dart:async' show Future;
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert';
+import 'dart:core';
+import 'dart:math';
 
-    // Note (order, line, midi1, midi2)
-    Note(0, 0, 64, 60),
-    Note(1, 1, 62, 55),
-    Note(2, 2, 60, 57),
-    Note(3, 1, 59, 52),
-    Note(4, 3, 57, 53),
+Future<List<Note>> initNotes() async{
 
-    Note(0, 0, 55, 48),
-    Note(1, 1, 57, 53),
-    Note(2, 2, 59, 55),
-    Note(3, 1, 64, 60),
-    Note(4, 3, 62, 55),
+  // read file data
+  String content = await loadAsset('assets/audio/notes.txt');
 
-    Note(0, 0, 60, 57),
-    Note(1, 1, 59, 52),
-    Note(2, 2, 57, 53),
-    Note(3, 1, 55, 48),
-    Note(4, 3, 57, 53),
-
-    ///////////////////////////////
-    Note(0, 0, 59, 55),
-    Note(1, 1, 67, 76),
-    Note(2, 2, 71, 74),
-    Note(3, 1, 72, 57),
-    Note(4, 3, 67, 71),
-
-    Note(0, 0, 60, 69),
-    Note(1, 1, 67, 48),
-    Note(2, 2, 65, 53),
-    Note(3, 1, 55, 71),
-    Note(4, 3, 72, 60),
-
-    Note(0, 0, 72, 72),
-    Note(1, 1, 74, 55),
-    Note(2, 2, 71, 71),
-    Note(3, 1, 57, 72),
-    Note(4, 3, 76, 70),
-
-    Note(0, 0, 79, 52),
-    Note(1, 1, 67, 50),
-    Note(2, 2, 69, 53),
-    Note(3, 1, 65, 65),
-    Note(4, 3, 64, 48),
-
-    Note(0, 0, 67, 67),
-    Note(1, 1, 53, 65),
-    Note(2, 2, 72, 72),
-    Note(3, 1, 55, 71),
-    Note(4, 3, 67, 67),
-
-    Note(0, 0, 60, 72),
-    Note(1, 1, 76, 76),
-    Note(2, 2, 79, 79),
-    Note(3, 1, 55, 79),
-    Note(4, 3, 81, 81),
+  // convert data to list of notes
+  return await convertToNotes(content);
 
 
-    Note(39, 2, 79, 79),
-    Note(40, 3, 77, 77),  // ln95
-    Note(41, -1, 67, 76), //Add 4 times -1 notes so that song will end after last normal note reaches end
-    Note(42, -1, 67, 76),
-    Note(43, -1, 67, 76),
-    Note(44, -1, 67, 76),
-  ];
 }
+
+
+Future<List<Note>> convertToNotes(String fileContent) async{
+
+  // split into lines
+  LineSplitter ls = new LineSplitter();
+  List<String> lines = ls.convert(fileContent);
+
+  // variables
+  int currentTick = -999;
+  Note currentNote = null;
+  int currentRandom = -999;
+  int countNote = 0;
+  var rng = new Random();
+  List<Note> notes = new List<Note>();
+
+  // process each line
+  for (var i = 0; i < lines.length; i++) {
+    print('Line $i: ${lines[i]}');
+
+    List<String> tokens = lines[i].split(' ');
+    print('token0:${tokens[0]}, token1:${tokens[1]}, token2:${tokens[2]}');
+
+    // parse to integer
+    var tick = int.parse(tokens[0]);
+    var midi = int.parse(tokens[1]);
+    var velocity = int.parse(tokens[2]);
+
+    // check if same tick
+    if(currentTick == tick){
+      // this means these midi values should be played at the same time
+      // so, assign midi values for same note
+
+      currentNote.midiValue.add(midi);
+      currentNote.velocityValue.add(velocity);
+
+    }
+    else{
+
+      List<int> midis = new List<int>();
+      midis.add(midi);
+      List<int> velocities = new List<int>();
+      velocities.add(velocity);
+
+      // random line from 0 to 3
+      int random = rng.nextInt(4);
+      // avoid 2 adjacent tiles in same line
+      while(random == currentRandom){
+        random = rng.nextInt(4);
+      }
+
+      // assign to new note
+      Note note = new Note(
+          orderNumber: countNote,
+          line: random,
+          tickValue: tick,
+          midiValue: midis,
+          velocityValue: velocities
+      );
+
+      // temp variable for later checking
+      currentTick = tick;
+      currentNote = note;
+      currentRandom = random;
+      countNote++;
+
+      // add to list note for return
+      notes.add(note);
+
+    }
+
+
+    // end of for
+  }
+
+  return notes;
+  // end of function
+}
+
+// read asset file
+Future<String> loadAsset(String path) async {
+  return await rootBundle.loadString(path);
+}
+
+
+
+
+
+
