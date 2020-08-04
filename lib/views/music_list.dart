@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piano_tile/helper/sizes_helpers.dart';
 import 'package:piano_tile/model/Song.dart';
+import 'package:piano_tile/model/custom_expansion_panel.dart' as CustomExpansionPanel;
 import 'package:piano_tile/views/home.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:marquee_flutter/marquee_flutter.dart';
@@ -35,9 +36,10 @@ class _MusicListState extends State<MusicList> {
             resizeToAvoidBottomInset: false,
             backgroundColor: Color(0xFF373737),
             appBar: PreferredSize(
-              preferredSize: Size.fromHeight(displayHeight(context)*0.15), // here the desired height
+              preferredSize: Size.fromHeight(displayHeight(context)*0.15),
               child: AppBar(
-                // bỏ comment để hiện thanh tài nguyên trên cùng màn hình
+                automaticallyImplyLeading: false,//Xóa dấu back
+                centerTitle: true,//Cho 2 mục trong title căn giữa - vẫn hơi lệch 1 chút so với Home
                 title: RowOnTop(context, 0, 0),
                 bottom: TabBar(
                   labelStyle: TextStyle(
@@ -279,52 +281,56 @@ class _BodyLayoutState extends State<BodyLayout> {
     );
   }
   Widget _buildPanel() {
-    return ExpansionPanelList.radio(
+    return CustomExpansionPanel.ExpansionPanelList.radio(
       initialOpenPanelValue: 1,
-      children: songs.map<ExpansionPanelRadio>((Song song) {
-        return ExpansionPanelRadio(
+      children: songs.map<CustomExpansionPanel.ExpansionPanelRadio>((Song song) {
+        return CustomExpansionPanel.ExpansionPanelRadio(
             value: song.id,
             canTapOnHeader: true,
             headerBuilder: (BuildContext context, bool isExpanded) {//Header
-              return ListTile(
-                leading:Container(
-                  height: double.infinity,
-                  child:ImageIcon(
-                    AssetImage('assets/images/music-note.png'),
-                    size: displayHeight(context)*0.06,
-                    color: Color(0xFF3A5A98),
-                  ),//replaced by image if available
-                ),
-                title: Text(song.getName(),
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,fontSize: displayWidth(context)*0.045,)
-                ),
-                subtitle:  Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Flexible(
-                        flex:3,
-                        child:Container(
-                          height: displayHeight(context)*0.037,
-                          child: MarqueeWidget(
-                            text:song.getArtists().join('-'),
-                            textStyle: TextStyle(fontSize: displayWidth(context)*0.04),
-                            scrollAxis: Axis.horizontal,),
-                          //Text(,overflow: TextOverflow.ellipsis,),
-                        ),),
-                      Flexible(
-                        flex: 3,
-                        child:SmoothStarRating(
-                          rating: song.getDifficulty().toDouble(),
-                          size: displayWidth(context)*0.059,
-                          filledIconData: Icons.music_note,
-                          defaultIconData: null,
-                          starCount: 5,
-                          isReadOnly: true,
-                        ),
-                      )
-                    ],
+              return Container(
+                height: displayHeight(context)*0.12,
+                alignment: Alignment.center,
+                child: ListTile(
+                  leading:Container(
+                    height: double.infinity,
+                    child:ImageIcon(
+                      AssetImage('assets/images/music-note.png'),
+                      size: displayHeight(context)*0.06,
+                      color: Color(0xFF3A5A98),
+                    ),//replaced by image if available
+                  ),
+                  title: Text(song.getName(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,fontSize: displayWidth(context)*0.045,)
+                  ),
+                  subtitle:  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Flexible(
+                          flex:3,
+                          child:Container(
+                            height: displayHeight(context)*0.037,
+                            child: MarqueeWidget(
+                              text:song.getArtists().join('-'),
+                              textStyle: TextStyle(fontSize: displayWidth(context)*0.04),
+                              scrollAxis: Axis.horizontal,),
+                            //Text(,overflow: TextOverflow.ellipsis,),
+                          ),),
+                        Flexible(
+                          flex: 3,
+                          child:SmoothStarRating(
+                            rating: song.getDifficulty().toDouble(),
+                            size: displayWidth(context)*0.05,
+                            filledIconData: Icons.music_note,
+                            defaultIconData: null,
+                            starCount: 5,
+                            isReadOnly: true,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -347,7 +353,7 @@ class _BodyLayoutState extends State<BodyLayout> {
                         //Text(,overflow: TextOverflow.ellipsis,),
                       ),),
                     Flexible(
-                        flex: 2,
+                        flex: 1,
                         child:LikeButton(
                           size:displayHeight(context)*0.060,
                           bubblesSize: displayHeight(context)*0.06,
@@ -368,14 +374,7 @@ class _BodyLayoutState extends State<BodyLayout> {
                     )
                   ],
                 ),
-            trailing: RaisedButton(
-              color: Colors.amber,
-              child: Text("Play"),
-              shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-              onPressed: () => {
-                Navigator.push(context,MaterialPageRoute(builder: (context) => GamePlay())
-                )},
-            ),
+
             ),);
       }).toList(),
     );
