@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:piano_tile/helper/sizes_helpers.dart';
 import 'package:piano_tile/model/Song.dart';
 import 'package:piano_tile/views/home.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
@@ -34,7 +35,7 @@ class _MusicListState extends State<MusicList> {
             resizeToAvoidBottomInset: false,
             backgroundColor: Color(0xFF373737),
             appBar: PreferredSize(
-              preferredSize: Size.fromHeight(130.0), // here the desired height
+              preferredSize: Size.fromHeight(displayHeight(context)*0.15), // here the desired height
               child: AppBar(
                 // bỏ comment để hiện thanh tài nguyên trên cùng màn hình
                 title: RowOnTop(context, 0, 0),
@@ -43,7 +44,7 @@ class _MusicListState extends State<MusicList> {
                     fontWeight: FontWeight.w900,
                   ),
                   indicatorColor: Colors.white12,
-                  indicatorWeight: 10.0,
+                  indicatorWeight: displayHeight(context)*0.01,
                   labelColor: Colors.white,
                   tabs: [
                     Tab(
@@ -51,7 +52,7 @@ class _MusicListState extends State<MusicList> {
                         alignment: Alignment.center,
                         child: Text("Vietnamese",
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: displayHeight(context)*0.022,
                         ),),
                       ),
                     ),
@@ -62,7 +63,7 @@ class _MusicListState extends State<MusicList> {
                           "Foreign",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: displayHeight(context)*0.022,
                           ),
                         ),
                       ),
@@ -71,10 +72,10 @@ class _MusicListState extends State<MusicList> {
                       child: Align(
                         alignment: Alignment.center,
                         child: Text(
-                          "Favorited",
+                          "Favorite",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: displayHeight(context)*0.022,
                           ),
                         ),
                       ),
@@ -126,10 +127,9 @@ class _BodyLayoutState extends State<BodyLayout> {
   int tabIndex;
   //danh sách bài hát
   List<Song> songs=[];
-  int selected = -1; //attention
+  int selected = -1;
   int visileItems=8;
   final scrollController = ScrollController();
-  double cardHeight=70;
   final GlobalKey datakey=GlobalKey();
   _BodyLayoutState(tabIndex){
     this.tabIndex=tabIndex;
@@ -280,7 +280,7 @@ class _BodyLayoutState extends State<BodyLayout> {
   }
   Widget _buildPanel() {
     return ExpansionPanelList.radio(
-      initialOpenPanelValue: 2,
+      initialOpenPanelValue: 1,
       children: songs.map<ExpansionPanelRadio>((Song song) {
         return ExpansionPanelRadio(
             value: song.id,
@@ -291,11 +291,14 @@ class _BodyLayoutState extends State<BodyLayout> {
                   height: double.infinity,
                   child:ImageIcon(
                     AssetImage('assets/images/music-note.png'),
-                    size: 50,
+                    size: displayHeight(context)*0.06,
                     color: Color(0xFF3A5A98),
                   ),//replaced by image if available
                 ),
-                title: Text(song.getName()),
+                title: Text(song.getName(),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,fontSize: displayWidth(context)*0.045,)
+                ),
                 subtitle:  Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -303,10 +306,10 @@ class _BodyLayoutState extends State<BodyLayout> {
                       Flexible(
                         flex:3,
                         child:Container(
-                          height: 30,
+                          height: displayHeight(context)*0.037,
                           child: MarqueeWidget(
                             text:song.getArtists().join('-'),
-                            textStyle: TextStyle(fontSize: 16.0),
+                            textStyle: TextStyle(fontSize: displayWidth(context)*0.04),
                             scrollAxis: Axis.horizontal,),
                           //Text(,overflow: TextOverflow.ellipsis,),
                         ),),
@@ -314,7 +317,7 @@ class _BodyLayoutState extends State<BodyLayout> {
                         flex: 3,
                         child:SmoothStarRating(
                           rating: song.getDifficulty().toDouble(),
-                          size: 18,
+                          size: displayWidth(context)*0.059,
                           filledIconData: Icons.music_note,
                           defaultIconData: null,
                           starCount: 5,
@@ -334,20 +337,21 @@ class _BodyLayoutState extends State<BodyLayout> {
                     Flexible(
                       flex:5,
                       child:Container(
-                          height: 30,
-                          padding: EdgeInsets.symmetric(horizontal:15.0),
+                          height: displayWidth(context)*0.113,
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.symmetric(horizontal:displayHeight(context)*0.02),
                           child: Text('Highscore : '+song.getHighscore().toString(),
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,fontSize: 17,color: Colors.lightBlue[900].withOpacity(0.8)
+                                  fontWeight: FontWeight.bold,fontSize: displayWidth(context)*0.045,color: Colors.lightBlue[900].withOpacity(0.8)
                               ))
                         //Text(,overflow: TextOverflow.ellipsis,),
                       ),),
                     Flexible(
                         flex: 2,
                         child:LikeButton(
-                          size:50,
-                          bubblesSize: 50,
-                          circleSize: 30,
+                          size:displayHeight(context)*0.060,
+                          bubblesSize: displayHeight(context)*0.06,
+                          circleSize: displayHeight(context)*0.037,
                           circleColor: CircleColor(start: Colors.amber, end: Colors.redAccent),
                           bubblesColor: BubblesColor(
                             dotPrimaryColor: Colors.redAccent,
@@ -357,7 +361,7 @@ class _BodyLayoutState extends State<BodyLayout> {
                             return Icon(
                               Icons.favorite,
                               color: isLiked ? Colors.redAccent : Colors.grey,
-                              size: 30,
+                              size: displayHeight(context)*0.04,
                             );
                           },
                         )
@@ -375,13 +379,6 @@ class _BodyLayoutState extends State<BodyLayout> {
             ),);
       }).toList(),
     );
-  }
-}
-
-class BottomNavLayout extends StatelessWidget{
-  @override
-  Widget build(BuildContext context) {
-    return bottomNav(context);
   }
 }
 
@@ -463,29 +460,7 @@ Widget songsListView(BuildContext context, tabIndex) {
   );
 }
 
-Widget bottomNav(BuildContext context) {
-  return BottomNavigationBar(
-    selectedItemColor: Colors.white,
-    backgroundColor: Colors.lightBlue[900],
-    currentIndex: 1, // this will be set when a new tab is tapped
-    items: [
-      BottomNavigationBarItem(
-        icon: new Icon(Icons.home),
-        title: new Text('Home',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-      ),
-      BottomNavigationBarItem(
-        icon: new Icon(Icons.library_music),
-        title: new Text('Songs',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-      ),
-      BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          title: Text('Settings',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)))
-    ],
-  );
-}
+
 
 List getSongs(tabIndex) {
   //TODO fetch data from server
