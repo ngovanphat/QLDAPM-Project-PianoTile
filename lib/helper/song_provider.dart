@@ -38,14 +38,14 @@ Future<List<Note>> convertToNotes(String fileContent) async{
 
     List<String> tokens = lines[i].split(' ');
     print('token0:${tokens[0]}, token1:${tokens[1]}, token2:${tokens[2]}');
-
     // parse to integer
     var tick = int.parse(tokens[0]);
     var midi = int.parse(tokens[1]);
     var velocity = int.parse(tokens[2]);
 
+
     // check if same tick
-    if(currentTick == tick){
+    if(currentTick == tick || velocity == 0){
       // this means these midi values should be played at the same time
       // so, assign midi values for same note
 
