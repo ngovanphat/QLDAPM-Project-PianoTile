@@ -23,6 +23,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Add the dependency for the Firebase Core Flutter SDK
+  firebase_core: ^0.4.0+9
+  firebase_analytics: ^5.0.2
+  firebase_auth: ^0.14.0+5
+
   audioplayers: ^0.15.1
 
   flutter_midi: ^1.0.1

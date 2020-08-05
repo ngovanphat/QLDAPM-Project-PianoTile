@@ -25,6 +25,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xff004466),
       body: SafeArea(
         child: IndexedStack(index: _currentIndex, children: [
           Container(
