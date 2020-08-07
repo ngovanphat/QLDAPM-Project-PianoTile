@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "467047534075",
+    "firebase_url": "https://try-storage-9ae24.firebaseio.com",
+    "project_id": "try-storage-9ae24",
+    "storage_bucket": "try-storage-9ae24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467047534075:android:09dc7706e059f4baaccf5e",
+        "android_client_info": {
+          "package_name": "com.example.flutter_firebase_storage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "467047534075-13gdlcmmst52hrj48r37ahiq032da22k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDe-Y28N7nRMkEXg9B_7RE8xaYnBEeqA0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "467047534075-13gdlcmmst52hrj48r37ahiq032da22k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "467047534075-gspho3mm2mqt0dilfol41tp02lg33ffv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.helloworld"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467047534075:android:f8ce7736870e0d77accf5e",
+        "android_client_info": {
+          "package_name": "com.example.piano_tile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "467047534075-13gdlcmmst52hrj48r37ahiq032da22k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDe-Y28N7nRMkEXg9B_7RE8xaYnBEeqA0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "467047534075-13gdlcmmst52hrj48r37ahiq032da22k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "467047534075-gspho3mm2mqt0dilfol41tp02lg33ffv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.helloworld"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

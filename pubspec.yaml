@@ -35,6 +35,10 @@ dependencies:
   smooth_star_rating: 1.1.1
   marquee_flutter: ^0.1.4
 
+  firebase_storage: ^3.1.6
+  path_provider: ^1.6.11
+  permissions_plugin: ^1.1.4
+
 
 
   # The following adds the Cupertino Icons font to your application.

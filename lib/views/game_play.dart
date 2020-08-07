@@ -10,15 +10,18 @@ import 'package:piano_tile/model/pause_menu.dart';
 import 'package:flutter_midi/flutter_midi.dart';
 import 'package:flutter/services.dart';
 
+
 class GamePlay extends StatefulWidget {
+
   @override
   _GamePlayState createState() => _GamePlayState();
+
 }
 
 class _GamePlayState extends State<GamePlay>
     with SingleTickerProviderStateMixin {
   AudioCache player = AudioCache();
-  List<Note> notes;
+  List<Note> notes = null;
   AnimationController animationController;
   int currentNoteIndex = 0;
   int points = 0;
@@ -41,6 +44,8 @@ class _GamePlayState extends State<GamePlay>
       print('success loading notes');
       print('length: ${notes.length}');
     });
+
+
 
     // init midi player with sound font
     midi.unmute();
@@ -92,6 +97,8 @@ class _GamePlayState extends State<GamePlay>
 
   @override
   Widget build(BuildContext context) {
+    
+
     return Material(
       child: Stack(
         fit: StackFit.passthrough,
@@ -171,6 +178,12 @@ class _GamePlayState extends State<GamePlay>
   }
 
   _drawLine(int lineNumber) {
+    // in case notes are loading
+    // just show empty line
+    if(notes == null){
+      return Container();
+    }
+
     int end = currentNoteIndex + 5;
     if(end > notes.length){
       // this means notes mostly run out
