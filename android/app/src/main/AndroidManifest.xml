@@ -11,7 +11,7 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="piano_tile"
+        android:label="Melody Tap"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
