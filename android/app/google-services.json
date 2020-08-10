@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "754135347462",
+    "firebase_url": "https://melody-tap.firebaseio.com",
+    "project_id": "melody-tap",
+    "storage_bucket": "melody-tap.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:754135347462:android:a68ff7e017fa618e736e87",
+        "android_client_info": {
+          "package_name": "com.example.piano_tile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "754135347462-487376t3g6u4bf16uba88u95va2uf3ri.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1Ko5mvWiORzyKx2t741bUkg7xY5jwC9A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "754135347462-487376t3g6u4bf16uba88u95va2uf3ri.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "754135347462-v5tqoii1o19co024vfivujpqhgtsg24l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pianoTile"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
