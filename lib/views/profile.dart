@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -36,7 +38,17 @@ class _ProfileState extends State<Profile> {
                       width: double.infinity,
                       height: 90,
                       child: FlatButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _handleSignIn().whenComplete(() {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return FirstScreen();
+                                },
+                              ),
+                            );
+                          });
+                        },
                         child: Row(
                           children: [
                             Image.asset('assets/images/google.png',
@@ -301,6 +313,38 @@ class _ProfileState extends State<Profile> {
           ),
         ),
       ),
+    );
+  }
+}
+
+final GoogleSignIn _googleSignIn = GoogleSignIn();
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
+Future<FirebaseUser> _handleSignIn() async {
+  final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+  final AuthCredential credential = GoogleAuthProvider.getCredential(
+    accessToken: googleAuth.accessToken,
+    idToken: googleAuth.idToken,
+  );
+
+  final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+  print("signed in " + user.displayName);
+  return user;
+}
+
+void signOutGoogle() async{
+  await _googleSignIn.signOut();
+
+  print("User Sign Out");
+}
+
+class FirstScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(color: Colors.blue[100]),
     );
   }
 }
