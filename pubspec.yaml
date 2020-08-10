@@ -34,6 +34,7 @@ dependencies:
 
   smooth_star_rating: 1.1.1
   marquee_flutter: ^0.1.4
+  like_button: ^1.0.1
 
 
 
