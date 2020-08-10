@@ -21,7 +21,6 @@ class GamePlay extends StatefulWidget {
 class _GamePlayState extends State<GamePlay>
     with SingleTickerProviderStateMixin {
   AudioCache player = AudioCache();
-  List<Note> notes = null;
   AnimationController animationController;
   int currentNoteIndex = 0;
   int points = 0;
@@ -32,18 +31,27 @@ class _GamePlayState extends State<GamePlay>
   // midi player
   FlutterMidi midi = new FlutterMidi();
 
+  // notes
+  List<Note> notes = null;
+  Future<String> statusOfInitNotes = null;
+
+  Future<String> _doInitNotes() async {
+    notes = await initNotes();
+    return 'done';
+  }
 
   @override
   void initState() {
     super.initState();
 
     // init notes
-    initNotes().then((value) {
-      notes = value;
-      setState(() {});
-      print('success loading notes');
-      print('length: ${notes.length}');
-    });
+//    initNotes().then((value) {
+//      notes = value;
+//      setState(() {});
+//      print('success loading notes');
+//      print('length: ${notes.length}');
+//    });
+    statusOfInitNotes = _doInitNotes();
 
 
 
@@ -100,28 +108,69 @@ class _GamePlayState extends State<GamePlay>
     
 
     return Material(
-      child: Stack(
-        fit: StackFit.passthrough,
-        children: <Widget>[
-          Image.asset(
-            'assets/images/background.jpg',
-            fit: BoxFit.cover,
-          ),
-          Row(
-            children: <Widget>[
-              _drawLine(0),
-              LineDivider(),
-              _drawLine(1),
-              LineDivider(),
-              _drawLine(2),
-              LineDivider(),
-              _drawLine(3)
-            ],
-          ),
-          _drawPoints(),
-          _pauseButton(),
-        ],
-      ),
+      child: FutureBuilder<String>(
+
+        future: statusOfInitNotes,
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+
+          if(snapshot.hasData && snapshot.data == 'done'){
+
+            return Stack(
+              fit: StackFit.passthrough,
+              children:
+              <Widget>[
+                Image.asset(
+                  'assets/images/background.jpg',
+                  fit: BoxFit.cover,
+                ),
+                Row(
+                  children: <Widget>[
+                    _drawLine(0),
+                    LineDivider(),
+                    _drawLine(1),
+                    LineDivider(),
+                    _drawLine(2),
+                    LineDivider(),
+                    _drawLine(3)
+                  ],
+                ),
+                _drawPoints(),
+                _pauseButton(),
+              ],
+            );
+          }
+          else{
+            List<Widget> children;
+            children = <Widget>[
+
+              SizedBox(
+                child: CircularProgressIndicator(),
+                width: 60,
+                height: 60,
+              ),
+              const Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Text('Loading song...'),
+              )
+            ];
+
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: children,
+              ),
+            );
+
+       
+
+
+          }
+        },
+
+      )
+
+
     );
   }
 
