@@ -1,10 +1,13 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:piano_tile/model/room.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play.dart';
-import 'package:piano_tile/views/profile.dart';
 import 'package:piano_tile/views/music_list.dart';
+import 'package:random_string/random_string.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'dart:math' show Random;
 
 class CreateRoom extends StatefulWidget {
   @override
@@ -13,7 +16,11 @@ class CreateRoom extends StatefulWidget {
 
 class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
-  int _currentIndex = 0;
+  String musicName = "Little Star";
+
+  Room room;
+  final FirebaseDatabase database = FirebaseDatabase.instance;
+
 
   @override
   void initState() {
@@ -21,7 +28,18 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
     _animationController =
     new AnimationController(vsync: this, duration: Duration(seconds: 1))
       ..repeat();
+    String key= randomString(6,from: 65,to: 90);
+    room = new Room(key, musicName, 'ngophat99', '', '', '');
+    print(key);
+    database.reference().child("Room")
+        .child(key)
+        .set(room.toJson())
+        .then((value) {print("pushed");})
+        .catchError((onError){
+           print(onError);
+      });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +49,7 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
         height: MediaQuery.of(context).size.height,
         width: double.infinity,
         child: Stack(
-          fit: StackFit.expand,
+          fit: StackFit.passthrough,
           children: [
             Image.asset('assets/images/background.jpg', fit: BoxFit.fill),
             RowOnTop(context, 0, 0),
@@ -54,7 +72,7 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                       Container(
                         margin: EdgeInsets.only(top: 10),
                         child: Text(
-                          '1. Little Star',
+                         '${room.musicName}',
                           style: TextStyle(
                               fontSize: 30,
                               color: Colors.white,
@@ -66,8 +84,8 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
-                            userInRoom(context, 'ngophat99'),
-                            userInRoom(context, ''),
+                            userInRoom(context, room.usernameOne),
+                            userInRoom(context, room.usernameTwo),
                           ],
                         ),
                       ),
@@ -76,8 +94,8 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
-                            userInRoom(context, ''),
-                            userInRoom(context, ''),
+                            userInRoom(context, room.usernameThree),
+                            userInRoom(context, room.usernameFour),
                           ],
                         ),
                       ),
