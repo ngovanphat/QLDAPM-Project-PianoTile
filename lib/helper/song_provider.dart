@@ -6,15 +6,89 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:permissions_plugin/permissions_plugin.dart';
+
+
 Future<List<Note>> initNotes() async{
 
+  // check if song already in local
+  // ...
+
+  // if not, download file from firebase storage
+  var storage = FirebaseStorage.instance;
+  StorageReference ref = storage.ref().child('canond.mid.txt');
+
+  var dir = await getExternalStorageDirectory();
+  var name = await ref.getName();
+  String pathToSave = '${dir.path}/${name}';
+
+  await downloadFile(ref, pathToSave);
+
   // read file data
-  String content = await loadAsset('assets/song/jingle_bells.mid.txt');
+//  String content = await loadAsset('assets/song/jingle_bells.mid.txt');
+  String content = await loadFile(pathToSave);
 
   // convert data to list of notes
   return await convertToNotes(content);
 
 
+}
+
+// download file from firebase storage
+// paramFileName: name of file in storage bucket
+Future<void> downloadFile(StorageReference ref, String pathToSave) async {
+
+
+  // check permissions
+  Map<Permission, PermissionState> permission = await PermissionsPlugin
+      .checkPermissions([
+    Permission.WRITE_EXTERNAL_STORAGE
+  ]);
+  print('permission state: ${permission[Permission.WRITE_EXTERNAL_STORAGE].toString()}');
+
+  // if not granted, try ask user for it
+  if(permission[Permission.WRITE_EXTERNAL_STORAGE] != PermissionState.GRANTED){
+
+    Map<Permission, PermissionState> permission2 = await PermissionsPlugin
+        .requestPermissions([
+      Permission.WRITE_EXTERNAL_STORAGE
+    ]);
+
+    if(permission2[Permission.WRITE_EXTERNAL_STORAGE] != PermissionState.GRANTED){
+      print('[download] permission not granted');
+      return;
+    }
+  }
+
+
+  // create local file
+  String filePath = pathToSave;
+
+  final File tempFile = File(filePath);
+  print('[download] path: ' + filePath);
+  if (tempFile.existsSync()) {
+    await tempFile.delete();
+  }
+  await tempFile.create();
+  assert(await tempFile.readAsString() == "");
+
+  // write downloaded data to local file
+  final StorageFileDownloadTask task = ref.writeToFile(tempFile);
+  final int byteCount = (await task.future).totalByteCount;
+  print('[download] $byteCount');
+
+  // show result
+  final String name = await ref.getName();
+  final String bucket = await ref.getBucket();
+  final String path = await ref.getPath();
+
+
+  print('[download] name: $name, bucket: $bucket, path: $path');
 }
 
 
@@ -34,7 +108,7 @@ Future<List<Note>> convertToNotes(String fileContent) async{
 
   // process each line
   for (var i = 0; i < lines.length; i++) {
-    print('Line $i: ${lines[i]}');
+//    print('Line $i: ${lines[i]}');
 
     List<String> tokens = lines[i].split(' ');
     print('token0:${tokens[0]}, token1:${tokens[1]}, token2:${tokens[2]}');
@@ -100,6 +174,12 @@ Future<List<Note>> convertToNotes(String fileContent) async{
 // read asset file
 Future<String> loadAsset(String path) async {
   return await rootBundle.loadString(path);
+}
+
+// read file in external storage
+Future<String> loadFile(String path) async {
+  File file = File(path);
+  return await file.readAsString();
 }
 
 
