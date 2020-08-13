@@ -46,3 +46,28 @@ Widget RowOnTop(BuildContext context, int level, int gems) {
     ),
   );
 }
+
+Widget userInRoom(BuildContext context, String username){
+  return  Container(
+    width: 150,
+    height: 48,
+    decoration: BoxDecoration(
+      shape: BoxShape.rectangle,
+      color: Colors.grey[900],
+      border: Border.all(
+          color: Colors.white,
+          width: 1.0
+      ),
+      borderRadius: BorderRadius.circular(30),
+    ),
+    child: Center(
+      child: Text(
+        '$username',
+        style: TextStyle(
+          fontSize: 22,
+          color: Colors.white,
+        ),
+      ),
+    ),
+  );
+}
