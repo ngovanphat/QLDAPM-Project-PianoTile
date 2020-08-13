@@ -21,7 +21,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     _animationController =
         new AnimationController(vsync: this, duration: Duration(seconds: 1))
           ..repeat();
-    _animationController.reset();
   }
 
   @override
@@ -92,7 +91,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           margin: EdgeInsets.only(top: 20),
                           child: FlatButton(
                             onPressed: () {
-                              _animationController.dispose();
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

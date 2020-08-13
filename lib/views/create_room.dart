@@ -17,9 +17,9 @@ class CreateRoom extends StatefulWidget {
 class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   String musicName = "Little Star";
-
+  String username = 'ngophat99';
   Room room;
-  final FirebaseDatabase database = FirebaseDatabase.instance;
+
 
 
   @override
@@ -29,18 +29,17 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
     new AnimationController(vsync: this, duration: Duration(seconds: 1))
       ..repeat();
     String key= randomString(6,from: 65,to: 90);
-    room = new Room(key, musicName, 'ngophat99', '', '', '');
-    print(key);
-    database.reference().child("Room")
-        .child(key)
-        .set(room.toJson())
-        .then((value) {print("pushed");})
-        .catchError((onError){
-           print(onError);
-      });
+    room = new Room(key, musicName, username, '', '', '');
+
+    room.updateToDatabase(key);
   }
 
+  @override
+  void deactivate() {
+    super.deactivate();
+    room.removeUserByName(username);
 
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

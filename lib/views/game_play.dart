@@ -9,6 +9,7 @@ import 'package:piano_tile/model/line.dart';
 import 'package:piano_tile/model/pause_menu.dart';
 import 'package:flutter_midi/flutter_midi.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 
 class GamePlay extends StatefulWidget {
@@ -143,15 +144,10 @@ class _GamePlayState extends State<GamePlay>
             List<Widget> children;
             children = <Widget>[
 
-              SizedBox(
-                child: CircularProgressIndicator(),
-                width: 60,
-                height: 60,
-              ),
-              const Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text('Loading song...'),
-              )
+            SpinKitWave(
+            color: Colors.blue,
+            size: 50.0,
+            )
             ];
 
             return Center(
