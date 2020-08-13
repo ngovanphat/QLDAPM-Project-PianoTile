@@ -30,7 +30,6 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
       ..repeat();
     String key= randomString(6,from: 65,to: 90);
     room = new Room(key, musicName, username, '', '', '');
-
     room.updateToDatabase(key);
   }
 

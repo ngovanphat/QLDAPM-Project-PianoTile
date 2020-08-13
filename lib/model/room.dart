@@ -11,12 +11,12 @@ class Room{
     database.reference().child("Room")
         .child(key)
         .set(this.toJson())
-        .then((value) {print("pushed");})
+        .then((value) {print(key);})
         .catchError((onError){
         print(onError);
     });
   }
-  Room.fromSnapshot(DataSnapshot snapshot)
+  fromSnapshot(DataSnapshot snapshot)
   {
     keyOfRoom = snapshot.value["keyOfRoom"];
     musicName = snapshot.value["musicName"];
@@ -25,15 +25,16 @@ class Room{
     usernameThree = snapshot.value["usernameThree"];
     usernameFour = snapshot.value["usernameFour"];
   }
-  removeUserByName (String username){
+  removeUserByName (String username) async{
+    await database.reference().child("Room").child(keyOfRoom).once().then((DataSnapshot dataSnapshot) {
+      fromSnapshot(dataSnapshot);
+    });
     if(usernameOne == username) usernameOne = '';
     else if(usernameTwo == username) usernameTwo='';
     else if(usernameThree == username) usernameThree='';
     else if(usernameFour == username) usernameFour = '';
-    if(usernameOne==''&&usernameTwo==''&&usernameThree==''&&usernameFour=='')
-      removeRoom();
-    else
-      updateToDatabase(keyOfRoom);
+    updateToDatabase(keyOfRoom);
+    if(usernameOne==''&&usernameTwo==''&&usernameThree==''&&usernameFour=='')removeRoom();
   }
   removeRoom(){
     database.reference().child("Room").child(keyOfRoom).remove();
