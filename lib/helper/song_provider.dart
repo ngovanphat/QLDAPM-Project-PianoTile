@@ -14,14 +14,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permissions_plugin/permissions_plugin.dart';
 
 
-Future<List<Note>> initNotes() async{
+Future<List<Note>> initNotes(String songName) async{
 
   // check if song already in local
   // ...
 
   // if not, download file from firebase storage
   var storage = FirebaseStorage.instance;
-  StorageReference ref = storage.ref().child('canond.mid.txt');
+//  StorageReference ref = storage.ref().child('canond.mid.txt');
+  StorageReference ref = storage.ref().child(songName);
 
   var dir = await getExternalStorageDirectory();
   var name = await ref.getName();
@@ -111,7 +112,7 @@ Future<List<Note>> convertToNotes(String fileContent) async{
 //    print('Line $i: ${lines[i]}');
 
     List<String> tokens = lines[i].split(' ');
-    print('token0:${tokens[0]}, token1:${tokens[1]}, token2:${tokens[2]}');
+//    print('token0:${tokens[0]}, token1:${tokens[1]}, token2:${tokens[2]}');
     // parse to integer
     var tick = int.parse(tokens[0]);
     var midi = int.parse(tokens[1]);
