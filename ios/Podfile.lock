@@ -390,6 +390,10 @@ PODS:
   - permissions_plugin (0.0.1):
     - Flutter
   - PromisesObjC (1.2.9)
+  - video_player (0.0.1):
+    - Flutter
+  - video_player_web (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - audioplayers (from `.symlinks/plugins/audioplayers/ios`)
@@ -411,6 +415,8 @@ DEPENDENCIES:
   - path_provider_linux (from `.symlinks/plugins/path_provider_linux/ios`)
   - path_provider_macos (from `.symlinks/plugins/path_provider_macos/ios`)
   - permissions_plugin (from `.symlinks/plugins/permissions_plugin/ios`)
+  - video_player (from `.symlinks/plugins/video_player/ios`)
+  - video_player_web (from `.symlinks/plugins/video_player_web/ios`)
 
 SPEC REPOS:
   trunk:
@@ -470,6 +476,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_macos/ios"
   permissions_plugin:
     :path: ".symlinks/plugins/permissions_plugin/ios"
+  video_player:
+    :path: ".symlinks/plugins/video_player/ios"
+  video_player_web:
+    :path: ".symlinks/plugins/video_player_web/ios"
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
@@ -510,6 +520,8 @@ SPEC CHECKSUMS:
   path_provider_macos: f760a3c5b04357c380e2fddb6f9db6f3015897e0
   permissions_plugin: 98cd73ca0d2e7ab845e3d0efdd29ef2737ffa27c
   PromisesObjC: b48e0338dbbac2207e611750777895f7a5811b75
+  video_player: 9cc823b1d9da7e8427ee591e8438bfbcde500e6e
+  video_player_web: da8cadb8274ed4f8dbee8d7171b420dedd437ce7
 
 PODFILE CHECKSUM: a6bc4fb5d0feff55023c22592a4d52c33dea5935
 

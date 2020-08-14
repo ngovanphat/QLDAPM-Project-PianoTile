@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:piano_tile/model/friend.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -131,9 +130,7 @@ class _ProfileState extends State<Profile> {
                       width: double.infinity,
                       height: 90,
                       child: FlatButton(
-                        onPressed: () {
-
-                        },
+                        onPressed: () {},
                         child: Row(
                           children: [
                             Image.asset('assets/images/diamond.png',
