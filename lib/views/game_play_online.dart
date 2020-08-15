@@ -34,6 +34,7 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
     'usernameFour'
   ];
   List<int> listPoints = [0,0,0,0];
+  List<UserPoint> listUserPoints = new List(4);
   List<String> listRanks = [
     '1st',
     '2nd',
@@ -219,11 +220,19 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
 
       // store points
       for(var i = 0; i < listUsernameKey.length; i++){
-        listPoints[i] = rows[listUsernameKey[i]+'Points'];
+//        listPoints[i] = rows[listUsernameKey[i]+'Points'];
+        listUserPoints[i] = new UserPoint();
+        listUserPoints[i].userNameKey = listUsernameKey[i];
+        listUserPoints[i].username = rows[listUsernameKey[i]];
+        listUserPoints[i].points = rows[listUsernameKey[i] + 'Points'];
       }
-      var myPoints = rows[currentUsernameKey+'Points'];
+//      var myPoints = rows[currentUsernameKey+'Points'];
+//      currentRank = resolveRank(myPoints, listPoints);
 
-      currentRank = resolveRank(myPoints, listPoints);
+      // sort userPoints
+      listUserPoints.sort(
+              (a,b) => b.points.compareTo(a.points)
+      );
 
     }
 
@@ -236,11 +245,70 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
 
     calculateRank().then((value) {
 
+      print('[online] making table');
+      // make table with ordered points
+      List<TableRow> rows = [];
+      rows.add(
+        TableRow( children: [
+        Column(children:[
+          Text('Rank',
+            style: TextStyle(fontWeight: FontWeight.bold),)
+        ]),
+        Column(children:[
+          Text('Name',
+            style: TextStyle(fontWeight: FontWeight.bold),)
+        ]),
+        Column(children:[
+          Text('Points',
+            style: TextStyle(fontWeight: FontWeight.bold),)
+        ]),
+      ])
+      );
+      print('[online] making table row1');
+      for(var i = 0; i < listUserPoints.length; i++){
+
+        TextStyle style = null;
+        if(listUserPoints[i].userNameKey == currentUsernameKey){
+          style = TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold);
+        }
+
+        rows.add(
+
+            TableRow( children: [
+              Text('${listRanks[i]}',
+                style: style,
+                textAlign: TextAlign.center,
+              ),
+              Text('${listUserPoints[i].username}',
+                style: style,
+                textAlign: TextAlign.center,
+              ),
+              Text('${listUserPoints[i].points}',
+                style: style,
+                textAlign: TextAlign.center,
+              ),
+            ])
+        );
+      }
+      print('[online] making table all rows');
+      Table tableRanks = Table(
+        border: TableBorder(),
+        children: rows
+      );
+
+      print('[online] making table table');
+
+      // show table in dialog
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Score: $points, rank: $currentRank"),
+            title: Text("Results"),
+            content: SingleChildScrollView(
+              child: tableRanks
+            ),
             actions: <Widget>[
               FlatButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -279,5 +347,12 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
 
 }
 
+
+class UserPoint{
+
+  String userNameKey;
+  String username;
+  int points;
+}
 
 
