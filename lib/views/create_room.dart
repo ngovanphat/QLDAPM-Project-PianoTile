@@ -6,6 +6,7 @@ import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play.dart';
 import 'package:piano_tile/views/music_list.dart';
 import 'package:random_string/random_string.dart';
+import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:math' show Random;
 
@@ -19,7 +20,7 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
   String musicName = "Little Star";
   String username = 'ngophat99';
   Room room;
-
+  bool isInRoom = true;
 
 
   @override
@@ -37,10 +38,15 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
   void deactivate() {
     super.deactivate();
     room.removeUserByName(username);
-
   }
   @override
   Widget build(BuildContext context) {
+    Timer.periodic(Duration(seconds: 5), (timer) {
+      room.triggerReadFromDB(room.keyOfRoom);
+      this.setState(() {
+        this.isInRoom = true;
+      });
+    });
     return Scaffold(
       backgroundColor: const Color(0xff004466),
       body: Container(
@@ -83,7 +89,7 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             userInRoom(context, room.usernameOne),
-                            userInRoom(context, room.usernameTwo),
+                            userInRoom(context, room.usernameTwo != '' ? room.usernameTwo : '+'),
                           ],
                         ),
                       ),
@@ -92,8 +98,8 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
-                            userInRoom(context, room.usernameThree),
-                            userInRoom(context, room.usernameFour),
+                            userInRoom(context, room.usernameThree != '' ? room.usernameThree : '+'),
+                            userInRoom(context, room.usernameFour != '' ? room.usernameFour : '+'),
                           ],
                         ),
                       ),
