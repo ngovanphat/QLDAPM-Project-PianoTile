@@ -36,6 +36,23 @@ class _FriendsListState extends State<FriendsList> {
           fontSize: 18,
         ),
       ),
+      trailing: FlatButton(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(70),
+            side: BorderSide(
+                color: Colors.white, width: 2)),
+        child: Text(
+          'Remove',
+          style: TextStyle(
+              fontSize: 18, color: Colors.white),
+        ),
+        color: Colors.white24,
+        onPressed: () {
+          setState(() {
+            _friends.removeAt(index);
+          });
+        },
+      ),
     );
   }
 
@@ -88,10 +105,22 @@ List loadFriend() {
     'Hanh Dung',
     'Thang Bui',
     'Minh Thuong',
+    'Minh Quann',
+    'Phat Ngo',
+    'Thuan Nam',
+    'Hanh Dung',
+    'Thang Bui',
+    'Minh Thuong',
     'Minh Quann'
   ];
-  final levels = ['1', '2', '3', '4', '5', '6'];
+  final levels = ['1', '2', '3', '4', '5', '6','1', '2', '3', '4', '5', '6'];
   final avatars = [
+    'assets/images/male.png',
+    'assets/images/male.png',
+    'assets/images/female.png',
+    'assets/images/male.png',
+    'assets/images/male.png',
+    'assets/images/male.png',
     'assets/images/male.png',
     'assets/images/male.png',
     'assets/images/female.png',
