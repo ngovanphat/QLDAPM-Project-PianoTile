@@ -27,9 +27,12 @@ dependencies:
   firebase_core: ^0.4.0+9
   firebase_analytics: ^5.0.2
   firebase_auth: ^0.16.1
+  firebase_database: ^3.1.6
   google_sign_in: ^4.0.7
-
+  random_string: ^2.1.0
   audioplayers: ^0.15.1
+  flutter_spinkit: "^4.1.2"
+
   flutter_midi: ^1.0.1
 
   smooth_star_rating: 1.1.1

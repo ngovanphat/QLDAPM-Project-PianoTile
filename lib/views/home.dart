@@ -4,6 +4,7 @@ import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play.dart';
 import 'package:piano_tile/views/profile.dart';
 import 'package:piano_tile/views/music_list.dart';
+import 'package:piano_tile/views/create_room.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -32,93 +33,94 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xff004466),
-      body: SafeArea(
-        child: IndexedStack(index: _currentIndex, children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            child: Stack(
-              fit: StackFit.passthrough,
-              children: [
-                Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
-                RowOnTop(context, 0, 0),
-                Container(
-                    margin: EdgeInsets.only(top: 100),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          AnimatedBuilder(
-                            animation: _animationController,
-                            builder: (_, child) {
-                              return Transform.rotate(
-                                angle: _animationController.value * 1 * 3.14,
-                                child: child,
-                              );
+      body: IndexedStack(index: _currentIndex, children: [
+        Container(
+          height: double.infinity,
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: [
+              Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
+              RowOnTop(context, 0, 0),
+              Container(
+                  margin: EdgeInsets.only(top: 100),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        AnimatedBuilder(
+                          animation: _animationController,
+                          builder: (_, child) {
+                            return Transform.rotate(
+                              angle: _animationController.value * 1 * 3.14,
+                              child: child,
+                            );
+                          },
+                          child: Image.asset('assets/images/disk.png'),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: Text(
+                            '1. BigCity Boi',
+                            style: TextStyle(
+                                fontSize: 30,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Container(
+                          width: 350,
+                          height: 55,
+                          margin: EdgeInsets.only(top: 20),
+                          child: FlatButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => GamePlay()));
                             },
-                            child: Image.asset('assets/images/disk.png'),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(70),
+                                side: BorderSide(
+                                    color: Colors.white, width: 3)),
                             child: Text(
-                              '1. BigCity Boi',
+                              'Play',
                               style: TextStyle(
-                                  fontSize: 30,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                                  fontSize: 25, color: Colors.white),
                             ),
+                            color: Colors.white24,
                           ),
-                          Container(
-                            width: 350,
-                            height: 70,
-                            margin: EdgeInsets.only(top: 20),
-                            child: FlatButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => GamePlay()));
-                              },
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(70),
-                                  side: BorderSide(
-                                      color: Colors.white, width: 3)),
-                              child: Text(
-                                'Play',
-                                style: TextStyle(
-                                    fontSize: 25, color: Colors.white),
-                              ),
-                              color: Colors.white24,
+                        ),
+                        Container(
+                          width: 350,
+                          height: 55,
+                          margin: EdgeInsets.only(top: 20),
+                          child: FlatButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CreateRoom()));
+                            },
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(70),
+                                side: BorderSide(
+                                    color: Colors.white, width: 3)),
+                            child: Text(
+                              'Create Room',
+                              style: TextStyle(
+                                  fontSize: 25, color: Colors.white),
                             ),
+                            color: Colors.white24,
                           ),
-                          Container(
-                            width: 350,
-                            height: 70,
-                            margin: EdgeInsets.only(top: 20),
-                            child: FlatButton(
-                              onPressed: () {
-                                print("click here to create room");
-                              },
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(70),
-                                  side: BorderSide(
-                                      color: Colors.white, width: 3)),
-                              child: Text(
-                                'Create Room',
-                                style: TextStyle(
-                                    fontSize: 25, color: Colors.white),
-                              ),
-                              color: Colors.white24,
-                            ),
-                          )
-                        ]))
-              ],
-            ),
+                        )
+                      ]))
+            ],
           ),
-          MusicList(),
-          Profile(),
-        ]),
-      ),
+        ),
+        MusicList(),
+        Profile(),
+      ]),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (int index) {
