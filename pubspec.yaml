@@ -32,6 +32,7 @@ dependencies:
   random_string: ^2.1.0
   audioplayers: ^0.15.1
   flutter_spinkit: "^4.1.2"
+
   flutter_midi: ^1.0.1
 
   smooth_star_rating: 1.1.1
