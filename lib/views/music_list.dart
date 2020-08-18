@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:core';
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:piano_tile/helper/sizes_helpers.dart';
 import 'package:piano_tile/model/Song.dart';
 import 'package:piano_tile/model/custom_expansion_panel.dart'
     as CustomExpansionPanel;
+import 'package:piano_tile/model/login_alert_dialog.dart';
 import 'package:piano_tile/views/home.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:marquee_flutter/marquee_flutter.dart';
@@ -138,6 +141,7 @@ class _BodyLayoutState extends State<BodyLayout> {
   int visileItems = 8;
   bool _isVisible = true;
   bool _isLoading = false;
+  bool _FavoritebtnEnabled = true;
   final _scrollController = ScrollController();
   final GlobalKey datakey = GlobalKey();
   _BodyLayoutState(tabIndex) {
@@ -155,6 +159,8 @@ class _BodyLayoutState extends State<BodyLayout> {
         debugPrint('Page reached end of page');
         var loadedSongs = await _fetchSongs(tabIndex, 0, 10);
         setState(() {
+          //TODO show loading for repeated load
+          //TODO save local after first download
           _isVisible = false;
           debugPrint(songs.length.toString());
         });
@@ -195,6 +201,9 @@ class _BodyLayoutState extends State<BodyLayout> {
   Widget _buildPanel() {
     return CustomExpansionPanel.ExpansionPanelList.radio(
       initialOpenPanelValue: selected,
+      expansionCallback: (int index, bool isExpanded) {
+        if (isExpanded) selected = index;
+      },
       children:
           songs.map<CustomExpansionPanel.ExpansionPanelRadio>((Song song) {
         return CustomExpansionPanel.ExpansionPanelRadio(
@@ -277,6 +286,7 @@ class _BodyLayoutState extends State<BodyLayout> {
                 Flexible(
                     flex: 1,
                     child: LikeButton(
+                      onTap: onFavoriteButtonTapped,
                       size: displayHeight(context) * 0.060,
                       bubblesSize: displayHeight(context) * 0.06,
                       circleSize: displayHeight(context) * 0.037,
@@ -302,20 +312,109 @@ class _BodyLayoutState extends State<BodyLayout> {
     );
   }
 
+  Future<bool> onFavoriteButtonTapped(bool isLiked) async {
+    //TODO test this func after login finish
+    debugPrint(_FavoritebtnEnabled.toString());
+    if (_FavoritebtnEnabled == false) return isLiked;
+    _FavoritebtnEnabled = false;
+    Timer(Duration(seconds: 2), () => _FavoritebtnEnabled = true);
+
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseUser user = await auth.currentUser();
+    if (user != null) {
+      final uid = user.uid;
+      if (!isLiked) {
+        try {
+          var db =
+              FirebaseDatabase.instance.reference().child("Favorites/" + uid);
+          await db.update({songs[selected].getId(): songs[selected].getName()});
+
+          return !isLiked;
+        } catch (e) {
+          debugPrint(e.toString());
+        }
+      } else {
+        try {
+          var db =
+              FirebaseDatabase.instance.reference().child("Favorites/" + uid);
+          await db.child(songs[selected].getId()).remove();
+        } catch (e) {
+          debugPrint(e.toString());
+        }
+      }
+    }else{
+      Widget loginDialog=new LoginDialog();
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return loginDialog;
+        },
+      );
+    }
+    return isLiked;
+  }
+
   Future<List> _fetchSongs(tabIndex, pageNumber, pageSize) async {
-    var db = FirebaseDatabase.instance.reference().child("Songs/NhacNuocNgoai");
-    await db
-        .orderByKey()
-        .startAt((pageNumber * 10 + 1).toString())
-        .limitToFirst(10)
-        .once()
-        .then((DataSnapshot snapshot) {
-      Map<dynamic, dynamic> values = snapshot.value;
-      values.forEach((key, values) {
-        songs.add(new Song(key + "NN", values["name"], values["artists"],
-            values["difficulty"], values["image"]));
-      });
-    });
+    switch (tabIndex) {
+      case 2:
+        {
+          final FirebaseAuth auth = FirebaseAuth.instance;
+          final FirebaseUser user = await auth.currentUser();
+          final uid = user.uid;
+          var db =
+              FirebaseDatabase.instance.reference().child("Favorites/" + uid);
+          await db
+              .orderByKey()
+              .startAt((pageNumber * 10 + 1).toString())
+              .limitToFirst(10)
+              .once()
+              .then((DataSnapshot snapshot) {
+            Map<dynamic, dynamic> values = snapshot.value;
+            values.forEach((key, values) {
+              songs.add(new Song(key, values["name"], values["artists"],
+                  values["difficulty"], values["image"]));
+            });
+          });
+        } //Yeu thich
+        break;
+      case 1:
+        {
+          var db = FirebaseDatabase.instance
+              .reference()
+              .child("Songs/NhacNuocNgoai");
+          await db
+              .orderByKey()
+              .startAt((pageNumber * 10 + 1).toString())
+              .limitToFirst(10)
+              .once()
+              .then((DataSnapshot snapshot) {
+            Map<dynamic, dynamic> values = snapshot.value;
+            values.forEach((key, values) {
+              songs.add(new Song(key + "NN", values["name"], values["artists"],
+                  values["difficulty"], values["image"]));
+            });
+          });
+        } //Nhac Nuoc Ngoai
+        break;
+      default:
+        {
+          var db =
+              FirebaseDatabase.instance.reference().child("Songs/NhacViet");
+          await db
+              .orderByKey()
+              .startAt((pageNumber * 10 + 1).toString())
+              .limitToFirst(10)
+              .once()
+              .then((DataSnapshot snapshot) {
+            Map<dynamic, dynamic> values = snapshot.value;
+            values.forEach((key, values) {
+              songs.add(new Song(key + "NN", values["name"], values["artists"],
+                  values["difficulty"], values["image"]));
+            });
+          });
+        } //Nhac Viet
+        break;
+    }
   }
 }
 
@@ -368,12 +467,6 @@ List getSongs(tabIndex) {
     return musicList.reversed.toList();
   } else if (tabIndex == 2) {
     musicList.removeRange(4, 8);
-    return musicList;
-  } else if (tabIndex == 3) {
-    for (var i = 9; i < titles.length + 9; i++) {
-      musicList.add(new Song(i.toString(), titles[i - 9], artists[i - 9],
-          difficulties[i - 9], images[i - 9]));
-    }
     return musicList;
   } else
     return musicList;

@@ -116,7 +116,7 @@ class Song {
       final FirebaseUser user = await auth.currentUser();
       final uid = user.uid;
       var db = FirebaseDatabase.instance.reference().child("HighScores/" + uid);
-      db
+      await db
           .child("/" + this.name)
           .update({'score': this.highscore, 'updateAt': Timestamp.now()});
 
