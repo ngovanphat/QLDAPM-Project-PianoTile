@@ -38,21 +38,60 @@ class _FriendsListState extends State<FriendsList> {
       ),
       trailing: FlatButton(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(70),
-            side: BorderSide(
-                color: Colors.white, width: 2)),
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.white, width: 1)),
         child: Text(
           'Remove',
-          style: TextStyle(
-              fontSize: 18, color: Colors.white),
+          style: TextStyle(fontSize: 14, color: Colors.white),
         ),
         color: Colors.white24,
         onPressed: () {
-          setState(() {
-            _friends.removeAt(index);
-          });
+          showAlertDialog(context, index);
         },
       ),
+    );
+  }
+
+  showAlertDialog(BuildContext context, int index) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text(
+        "Remove",
+        style: TextStyle(
+          color: Colors.red,
+        ),
+      ),
+      onPressed: () {
+        setState(() {
+          _friends.removeAt(index);
+        });
+        Navigator.of(context).pop();
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Remove Friend?"),
+      content: Text(
+          "Would you like to continue removing this friend from your list?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 
@@ -113,7 +152,7 @@ List loadFriend() {
     'Minh Thuong',
     'Minh Quann'
   ];
-  final levels = ['1', '2', '3', '4', '5', '6','1', '2', '3', '4', '5', '6'];
+  final levels = ['1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6'];
   final avatars = [
     'assets/images/male.png',
     'assets/images/male.png',
