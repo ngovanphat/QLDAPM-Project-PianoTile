@@ -3,12 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/room.dart';
 import 'package:piano_tile/model/widget.dart';
-import 'package:piano_tile/views/game_play.dart';
+import 'package:piano_tile/views/game_play_online.dart';
 import 'package:piano_tile/views/music_list.dart';
 import 'package:random_string/random_string.dart';
 import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:math' show Random;
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class CreateRoom extends StatefulWidget {
   @override
@@ -17,7 +19,7 @@ class CreateRoom extends StatefulWidget {
 
 class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
-  String musicName = "Little Star";
+  String musicName = "Tìm lại bầu trời";
   String username = 'ngophat99';
   Room room;
   bool isInRoom = true;
@@ -32,6 +34,33 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
     String key= randomString(6,from: 65,to: 90);
     room = new Room(key, musicName, username, '', '', '');
     room.updateToDatabase(key);
+
+    // update additional fields: usernameOnePoints, usernameTwoPoints,...
+    // for storing user points
+    saveAdditionalFields(roomId: key);
+
+    // write to preferences
+    // for later retrieving in other screens
+    savePreferences(userId: username, roomId: key, isHost: true);
+    print('[creat_room] done update database and save preferences');
+  }
+
+  Future<void> saveAdditionalFields({String roomId}) async{
+    var ref = FirebaseDatabase.instance.reference().child('Room')
+        .child(roomId);
+    ref.update({"usernameOnePoints": 0});
+    ref.update({"usernameTwoPoints": 0});
+    ref.update({"usernameThreePoints": 0});
+    ref.update({"usernameFourPoints": 0});
+
+  }
+
+  Future<void> savePreferences({String userId, String roomId, bool isHost}) async{
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('userId', userId);
+    prefs.setString('roomId', roomId);
+    prefs.setBool('isRoomHost', isHost);
   }
 
   @override
@@ -133,10 +162,11 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                         margin: EdgeInsets.only(top: 20),
                         child: FlatButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
+//                            Navigator.pushReplacement(
+                            Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => GamePlay()));
+                                    builder: (context) => GamePlayOnline()));
                           },
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(70),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 // import lib of us
@@ -13,6 +15,10 @@ import 'package:flutter/services.dart';
 import 'package:piano_tile/views/game_play.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:path_provider/path_provider.dart';
+
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GamePlayOnline extends GamePlay {
 
@@ -25,6 +31,7 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
 
   DatabaseReference refRoom;
   String roomName = null;
+  String currentUsername = null;
   String currentUsernameKey = null;
   String currentRank = null;
   List<String> listUsernameKey = [
@@ -47,19 +54,32 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
   @override
   Future<String> doInitNotes() async {
 
+    // get my information from file
+    // include: username, current room name
+    await getMyInfo();
+
+    // then get room Information
+    // include: song name, other players name, points
     await getRoomInfo();
 
+    // download note file and make note list
     return await super.doInitNotes();
+  }
+
+  Future<String> getMyInfo() async {
+
+    // read from shared preferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    this.currentUsername = prefs.getString('userId') ?? "foo";
+    this.roomName = prefs.getString('roomId') ?? "GENERAL";
+
+    return 'done';
   }
 
   Future<String> getRoomInfo() async{
     // get firebase database reference
     refRoom = FirebaseDatabase.instance.reference().child('Room');
 
-    // join room if not join yet
-    if(roomName == null){
-      roomName = 'GENERAL';
-    }
 
     DataSnapshot snapshot = await refRoom.child(roomName).once();
     if(snapshot != null){
@@ -67,25 +87,9 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
       Map<dynamic, dynamic> rows = snapshot.value;
 
 
-      // get username order
-      for(var i = 0; i < listUsernameKey.length; i++){
-
-        var username = rows[listUsernameKey[i]];
-        if(username == null || username == ''){
-
-          // this means i should get this slot
-          currentUsernameKey = listUsernameKey[i];
-
-          // save my username to slot
-          refRoom.child(roomName).update({currentUsernameKey: 'foo'});
-          refRoom.child(roomName).update({currentUsernameKey + 'Points': 0});
-
-          print('[game_play_online] got slot: ${currentUsernameKey}');
-
-          break;
-        }
-
-      }
+      // find  username<order> of me
+      currentUsernameKey = findUsernameKey(rows, currentUsername);
+      print('[game_play_online] usernameKey: $currentUsernameKey');
 
       if(currentUsernameKey == null || currentUsernameKey == ''){
         // this means room is full
@@ -93,15 +97,11 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
         // ...
       }
 
-      // get song name (.mid.txt)
-      String nameOfSong = null;
-      rows.forEach((key, value) {
-        if(key == 'musicName'){
 
-          nameOfSong = value;
-          print('[game_play_online] found song: ${nameOfSong}');
-        }
-      });
+      // get song name (.mid.txt)
+      String nameOfSong = findSongName(rows, 'musicName');
+      print('[game_play_online] found song: ${nameOfSong}');
+
 
       // find song in song list
       // to find its filename
@@ -110,56 +110,85 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
           .reference()
           .child('Songs');
 
-      bool isFound = false;
       DataSnapshot snapshot1 = await refSong.child('NhacViet').once();
       Map<dynamic,dynamic> songs = snapshot1.value;
-      songs.forEach((key, value){
+      super.songName = findSongFileName(songs, nameOfSong);
 
-        if(value['name'] == nameOfSong){
-          super.songName = value['filename'];
-          print('[online] filename of song: ${super.songName}');
-          isFound = true;
-        }
-      });
-      if(isFound == false){
+      if(super.songName == null){
 
         // try found in Nhac Nuoc Ngoai
         snapshot1 = await refSong.child('NhacNuocNgoai').once();
         songs = snapshot1.value;
-        songs.forEach((key, value){
-
-          if(value['name'] == nameOfSong){
-            super.songName = value['filename'];
-            print('[online] filename of song: ${super.songName}');
-            isFound = true;
-          }
-        });
+        super.songName = findSongFileName(songs, nameOfSong);
 
       }
+      print('[online] filename of song: ${super.songName}');
 
 
       // subscribe room to listen point changes
-      subscriptionPoints = refRoom
-          .child(roomName)
-          .onValue
-          .listen((event) {
-
-        Map<dynamic, dynamic> rowsChanged = event.snapshot.value;
-
-        // update to local list points
-        for(var i = 0; i < listPoints.length; i++){
-          listPoints[i] = rowsChanged[listUsernameKey[i]+'Points'];
-        }
-
-        // resolve
-        currentRank = resolveRank(super.points, listPoints);
-
-      });
+      subscriptionPoints = subscribePointChanges(refRoom.child(roomName));
 
     }; // end of snapshot
 
     return 'done';
   }
+
+  // find key that is holding currentUsername
+  String findUsernameKey(Map<dynamic, dynamic> rows, String currentUsername){
+
+    for(var i = 0; i < listUsernameKey.length; i++){
+
+      var username = rows[listUsernameKey[i]];
+
+      if(username == currentUsername){
+        return listUsernameKey[i];
+      }
+    }
+    return null;
+
+  }
+
+  // find song name at a certain key
+  String findSongName(Map<dynamic, dynamic> rows, String key){
+    return rows[key];
+  }
+
+  // find song filename from song list
+  String findSongFileName(Map<dynamic, dynamic> songs, String nameOfSong){
+
+    print('[online_findsongfilename] songs: $songs');
+    String filename = null;
+    songs.forEach((key, value){
+
+      if(value['name'] == nameOfSong){
+        filename =  value['filename'];
+      }
+    });
+
+    return filename;
+  }
+
+  // subscribe listener to room data changes
+  StreamSubscription subscribePointChanges(DatabaseReference refRoom){
+
+    return refRoom
+        .onValue
+        .listen((event) {
+
+      Map<dynamic, dynamic> rowsChanged = event.snapshot.value;
+
+      // update to local list points
+      for(var i = 0; i < listPoints.length; i++){
+        listPoints[i] = rowsChanged[listUsernameKey[i]+'Points'];
+      }
+
+      // resolve
+      currentRank = resolveLocalRank(super.points, listPoints);
+
+    });
+  }
+
+
 
   @override
   drawPoints() {
@@ -191,7 +220,7 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
     });
   }
 
-  String resolveRank(int myPoints, List<int> listPoints) {
+  String resolveLocalRank(int myPoints, List<int> listPoints) {
 
     // sort
     listPoints.sort((a,b){
@@ -211,23 +240,21 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
   }
 
 
-  Future<String> calculateRank() async{
+  Future<String> calculateFinalRank() async{
 
-    // gather points of other players at the moment
+    // gather points of other players
     DataSnapshot snapshot = await refRoom.child(roomName).once();
     if(snapshot != null){
       Map<dynamic, dynamic> rows = snapshot.value;
 
       // store points
       for(var i = 0; i < listUsernameKey.length; i++){
-//        listPoints[i] = rows[listUsernameKey[i]+'Points'];
+
         listUserPoints[i] = new UserPoint();
         listUserPoints[i].userNameKey = listUsernameKey[i];
         listUserPoints[i].username = rows[listUsernameKey[i]];
         listUserPoints[i].points = rows[listUsernameKey[i] + 'Points'];
       }
-//      var myPoints = rows[currentUsernameKey+'Points'];
-//      currentRank = resolveRank(myPoints, listPoints);
 
       // sort userPoints
       listUserPoints.sort(
@@ -239,66 +266,76 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
     return 'done';
   }
 
+  TableRow makeTableRowHeaders(){
+
+    return TableRow( children: [
+      Column(children:[
+        Text('Rank',
+          style: TextStyle(fontWeight: FontWeight.bold),)
+      ]),
+      Column(children:[
+        Text('Name',
+          style: TextStyle(fontWeight: FontWeight.bold),)
+      ]),
+      Column(children:[
+        Text('Points',
+          style: TextStyle(fontWeight: FontWeight.bold),)
+      ]),
+    ]);
+  }
+
+  List<TableRow> makeTableRows(){
+
+    List<TableRow> rows = [];
+    rows.add(
+        makeTableRowHeaders()
+    );
+
+    for(var i = 0; i < listUserPoints.length; i++){
+
+      TextStyle style = null;
+      if(listUserPoints[i].userNameKey == currentUsernameKey){
+        style = TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.bold);
+      }
+
+      rows.add(
+
+          TableRow( children: [
+            Text('${listRanks[i]}',
+              style: style,
+              textAlign: TextAlign.center,
+            ),
+            Text('${listUserPoints[i].username}',
+              style: style,
+              textAlign: TextAlign.center,
+            ),
+            Text('${listUserPoints[i].points}',
+              style: style,
+              textAlign: TextAlign.center,
+            ),
+          ])
+      );
+    }
+
+    return rows;
+  }
 
   @override
   void showFinishDialog() {
 
-    calculateRank().then((value) {
+    calculateFinalRank().then((value) {
 
       print('[online] making table');
+
       // make table with ordered points
-      List<TableRow> rows = [];
-      rows.add(
-        TableRow( children: [
-        Column(children:[
-          Text('Rank',
-            style: TextStyle(fontWeight: FontWeight.bold),)
-        ]),
-        Column(children:[
-          Text('Name',
-            style: TextStyle(fontWeight: FontWeight.bold),)
-        ]),
-        Column(children:[
-          Text('Points',
-            style: TextStyle(fontWeight: FontWeight.bold),)
-        ]),
-      ])
-      );
-      print('[online] making table row1');
-      for(var i = 0; i < listUserPoints.length; i++){
-
-        TextStyle style = null;
-        if(listUserPoints[i].userNameKey == currentUsernameKey){
-          style = TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.bold);
-        }
-
-        rows.add(
-
-            TableRow( children: [
-              Text('${listRanks[i]}',
-                style: style,
-                textAlign: TextAlign.center,
-              ),
-              Text('${listUserPoints[i].username}',
-                style: style,
-                textAlign: TextAlign.center,
-              ),
-              Text('${listUserPoints[i].points}',
-                style: style,
-                textAlign: TextAlign.center,
-              ),
-            ])
-        );
-      }
-      print('[online] making table all rows');
+      List<TableRow> rows = makeTableRows();
       Table tableRanks = Table(
         border: TableBorder(),
         children: rows
       );
 
-      print('[online] making table table');
 
       // show table in dialog
       showDialog(
@@ -322,12 +359,8 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
         // clean up
         doCleanUp();
 
-
-        // return to home page or room page
+        // return to previous page
         Navigator.pop(context);
-//        Navigator.of(context).popUntil(
-//                (route) => route.settings.name == "/home"
-//        );
 
       });
 
@@ -337,11 +370,8 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
   }
 
   void doCleanUp(){
-    // clear username
-    refRoom.child(roomName).update({currentUsernameKey: ''});
-    refRoom.child(roomName).update({currentUsernameKey+'Points': 0});
 
-    // un-subscribe
+    // un-subscribe listening to room changes
     subscriptionPoints.cancel();
   }
 
