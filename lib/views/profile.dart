@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:piano_tile/views/friends_list.dart';
 
 import 'home.dart';
 
@@ -190,7 +191,12 @@ class _ProfileState extends State<Profile> {
                       width: double.infinity,
                       height: 90,
                       child: FlatButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FriendsList()));
+                        },
                         child: Row(
                           children: [
                             Image.asset('assets/images/friends.png',

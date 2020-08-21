@@ -235,6 +235,9 @@ PODS:
     - FirebaseAnalytics (= 6.7.0)
   - Firebase/CoreOnly (6.29.0):
     - FirebaseCore (= 6.9.2)
+  - Firebase/Database (6.29.0):
+    - Firebase/CoreOnly
+    - FirebaseDatabase (~> 6.4.0)
   - Firebase/Firestore (6.29.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 1.16.3)
@@ -257,6 +260,9 @@ PODS:
     - Firebase/Core
     - Flutter
   - firebase_core_web (0.1.0):
+    - Flutter
+  - firebase_database (0.0.1):
+    - Firebase/Database
     - Flutter
   - firebase_storage (0.0.1):
     - Firebase/Storage
@@ -284,6 +290,9 @@ PODS:
     - GoogleUtilities/Environment (~> 6.7)
     - GoogleUtilities/Logger (~> 6.7)
     - nanopb (~> 1.30905.0)
+  - FirebaseDatabase (6.4.0):
+    - FirebaseCore (~> 6.8)
+    - leveldb-library (~> 1.22)
   - FirebaseFirestore (1.16.3):
     - abseil/algorithm (= 0.20200225.0)
     - abseil/base (= 0.20200225.0)
@@ -305,6 +314,8 @@ PODS:
     - FirebaseCore (~> 6.8)
     - GTMSessionFetcher/Core (~> 1.1)
   - Flutter (1.0.0)
+  - flutter_custom_dialog (0.0.1):
+    - Flutter
   - flutter_midi (0.0.1):
     - Flutter
   - google_sign_in (0.0.1):
@@ -402,8 +413,10 @@ DEPENDENCIES:
   - firebase_auth_web (from `.symlinks/plugins/firebase_auth_web/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_core_web (from `.symlinks/plugins/firebase_core_web/ios`)
+  - firebase_database (from `.symlinks/plugins/firebase_database/ios`)
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
+  - flutter_custom_dialog (from `.symlinks/plugins/flutter_custom_dialog/ios`)
   - flutter_midi (from `.symlinks/plugins/flutter_midi/ios`)
   - google_sign_in (from `.symlinks/plugins/google_sign_in/ios`)
   - google_sign_in_web (from `.symlinks/plugins/google_sign_in_web/ios`)
@@ -422,6 +435,7 @@ SPEC REPOS:
     - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreDiagnostics
+    - FirebaseDatabase
     - FirebaseFirestore
     - FirebaseInstallations
     - FirebaseStorage
@@ -452,10 +466,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_core_web:
     :path: ".symlinks/plugins/firebase_core_web/ios"
+  firebase_database:
+    :path: ".symlinks/plugins/firebase_database/ios"
   firebase_storage:
     :path: ".symlinks/plugins/firebase_storage/ios"
   Flutter:
     :path: Flutter
+  flutter_custom_dialog:
+    :path: ".symlinks/plugins/flutter_custom_dialog/ios"
   flutter_midi:
     :path: ".symlinks/plugins/flutter_midi/ios"
   google_sign_in:
@@ -483,15 +501,18 @@ SPEC CHECKSUMS:
   firebase_auth_web: 0955c07bcc06e84af76b9d4e32e6f31518f2d7de
   firebase_core: 335c02abd48672b7c83c683df833d0488a72e73e
   firebase_core_web: d501d8b946b60c8af265428ce483b0fff5ad52d1
+  firebase_database: 88085c38a41ad0b5c3c611ede7205831a2ece844
   firebase_storage: 22966fce4aa6e8848cbaa017df62107cee29f327
   FirebaseAnalytics: aa522dce9fd93002ba1554467d23ce7092323000
   FirebaseAuth: a818d73466d51db897d3bf3c0f3baa3dae7fd4c0
   FirebaseCore: 7930a1946517d94256d857f97371ed993b55f7bd
   FirebaseCoreDiagnostics: 7535fe695737f8c5b350584292a70b7f8ff0357b
+  FirebaseDatabase: 55e69fe802ccb438d9c6ee51eb32fd425d5409d3
   FirebaseFirestore: 5ea7b0878363f9ec66bdcee0c29ad875d1b511ac
   FirebaseInstallations: 3c520c951305cbf9ca54eb891ff9e6d1fd384881
   FirebaseStorage: 3ef81ca5fa7817f85451ca09d516a34d2c7542a7
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_custom_dialog: c0d222a3c35af5b57581e54ef8784c94037cd2ec
   flutter_midi: 4fe7280cf156c668fe92445f384b1bc440473cdb
   google_sign_in: 6bd214b9c154f881422f5fe27b66aaa7bbd580cc
   google_sign_in_web: 52deb24929ac0992baff65c57956031c44ed44c3

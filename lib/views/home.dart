@@ -5,6 +5,7 @@ import 'package:piano_tile/views/game_play.dart';
 import 'package:piano_tile/views/game_play_online.dart';
 import 'package:piano_tile/views/profile.dart';
 import 'package:piano_tile/views/music_list.dart';
+import 'package:piano_tile/views/create_room.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -21,6 +22,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     _animationController =
         new AnimationController(vsync: this, duration: Duration(seconds: 1))
           ..repeat();
+  }
+
+  @override
+  dispose() {
+   _animationController.dispose(); // you need this
+    super.dispose();
   }
 
   @override
@@ -65,7 +72,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           ),
                           Container(
                             width: 350,
-                            height: 40,
+
+                            height: 55,
+
                             margin: EdgeInsets.only(top: 20),
                             child: FlatButton(
                               onPressed: () {
@@ -91,33 +100,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           ),
                           Container(
                             width: 350,
-                            height: 30,
-                            margin: EdgeInsets.only(top: 10),
+
+                            height: 55,
+                            margin: EdgeInsets.only(top: 20),
+
                             child: FlatButton(
                               onPressed: () {
-
-                                Navigator.pushNamed(context, '/gameplayonline');
-
-                              },
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(70),
-                                  side: BorderSide(
-                                      color: Colors.white, width: 3)),
-                              child: Text(
-                                'Play Online Demo',
-                                style: TextStyle(
-                                    fontSize: 15, color: Colors.white),
-                              ),
-                              color: Colors.white24,
-                            ),
-                          ),
-                          Container(
-                            width: 350,
-                            height: 70,
-                            margin: EdgeInsets.only(top: 10),
-                            child: FlatButton(
-                              onPressed: () {
-                                print("click here to create room");
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => CreateRoom()));
                               },
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(70),
