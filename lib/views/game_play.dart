@@ -15,11 +15,11 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 class GamePlay extends StatefulWidget {
 
   @override
-  _GamePlayState createState() => _GamePlayState();
+  GamePlayState createState() => GamePlayState();
 
 }
 
-class _GamePlayState extends State<GamePlay>
+class GamePlayState<T extends GamePlay> extends State<T>
     with SingleTickerProviderStateMixin {
   AudioCache player = AudioCache();
   AnimationController animationController;
@@ -35,9 +35,10 @@ class _GamePlayState extends State<GamePlay>
   // notes
   List<Note> notes = null;
   Future<String> statusOfInitNotes = null;
+  String songName = 'canond.mid.txt';
 
-  Future<String> _doInitNotes() async {
-    notes = await initNotes();
+  Future<String> doInitNotes() async {
+    notes = await initNotes(songName);
     return 'done';
   }
 
@@ -52,7 +53,7 @@ class _GamePlayState extends State<GamePlay>
 //      print('success loading notes');
 //      print('length: ${notes.length}');
 //    });
-    statusOfInitNotes = _doInitNotes();
+    statusOfInitNotes = doInitNotes();
 
 
 
@@ -73,12 +74,8 @@ class _GamePlayState extends State<GamePlay>
             isPlaying = false;
             notes[currentNoteIndex].state = NoteState.missed;
           });
-          animationController.reverse().then((_) => _showFinishDialog());
+          animationController.reverse().then((_) => showFinishDialog());
         }
-//        else if (currentNoteIndex == notes.length) {
-//          // song finished
-//          _showFinishDialog();
-//        }
         else {
           setState(() {
             ++currentNoteIndex;
@@ -86,7 +83,7 @@ class _GamePlayState extends State<GamePlay>
 
           if(currentNoteIndex >= notes.length){
             // song finished here
-            _showFinishDialog();
+            showFinishDialog();
           }
           else{
             animationController.forward(from: 0);
@@ -135,7 +132,7 @@ class _GamePlayState extends State<GamePlay>
                     _drawLine(3)
                   ],
                 ),
-                _drawPoints(),
+                drawPoints(),
                 _pauseButton(),
               ],
             );
@@ -170,7 +167,7 @@ class _GamePlayState extends State<GamePlay>
     );
   }
 
-  void _restart() {
+  void restart() {
     setState(() {
       hasStarted = false;
       isPlaying = true;
@@ -185,7 +182,7 @@ class _GamePlayState extends State<GamePlay>
     animationController.reset();
   }
 
-  void _showFinishDialog() {
+  void showFinishDialog() {
     showDialog(
       context: context,
       builder: (context) {
@@ -199,10 +196,10 @@ class _GamePlayState extends State<GamePlay>
           ],
         );
       },
-    ).then((_) => _restart());
+    ).then((_) => restart());
   }
 
-  void _onTap(Note note) {
+  void onTap(Note note) {
     bool areAllPreviousTapped = notes
         .sublist(0, note.orderNumber)
         .every((n) => n.state == NoteState.tapped);
@@ -239,13 +236,13 @@ class _GamePlayState extends State<GamePlay>
       child: Line(
         lineNumber: lineNumber,
         currentNote: notes.sublist(currentNoteIndex, end),
-        onTileTap: _onTap,
+        onTileTap: onTap,
         animation: animationController,
       ),
     );
   }
 
-  _drawPoints() {
+  drawPoints() {
     return Align(
       alignment: Alignment.topCenter,
       child: Padding(

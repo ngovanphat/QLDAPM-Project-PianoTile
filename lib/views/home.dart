@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play.dart';
+import 'package:piano_tile/views/game_play_online.dart';
 import 'package:piano_tile/views/profile.dart';
 import 'package:piano_tile/views/music_list.dart';
 import 'package:piano_tile/views/create_room.dart';
@@ -71,14 +72,19 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           ),
                           Container(
                             width: 350,
+
                             height: 55,
+
                             margin: EdgeInsets.only(top: 20),
                             child: FlatButton(
                               onPressed: () {
+
                                 Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => GamePlay()));
+
+
                               },
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(70),
@@ -94,8 +100,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           ),
                           Container(
                             width: 350,
+
                             height: 55,
                             margin: EdgeInsets.only(top: 20),
+
                             child: FlatButton(
                               onPressed: () {
                                 Navigator.push(
