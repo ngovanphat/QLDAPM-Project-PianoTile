@@ -77,9 +77,21 @@ class _FriendsListState extends State<FriendsList> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Remove Friend?"),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: Colors.white, width: 1),
+      ),
+      backgroundColor: Colors.black,
+      title: Center(
+        child: Text(
+          "Remove Friend?",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
       content: Text(
-          "Would you like to continue removing this friend from your list?"),
+        "Would you like to continue removing this friend from your list?",
+        style: TextStyle(color: Colors.white),
+      ),
       actions: [
         cancelButton,
         continueButton,
