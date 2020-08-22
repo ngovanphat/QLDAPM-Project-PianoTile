@@ -37,8 +37,17 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
   @override
   void deactivate() {
     super.deactivate();
+
     room.removeUserByName(username);
   }
+  dialogContent(BuildContext context){
+    return Stack(
+      children: <Widget>[
+        Text("sorry"),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Timer.periodic(Duration(seconds: 5), (timer) {
@@ -58,11 +67,27 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
             Image.asset('assets/images/background.jpg', fit: BoxFit.fill),
             RowOnTop(context, 0, 0),
             Container(
-                margin: EdgeInsets.only(top: 100),
+                margin: EdgeInsets.only(top: 70),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      Container(
+                        margin: EdgeInsets.only(bottom: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text('ROOM ID: ${room.keyOfRoom}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold
+                              ),
+
+                            )
+                          ],
+                        ),
+                      ),
                       AnimatedBuilder(
                         animation: _animationController,
                         builder: (_, child) {
@@ -73,23 +98,45 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                         },
                         child: Image.asset('assets/images/disk.png'),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 10),
-                        child: Text(
-                         '${room.musicName}',
-                          style: TextStyle(
-                              fontSize: 30,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(top: 10),
+                            child: Text(
+                             '${room.musicName}',
+                              style: TextStyle(
+                                  fontSize: 30,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 13),
+                            child: IconButton(
+                              icon: Icon(Icons.arrow_drop_down_circle),
+                              tooltip: 'Open Music List',
+                              onPressed: () {
+                                print("Show list music dialog");
+                              },
                               color: Colors.white,
-                              fontWeight: FontWeight.bold),
-                        ),
+                            ),
+                          ),
+                        ],
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 20),
+                        margin: EdgeInsets.only(top: 23),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             userInRoom(context, room.usernameOne),
-                            userInRoom(context, room.usernameTwo != '' ? room.usernameTwo : '+'),
+                            room.usernameTwo != '' ? userInRoom(context, room.usernameTwo) : GestureDetector(
+                              child:  userInRoom(context, '+'),
+                              onTap: (){
+                                  print("press add button");
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -98,33 +145,19 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
-                            userInRoom(context, room.usernameThree != '' ? room.usernameThree : '+'),
-                            userInRoom(context, room.usernameFour != '' ? room.usernameFour : '+'),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        width: 350,
-                        height: 55,
-                        margin: EdgeInsets.only(top: 20),
-                        child: FlatButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MusicList()));
-                          },
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(70),
-                              side: BorderSide(
-                                  color: Colors.white, width: 3)),
-                          child: Text(
-                            'List Music',
-                            style: TextStyle(
-                                fontSize: 25, color: Colors.white),
+                           room.usernameThree != '' ? userInRoom(context, room.usernameThree) : GestureDetector(
+                             child:  userInRoom(context, '+'),
+                             onTap: (){
+                               print("press add button");
+                             },
+                           ),
+                          room.usernameFour!= '' ? userInRoom(context, room.usernameFour) : GestureDetector(
+                            child:  userInRoom(context, '+'),
+                            onTap: (){
+                              print("press add button");
+                            },
                           ),
-                          color: Colors.white24,
+                          ],
                         ),
                       ),
                       Container(
