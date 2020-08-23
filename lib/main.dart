@@ -4,7 +4,6 @@ import 'package:piano_tile/views/game_play.dart';
 import 'package:piano_tile/views/game_play_online.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 void main() {
   runApp(MyApp());
 }

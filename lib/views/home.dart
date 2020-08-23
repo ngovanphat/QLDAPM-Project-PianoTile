@@ -6,6 +6,8 @@ import 'package:piano_tile/views/game_play_online.dart';
 import 'package:piano_tile/views/profile.dart';
 import 'package:piano_tile/views/music_list.dart';
 import 'package:piano_tile/views/create_room.dart';
+import 'package:piano_tile/model/ad_manager.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -15,6 +17,11 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   int _currentIndex = 0;
+
+  Future<void> _initAdMob() {
+    // TODO: Initialize AdMob SDK
+    return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
+  }
 
   @override
   void initState() {
