@@ -1,6 +1,8 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:marquee_flutter/marquee_flutter.dart';
+import 'package:piano_tile/helper/sizes_helpers.dart';
 import 'package:piano_tile/model/room.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play_online.dart';
@@ -10,6 +12,9 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:math' show Random;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piano_tile/model/custom_expansion_panel.dart' as CustomExpansionPanel;
+import 'package:piano_tile/model/Song.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 
 class CreateRoom extends StatefulWidget {
@@ -23,7 +28,55 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
   String username = 'ngophat99';
   Room room;
   bool isInRoom = true;
+  List<Song> songs = [];
 
+  List getSongs() {
+    //TODO fetch data from server
+    //tên bài hát
+    final titles = [
+      'Little Star',
+      'Jingle Bells',
+      'Canon',
+      'Two Tigers',
+      'The Blue Danube',
+      'Happy New Year',
+      'Beyer No. 8',
+      'Bluestone Alley',
+      'Reverie'
+    ];
+    //tên ca sĩ/nhóm nhạc
+    final artists = [
+      'English Folk Music',
+      'James Lord Pierpont',
+      'Johann Pachelbel',
+      'French Folk Music',
+      'Johann Strauss II',
+      'English Folk Music',
+      'Ferdinand Beyer',
+      'Congfei Wei',
+      'Claude Debussy'
+    ];
+    //icons sẽ được thay bằng hình nhạc sau
+    final images = [
+      'assets/images/music-note.png',
+      'assets/images/music-note.png',
+      'assets/images/music-note.png',
+      'assets/images/music-note.png',
+      'assets/images/music-note.png',
+      'assets/images/music-note.png',
+      'assets/images/music-note.png',
+      'assets/images/music-note.png',
+      'assets/images/music-note.png'
+    ];
+    final List<int> difficulties = [1, 1, 1, 2, 3, 4, 4, 5, 5];
+
+    final List<Song> musicList = [];
+    for (var i = 0; i < titles.length; i++) {
+      musicList.add(new Song(
+          i.toString(), titles[i], [artists[i]], difficulties[i], images[i]));
+    }
+    return musicList;
+  }
 
   @override
   void initState() {
@@ -34,6 +87,7 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
     String key= randomString(6,from: 65,to: 90);
     room = new Room(key, musicName, username, '', '', '');
     room.updateToDatabase(key);
+    songs = getSongs();
 
     // update additional fields: usernameOnePoints, usernameTwoPoints,...
     // for storing user points
@@ -147,7 +201,78 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                               icon: Icon(Icons.arrow_drop_down_circle),
                               tooltip: 'Open Music List',
                               onPressed: () {
-                                print("Show list music dialog");
+                                songs = getSongs();
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Select song'),
+                                        scrollable: true,
+                                        content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Container(
+                                                height: 700.0,
+                                                width: 600.0,
+                                                child: ListView.builder(
+                                                  itemCount: songs.length,
+                                                  itemBuilder: (context, index) {
+                                                    return GestureDetector(
+                                                        onTap: () {
+                                                          musicName = songs[index].getName();
+                                                        },
+                                                        child: Card(
+                                                          child: ListTile(
+                                                            isThreeLine: true,
+                                                            leading: Container(
+                                                              height: double.infinity,
+                                                              child: ImageIcon(
+                                                                AssetImage(songs[index].getImage()),
+                                                                size: 50,
+                                                                color: Color(0xFF3A5A98),
+                                                              ), //replaced by image if available
+                                                            ),
+                                                            title: Text(songs[index].getName()),
+                                                            subtitle: Container(
+                                                              child: Row(
+                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                children: <Widget>[
+                                                                  Flexible(
+                                                                    flex: 3,
+                                                                    child: Container(
+                                                                      height: 30,
+                                                                      child: new MarqueeWidget(
+                                                                        text: songs[index].getArtists().join('-'),
+                                                                        textStyle: new TextStyle(fontSize: 16.0),
+                                                                        scrollAxis: Axis.horizontal,
+                                                                      ),
+                                                                      //Text(,overflow: TextOverflow.ellipsis,),
+                                                                    ),
+                                                                  ),
+                                                                  Flexible(
+                                                                    flex: 3,
+                                                                    child: SmoothStarRating(
+                                                                      rating: songs[index].getDifficulty().toDouble(),
+                                                                      size: 18,
+                                                                      filledIconData: Icons.music_note,
+                                                                      defaultIconData: null,
+                                                                      starCount: 5,
+                                                                      isReadOnly: true,
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ));
+                                                  },
+                                                ),
+                                              )
+                                            ]
+                                        ),
+                                      );
+                                    }
+                                );
                               },
                               color: Colors.white,
                             ),
