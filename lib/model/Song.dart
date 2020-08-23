@@ -118,7 +118,7 @@ String getNotes(){
       final FirebaseAuth auth = FirebaseAuth.instance;
       final FirebaseUser user = await auth.currentUser();
       final uid = user.uid;
-      var db = FirebaseDatabase.instance.reference().child("HighScores/" + "abc");
+      var db = FirebaseDatabase.instance.reference().child("HighScores/" + uid);
       await db
           .child("/" + this.name)
           .update({'score': this.highscore, 'updateAt': Timestamp.now()});
@@ -129,8 +129,7 @@ String getNotes(){
     }
   }
 
-  void setFavorite() {
-    //TODO add new favorite to user info
-    this.isFavorited = false ? true : false;
+  void setFavorite(bool newState) {
+    this.isFavorited = newState;
   }
 }

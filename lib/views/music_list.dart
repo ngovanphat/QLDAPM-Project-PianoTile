@@ -20,6 +20,14 @@ import 'package:like_button/like_button.dart';
 
 import 'game_play.dart';
 
+List<Song> songs = [];
+List<String> favorites=[];
+bool _isVisible = true;
+bool _isLoading = false;
+bool _FavoritebtnEnabled = true;
+bool loadedAll = false;
+int tabIndex=0;
+
 class MusicList extends StatefulWidget {
   @override
   _MusicListState createState() => _MusicListState();
@@ -37,120 +45,127 @@ class _MusicListState extends State<MusicList> {
       },
       child: DefaultTabController(
         length: 3,
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          backgroundColor: Color(0xFF373737),
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(displayHeight(context) * 0.15),
-            child: AppBar(
-              automaticallyImplyLeading: false, //Xóa dấu back
-              centerTitle:
-                  true, //Cho 2 mục trong title căn giữa - vẫn hơi lệch 1 chút so với Home
-              title: RowOnTop(context, 0, 0),
-              bottom: TabBar(
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w900,
+        child: Builder(builder: (BuildContext context) {
+          final TabController tabController = DefaultTabController.of(context);
+          tabController.addListener(() {
+            if (!tabController.indexIsChanging) {
+              if(tabController.index==2){
+                _fetchSongs(tabController.index,0,10);
+              }
+            }
+          });
+          return Scaffold(
+            resizeToAvoidBottomInset: false,
+            backgroundColor: Color(0xFF373737),
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(displayHeight(context) * 0.15),
+              child: AppBar(
+                automaticallyImplyLeading: false, //Xóa dấu back
+                centerTitle:
+                    true, //Cho 2 mục trong title căn giữa - vẫn hơi lệch 1 chút so với Home
+                title: RowOnTop(context, 0, 0),
+                bottom: TabBar(
+                  onTap: (index) {
+                    tabIndex = index;
+                  },
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.w900,
+                  ),
+                  indicatorColor: Colors.lightBlueAccent,
+                  indicatorWeight: displayHeight(context) * 0.01,
+                  labelColor: Colors.white,
+                  tabs: [
+                    Tab(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Vietnamese",
+                          style: TextStyle(
+                            fontSize: displayHeight(context) * 0.022,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Tab(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Foreign",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: displayHeight(context) * 0.022,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Tab(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Favorite",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: displayHeight(context) * 0.022,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                indicatorColor: Colors.white12,
-                indicatorWeight: displayHeight(context) * 0.01,
-                labelColor: Colors.white,
-                tabs: [
-                  Tab(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Vietnamese",
-                        style: TextStyle(
-                          fontSize: displayHeight(context) * 0.022,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Tab(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Foreign",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: displayHeight(context) * 0.022,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Tab(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Favorite",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: displayHeight(context) * 0.022,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
-          ),
-          body: TabBarView(
-            children: [
-              Container(
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/images/background.jpg'),
-                          fit: BoxFit.cover)),
-                  child: BodyLayout(0)),
-              Container(
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/images/background.jpg'),
-                          fit: BoxFit.cover)),
-                  child: BodyLayout(1)),
-              Container(
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/images/background.jpg'),
-                          fit: BoxFit.cover)),
-                  child: BodyLayout(2)),
-            ],
-          ),
-        ),
+            body: TabBarView(
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage('assets/images/background.jpg'),
+                            fit: BoxFit.cover)),
+                    child: BodyLayout(0)),
+                Container(
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage('assets/images/background.jpg'),
+                            fit: BoxFit.cover)),
+                    child: BodyLayout(1)),
+                Container(
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage('assets/images/background.jpg'),
+                            fit: BoxFit.cover)),
+                    child: BodyLayout(2)),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }
 }
 
 class BodyLayout extends StatefulWidget {
-  int tabIndex;
   //BodyLayout({Key key, this.tabIndex}) : super(key: key);
   BodyLayout(int tabIndex) {
-    this.tabIndex = tabIndex;
   }
 
   @override
-  _BodyLayoutState createState() => _BodyLayoutState(tabIndex);
+  _BodyLayoutState createState() => _BodyLayoutState();
 }
 
 class _BodyLayoutState extends State<BodyLayout> {
-  int tabIndex;
-  //danh sách bài hát
-  List<Song> songs = [];
+  List<int> listTracker=[-1,-1,-1];
+  int expListCounter=0;
   int selected = 0;
   int visileItems = 8;
-  bool _isVisible = true;
-  bool _isLoading = false;
-  bool _FavoritebtnEnabled = true;
   final _scrollController = ScrollController();
   final GlobalKey datakey = GlobalKey();
-  _BodyLayoutState(tabIndex) {
-    this.tabIndex = tabIndex;
-  }
 
   @override
   void initState() {
     songs = getSongs(tabIndex);
+    listTracker[0]=selected;
+    fetchFavorites();
+    expListCounter++;
     _scrollController.addListener(() async {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
@@ -202,14 +217,37 @@ class _BodyLayoutState extends State<BodyLayout> {
     return CustomExpansionPanel.ExpansionPanelList.radio(
       initialOpenPanelValue: selected,
       expansionCallback: (int index, bool isExpanded) {
-        if (isExpanded) selected = index;
+        listTracker[expListCounter]=index;
+        expListCounter++;
+        if(isExpanded){
+          listTracker=[-1,-1,-1];
+          expListCounter=0;
+          selected=-1;
+          return;
+        }
+        if(expListCounter==1){
+          selected=index;
+        }
+        if(expListCounter==3){
+          expListCounter=1;
+          if(listTracker[0]==listTracker[2]){
+            selected = listTracker[1];
+            int tmp=listTracker[1];
+            listTracker=[tmp,-1,-1];
+          }
+          else {
+            int tmp = listTracker[2];
+            listTracker = [tmp, -1, -1];
+            selected=tmp;
+          }
+        }
       },
       children:
           songs.map<CustomExpansionPanel.ExpansionPanelRadio>((Song song) {
         return CustomExpansionPanel.ExpansionPanelRadio(
           value: songs.indexOf(song),
           canTapOnHeader: true,
-          song :song,
+          song: song,
           headerBuilder: (BuildContext context, bool isExpanded) {
             //Header
             return Container(
@@ -300,7 +338,7 @@ class _BodyLayoutState extends State<BodyLayout> {
                       likeBuilder: (bool isLiked) {
                         return Icon(
                           Icons.favorite,
-                          color: isLiked ? Colors.redAccent : Colors.grey,
+                          color: song.getFavorite() ? Colors.redAccent : Colors.grey,
                           size: displayHeight(context) * 0.04,
                         );
                       },
@@ -312,9 +350,30 @@ class _BodyLayoutState extends State<BodyLayout> {
       }).toList(),
     );
   }
-
+  void fetchFavorites() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseUser user = await auth.currentUser();
+    final uid = user.uid;
+    if (user != null) {
+      var db =
+      FirebaseDatabase.instance.reference().child('Favorites').child(uid);
+      await db.once().then((DataSnapshot snapshot){
+        if(snapshot.value==null)
+          return;
+        Map<dynamic, dynamic> values = snapshot.value;
+        values.forEach((key,values) {
+          favorites.add(key);
+        });
+      });
+      debugPrint(favorites.join(','));
+      for(int i=0;i<songs.length;i++){
+        if(favorites.contains(songs[i].getId())){
+          songs[i].setFavorite(true);
+        }
+      }
+    }
+  }
   Future<bool> onFavoriteButtonTapped(bool isLiked) async {
-    //TODO test this func after login finish
     debugPrint(_FavoritebtnEnabled.toString());
     if (_FavoritebtnEnabled == false) return isLiked;
     _FavoritebtnEnabled = false;
@@ -328,8 +387,11 @@ class _BodyLayoutState extends State<BodyLayout> {
         try {
           var db =
               FirebaseDatabase.instance.reference().child("Favorites/" + uid);
-          await db.update({songs[selected].getId(): songs[selected].getName()});
-
+          if(tabIndex==0)
+            await db.child(songs[selected].getId().padLeft(2, '0')+"VN").update({"name": songs[selected].getName()});
+          else if(tabIndex==1) await db.child(songs[selected].getId().padLeft(2, '0')+"NN").update({"name": songs[selected].getName()});
+          //Không check cho tabindex 2 vì khi unfavorite sẽ xóa đó khỏi tab
+          songs[selected].setFavorite(true);
           return !isLiked;
         } catch (e) {
           debugPrint(e.toString());
@@ -339,12 +401,13 @@ class _BodyLayoutState extends State<BodyLayout> {
           var db =
               FirebaseDatabase.instance.reference().child("Favorites/" + uid);
           await db.child(songs[selected].getId()).remove();
+          songs[selected].setFavorite(false);
         } catch (e) {
           debugPrint(e.toString());
         }
       }
-    }else{
-      Widget loginDialog=new LoginDialog();
+    } else {
+      Widget loginDialog = new LoginDialog();
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -354,71 +417,80 @@ class _BodyLayoutState extends State<BodyLayout> {
     }
     return isLiked;
   }
+//TODO refine id system for music list
 
-  Future<List> _fetchSongs(tabIndex, pageNumber, pageSize) async {
-    switch (tabIndex) {
-      case 2:
-        {
-          final FirebaseAuth auth = FirebaseAuth.instance;
-          final FirebaseUser user = await auth.currentUser();
-          final uid = user.uid;
-          var db =
-              FirebaseDatabase.instance.reference().child("Favorites/" + uid);
-          await db
-              .orderByKey()
-              .startAt((pageNumber * 10 + 1).toString())
-              .limitToFirst(10)
-              .once()
-              .then((DataSnapshot snapshot) {
-            Map<dynamic, dynamic> values = snapshot.value;
-            values.forEach((key, values) {
-              songs.add(new Song(key, values["name"], values["artists"],
-                  values["difficulty"], values["image"],notes_dir: values["notes_dir"]));
-            });
+}
+Future<List> _fetchSongs(tabIndex, pageNumber, pageSize) async {
+  switch (tabIndex) {
+    case 2:
+      {
+        final FirebaseAuth auth = FirebaseAuth.instance;
+        final FirebaseUser user = await auth.currentUser();
+        final uid = user.uid;
+        debugPrint(uid);
+        var db =
+        FirebaseDatabase.instance.reference().child('Favorites/' + uid);
+        await db
+            .orderByKey()
+            .startAt((pageNumber * 10 + 1).toString())
+            .limitToFirst(10)
+            .once()
+            .then((DataSnapshot snapshot) {
+          Map<dynamic, dynamic> values = snapshot.value;
+          values.forEach((key, values) {
+            debugPrint(key);
+            songs.add(new Song(key, values["name"], values["artists"],
+                values["difficulty"], values["image"],
+                notes_dir: values["notes_dir"]));
           });
-        } //Yeu thich
-        break;
-      case 1:
-        {
-          var db = FirebaseDatabase.instance
-              .reference()
-              .child("Songs/NhacNuocNgoai");
-          await db
-              .orderByKey()
-              .startAt((pageNumber * 10 + 1).toString())
-              .limitToFirst(10)
-              .once()
-              .then((DataSnapshot snapshot) {
-            Map<dynamic, dynamic> values = snapshot.value;
-            values.forEach((key, values) {
-              songs.add(new Song(key + "NN", values["name"], values["artists"],
-                  values["difficulty"], values["image"],notes_dir: values["notes_dir"]));
-            });
+        });
+        if (songs.isEmpty) {
+          loadedAll = true;
+          _isVisible = false;
+        }
+      } //Yeu thich
+      break;
+    case 1:
+      {
+        var db = FirebaseDatabase.instance
+            .reference()
+            .child("Songs/NhacNuocNgoai");
+        await db
+            .orderByKey()
+            .startAt((pageNumber * 10 + 1).toString())
+            .limitToFirst(10)
+            .once()
+            .then((DataSnapshot snapshot) {
+          Map<dynamic, dynamic> values = snapshot.value;
+          values.forEach((key, values) {
+            songs.add(new Song(key + "DB", values["name"], values["artists"],
+                values["difficulty"], values["image"],
+                notes_dir: values["notes_dir"]));
           });
-        } //Nhac Nuoc Ngoai
-        break;
-      default:
-        {
-          var db =
-              FirebaseDatabase.instance.reference().child("Songs/NhacViet");
-          await db
-              .orderByKey()
-              .startAt((pageNumber * 10 + 1).toString())
-              .limitToFirst(10)
-              .once()
-              .then((DataSnapshot snapshot) {
-            Map<dynamic, dynamic> values = snapshot.value;
-            values.forEach((key, values) {
-              songs.add(new Song(key + "NN", values["name"], values["artists"],
-                  values["difficulty"], values["image"],notes_dir: values["notes_dir"]));
-            });
+        });
+      } //Nhac Nuoc Ngoai
+      break;
+    default:
+      {
+        var db =
+        FirebaseDatabase.instance.reference().child("Songs/NhacViet");
+        await db
+            .orderByKey()
+            .startAt((pageNumber * 10 + 1).toString())
+            .limitToFirst(10)
+            .once()
+            .then((DataSnapshot snapshot) {
+          Map<dynamic, dynamic> values = snapshot.value;
+          values.forEach((key, values) {
+            songs.add(new Song(key + "DB", values["name"], values["artists"],
+                values["difficulty"], values["image"],
+                notes_dir: values["notes_dir"]));
           });
-        } //Nhac Viet
-        break;
-    }
+        });
+      } //Nhac Viet
+      break;
   }
 }
-
 List getSongs(tabIndex) {
   //TODO fetch data from server
   //tên bài hát
@@ -462,13 +534,15 @@ List getSongs(tabIndex) {
   final List<Song> musicList = [];
   for (var i = 0; i < titles.length; i++) {
     musicList.add(new Song(
-        i.toString(), titles[i], artists[i], difficulties[i], images[i], notes_dir: "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/Shining_the_morning.mid.txt?alt=media&token=052c65bf-f531-40bc-9584-02f9cdb3f306"));
+        i.toString().padLeft(2, '0'), titles[i], artists[i], difficulties[i], images[i],
+        notes_dir:
+            "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/Shining_the_morning.mid.txt?alt=media&token=052c65bf-f531-40bc-9584-02f9cdb3f306"));
   }
   if (tabIndex == 1) {
     return musicList.reversed.toList();
   } else if (tabIndex == 2) {
-    musicList.removeRange(4, 8);
-    return musicList;
+    List<Song> temp = [];
+    return temp;
   } else
     return musicList;
 }
