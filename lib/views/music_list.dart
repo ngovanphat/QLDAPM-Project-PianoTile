@@ -209,6 +209,7 @@ class _BodyLayoutState extends State<BodyLayout> {
         return CustomExpansionPanel.ExpansionPanelRadio(
           value: songs.indexOf(song),
           canTapOnHeader: true,
+          song :song,
           headerBuilder: (BuildContext context, bool isExpanded) {
             //Header
             return Container(
@@ -372,7 +373,7 @@ class _BodyLayoutState extends State<BodyLayout> {
             Map<dynamic, dynamic> values = snapshot.value;
             values.forEach((key, values) {
               songs.add(new Song(key, values["name"], values["artists"],
-                  values["difficulty"], values["image"]));
+                  values["difficulty"], values["image"],notes_dir: values["notes_dir"]));
             });
           });
         } //Yeu thich
@@ -391,7 +392,7 @@ class _BodyLayoutState extends State<BodyLayout> {
             Map<dynamic, dynamic> values = snapshot.value;
             values.forEach((key, values) {
               songs.add(new Song(key + "NN", values["name"], values["artists"],
-                  values["difficulty"], values["image"]));
+                  values["difficulty"], values["image"],notes_dir: values["notes_dir"]));
             });
           });
         } //Nhac Nuoc Ngoai
@@ -409,7 +410,7 @@ class _BodyLayoutState extends State<BodyLayout> {
             Map<dynamic, dynamic> values = snapshot.value;
             values.forEach((key, values) {
               songs.add(new Song(key + "NN", values["name"], values["artists"],
-                  values["difficulty"], values["image"]));
+                  values["difficulty"], values["image"],notes_dir: values["notes_dir"]));
             });
           });
         } //Nhac Viet
@@ -461,7 +462,7 @@ List getSongs(tabIndex) {
   final List<Song> musicList = [];
   for (var i = 0; i < titles.length; i++) {
     musicList.add(new Song(
-        i.toString(), titles[i], artists[i], difficulties[i], images[i]));
+        i.toString(), titles[i], artists[i], difficulties[i], images[i], notes_dir: "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/Shining_the_morning.mid.txt?alt=media&token=052c65bf-f531-40bc-9584-02f9cdb3f306"));
   }
   if (tabIndex == 1) {
     return musicList.reversed.toList();

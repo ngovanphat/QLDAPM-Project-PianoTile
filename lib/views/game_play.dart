@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // import lib of us
 import 'package:audioplayers/audio_cache.dart';
 import 'package:piano_tile/helper/song_provider.dart';
+import 'package:piano_tile/model/Song.dart';
 import 'package:piano_tile/model/note.dart';
 import 'package:piano_tile/model/line_divider.dart';
 import 'package:piano_tile/model/line.dart';
@@ -12,9 +13,10 @@ import 'package:flutter/services.dart';
 
 
 class GamePlay extends StatefulWidget {
-
+ final Song song;
+ const GamePlay( {Key key,this.song}):super(key:key);
   @override
-  _GamePlayState createState() => _GamePlayState();
+  _GamePlayState createState() => _GamePlayState(song:song);
 
 }
 
@@ -27,23 +29,24 @@ class _GamePlayState extends State<GamePlay>
   bool hasStarted = false;
   bool isPlaying = true;
   bool ispause = false;
-
+  Song song;
   // midi player
   FlutterMidi midi = new FlutterMidi();
 
   // notes
   List<Note> notes = null;
   Future<String> statusOfInitNotes = null;
-
+  _GamePlayState({this.song});
   Future<String> _doInitNotes() async {
-    notes = await initNotes();
+
+    notes = await initNotes(song.getNotes());
     return 'done';
   }
 
   @override
   void initState() {
     super.initState();
-
+    song=widget.song;
     // init notes
 //    initNotes().then((value) {
 //      notes = value;
@@ -51,6 +54,9 @@ class _GamePlayState extends State<GamePlay>
 //      print('success loading notes');
 //      print('length: ${notes.length}');
 //    });
+    if(song==null){//for home page song
+      song=new Song("-1","Shining The Morning","abc",1," ",notes_dir: "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/canond.mid.txt?alt=media&token=0d3fbea0-61be-4e9e-832e-dcec4bf16727");
+    }
     statusOfInitNotes = _doInitNotes();
 
 
@@ -197,7 +203,10 @@ class _GamePlayState extends State<GamePlay>
           title: Text("Score: $points"),
           actions: <Widget>[
             FlatButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                song.setHighscore(points);
+                Navigator.of(context).pop();
+              },
               child: Text("Restart"),
             )
           ],

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:piano_tile/views/game_play.dart';
-
+import 'package:piano_tile/model/Song.dart';
 /*
 
 Only customized the trailing icon to play button
@@ -78,6 +78,7 @@ class ExpansionPanel {
     @required this.body,
     this.isExpanded = false,
     this.canTapOnHeader = false,
+    @required this.song,
   }) : assert(headerBuilder != null),
        assert(body != null),
        assert(isExpanded != null),
@@ -100,7 +101,7 @@ class ExpansionPanel {
   ///
   /// Defaults to false.
   final bool canTapOnHeader;
-
+  final Song song;
 }
 
 /// An expansion panel that allows for radio-like functionality.
@@ -123,11 +124,13 @@ class ExpansionPanelRadio extends ExpansionPanel {
     @required ExpansionPanelHeaderBuilder headerBuilder,
     @required Widget body,
     bool canTapOnHeader = false,
+    Song song=null,
   }) : assert(value != null),
       super(
         body: body,
         headerBuilder: headerBuilder,
         canTapOnHeader: canTapOnHeader,
+        song:song,
       );
 
   /// The value that uniquely identifies a radio panel so that the currently
@@ -468,9 +471,10 @@ class _ExpansionPanelListState extends State<ExpansionPanelList> {
           color: Colors.amber,
           child: Text("Play"),
           shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-          onPressed: () => {
-            Navigator.push(context,MaterialPageRoute(builder: (context) => GamePlay())
-            )},
+          onPressed: (){
+            debugPrint(child.song.getNotes());
+            Navigator.push(context,MaterialPageRoute(builder: (context) => GamePlay(song:child.song))
+            );},
         ),
         /*
         ======================================================

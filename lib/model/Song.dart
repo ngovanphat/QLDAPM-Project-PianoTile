@@ -48,7 +48,10 @@ class Song {
   String getImage() {
     return this.image;
   }
-
+String getNotes(){
+    debugPrint("note dir"+this.notes_dir);
+    return this.notes_dir;
+}
   void setId(id) {
     this.id = id;
   }
@@ -68,7 +71,6 @@ class Song {
   void setImage(image) {
     this.image = image;
   }
-
   Song.fromJson(this.id, Map data) {
     name = data['name'];
     artists = data['artists'];
@@ -97,6 +99,7 @@ class Song {
   }
   void fetchHighscore(userID) {
     //TODO get highscore from database
+
   }
   void fetchFavorite(userID) {}
   int getHighscore() {
@@ -115,7 +118,7 @@ class Song {
       final FirebaseAuth auth = FirebaseAuth.instance;
       final FirebaseUser user = await auth.currentUser();
       final uid = user.uid;
-      var db = FirebaseDatabase.instance.reference().child("HighScores/" + uid);
+      var db = FirebaseDatabase.instance.reference().child("HighScores/" + "abc");
       await db
           .child("/" + this.name)
           .update({'score': this.highscore, 'updateAt': Timestamp.now()});

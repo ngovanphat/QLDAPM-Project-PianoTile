@@ -14,14 +14,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permissions_plugin/permissions_plugin.dart';
 
 
-Future<List<Note>> initNotes() async{
+Future<List<Note>> initNotes(String notedir) async{
 
   // check if song already in local
   // ...
 
   // if not, download file from firebase storage
   var storage = FirebaseStorage.instance;
-  StorageReference ref = storage.ref().child('canond.mid.txt');
+  StorageReference ref = await storage.getReferenceFromUrl(notedir);
 
   var dir = await getExternalStorageDirectory();
   var name = await ref.getName();
