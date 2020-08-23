@@ -219,7 +219,8 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                                                   itemBuilder: (context, index) {
                                                     return GestureDetector(
                                                         onTap: () {
-                                                          musicName = songs[index].getName();
+                                                          setState(() { room.musicName = songs[index].getName(); });
+                                                          Navigator.of(context).pop();
                                                         },
                                                         child: Card(
                                                           child: ListTile(
