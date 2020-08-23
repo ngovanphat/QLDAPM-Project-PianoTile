@@ -104,19 +104,99 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             height: 55,
                             margin: EdgeInsets.only(top: 20),
 
+
                             child: FlatButton(
                               onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CreateRoom()));
+                                showDialog(
+                                    context: context,
+                                    builder: (_) => Material(
+                                    type: MaterialType.transparency,
+                                    // Aligns the container to center
+                                    child: FractionallySizedBox(heightFactor: 1, widthFactor: 0.80,
+                                        child: Center(
+                                        child: new Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          new FlatButton(
+                                              color: Colors.blueAccent,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(70),
+                                                  side: BorderSide(
+                                                      color: Colors.white, width: 3)),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Icon(Icons.add_circle_outline, color: Colors.white, size: 50),
+                                                  Text(
+                                                    "Create room",
+                                                    style: TextStyle(color: Colors.white, fontSize: 25),
+                                                  )
+                                                ],
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(builder: (context) => CreateRoom()));
+                                              }),
+                                          Padding(padding: const EdgeInsets.only(top: 30)),
+                                          new FlatButton(
+                                              color: Colors.blueAccent,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(70),
+                                                  side: BorderSide(
+                                                      color: Colors.white, width: 3)),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Icon(Icons.people_outline, color: Colors.white, size: 50),
+                                                  Text(
+                                                    "Join room",
+                                                    style: TextStyle(color: Colors.white, fontSize: 25),
+                                                  )
+                                                ],
+                                              ),
+                                              onPressed: () {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (_) => Material(
+                                                      type:MaterialType.transparency
+                                                    ),
+                                                    child: FractionallySizedBox(heightFactor: 1, widthFactor: 0.80,
+                                                    child: Center(
+                                                      child: new Column(
+                                                        children: <Widget>[
+                                                          new TextField(
+                                                            decoration: new InputDecoration(hintText: "Enter room code"),
+                                                          ),
+                                                          new FlatButton(
+                                                            child: new Text("Join"),
+                                                            onPressed: (){
+                                                              print("Joined");
+                                                            },
+                                                          )
+                                                        ],
+                                                      )
+                                                    )
+                                                    )
+                                                );
+                                                //Navigator.of(context).pop();
+                                              }),
+                                        ]
+                                      )
+                                    )
+                                    )
+                                    )
+                                );
                               },
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(70),
                                   side: BorderSide(
                                       color: Colors.white, width: 3)),
                               child: Text(
-                                'Create Room',
+                                'Multiplay',
                                 style: TextStyle(
                                     fontSize: 25, color: Colors.white),
                               ),
