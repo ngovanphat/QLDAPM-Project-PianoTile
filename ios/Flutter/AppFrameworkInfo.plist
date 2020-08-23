@@ -22,5 +22,7 @@
   <string>1.0</string>
   <key>MinimumOSVersion</key>
   <string>8.0</string>
+  <key>GADApplicationIdentifier</key>
+  <string>ca-app-pub-6269523505662670~5529603286</string>
 </dict>
 </plist>

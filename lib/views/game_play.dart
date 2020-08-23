@@ -10,6 +10,7 @@ import 'package:piano_tile/model/pause_menu.dart';
 import 'package:flutter_midi/flutter_midi.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:piano_tile/views/music_list.dart';
 
 
 class GamePlay extends StatefulWidget {
@@ -190,13 +191,21 @@ class GamePlayState<T extends GamePlay> extends State<T>
           title: Text("Score: $points"),
           actions: <Widget>[
             FlatButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MusicList())),
+              child: Text("Exit"),
+            ),
+            FlatButton(
+              onPressed: () => restart(),
               child: Text("Restart"),
+            ),
+            FlatButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("Recover with ads")
             )
           ],
         );
-      },
-    ).then((_) => restart());
+      }
+    );
   }
 
   void onTap(Note note) {
