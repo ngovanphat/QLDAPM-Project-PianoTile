@@ -188,7 +188,7 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                           Container(
                             margin: EdgeInsets.only(top: 10),
                             child: Text(
-                             '${room.musicName}',
+                             '${musicName}',
                               style: TextStyle(
                                   fontSize: 30,
                                   color: Colors.white,
@@ -219,7 +219,7 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
                                                   itemBuilder: (context, index) {
                                                     return GestureDetector(
                                                         onTap: () {
-                                                          setState(() { room.musicName = songs[index].getName(); });
+                                                          setState(() { musicName = songs[index].getName(); });
                                                           Navigator.of(context).pop();
                                                         },
                                                         child: Card(
