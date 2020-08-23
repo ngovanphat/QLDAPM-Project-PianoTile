@@ -272,7 +272,11 @@ class GamePlayState<T extends GamePlay> extends State<T>
             setState(() => ad_loaded = false);
             },
               child: Text("Recover with ads")
-            )
+            ),
+            FlatButton(
+              onPressed: () => restart(),
+              child: Text("Recover with gems")
+            ),
           ],
         );
       }
