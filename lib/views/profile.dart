@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
+import 'package:piano_tile/views/friends_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:piano_tile/views/friends_list.dart';
+import 'package:piano_tile/views/logged_in_profile.dart';
 
-import 'home.dart';
+String name = "", email = "", imageUrl = "", text = "";
 
 class Profile extends StatefulWidget {
   @override
@@ -13,6 +14,10 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  _ProfileState() {
+    assignUserElements();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,19 +47,23 @@ class _ProfileState extends State<Profile> {
                       height: 90,
                       child: FlatButton(
                         onPressed: () {
-                          _handleSignIn().whenComplete(() {
+                          if (getCurrentUser() != null) {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return Home();
+                                  return FirstScreen();
                                 },
                               ),
                             );
-                          });
+                          } else {
+                            _handleSignIn().whenComplete(() {
+                              setState(() {});
+                            });
+                          }
                         },
                         child: Row(
                           children: [
-                            Image.asset('assets/images/google.png',
+                            Image.asset("assets/images/google.png",
                                 fit: BoxFit.cover),
                             Container(
                               margin: EdgeInsets.only(left: 20),
@@ -67,7 +76,6 @@ class _ProfileState extends State<Profile> {
                               height: double.infinity,
                               color: const Color(0xffffd11a),
                             ),
-
                             Container(
                               width: 3,
                               height: double.infinity,
@@ -89,24 +97,26 @@ class _ProfileState extends State<Profile> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(15.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "LOG IN GOOGLE TO:",
+                                        name,
+                                        //"LOG IN GOOGLE TO:",
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
                                         ),
                                       ),
                                       Text(
-                                        "Play with friends",
+                                        email,
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
                                         ),
                                       ),
                                       Text(
-                                        "Save your progress",
+                                        text,
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
@@ -157,7 +167,8 @@ class _ProfileState extends State<Profile> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "FREE DIAMONDS",
@@ -223,7 +234,8 @@ class _ProfileState extends State<Profile> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "FRIENDS LIST",
@@ -284,7 +296,8 @@ class _ProfileState extends State<Profile> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "FAVORITE SONGS",
@@ -338,10 +351,44 @@ Future<FirebaseUser> _handleSignIn() async {
   );
 
   final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+
+  assert(!user.isAnonymous);
+  assert(await user.getIdToken() != null);
+
+  final FirebaseUser currentUser = await _auth.currentUser();
+  assert(user.uid == currentUser.uid);
+  assert(user.email != null);
+  assert(user.displayName != null);
+  assert(user.photoUrl != null);
+
+  name = user.displayName;
+  email = user.email;
+  imageUrl = user.photoUrl;
+  text = "";
+
   return user;
 }
 
-void signOutGoogle() async{
+void signOutGoogle() async {
   await _googleSignIn.signOut();
 }
 
+Future getCurrentUser() async {
+  final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
+  return _user;
+}
+
+void assignUserElements() async {
+  final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
+  if (_user == null) {
+    name = "LOG IN GOOGLE TO:";
+    email = "Play with friends";
+    imageUrl = "assets/images/google.png";
+    text = "Save your progress";
+  } else {
+    name = _user.displayName;
+    email = _user.email;
+    imageUrl = _user.photoUrl;
+    text = "";
+  }
+}

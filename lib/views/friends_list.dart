@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/friend.dart';
@@ -121,7 +122,7 @@ class _FriendsListState extends State<FriendsList> {
   Widget build(BuildContext context) {
     Widget content;
 
-    if (_friends.isEmpty) {
+    if (getCurrentUser() == null) {
       content = new Center(
         child: new CircularProgressIndicator(),
       );
@@ -259,4 +260,9 @@ List loadFriend() {
   }
 
   return friendList;
+}
+
+Future getCurrentUser() async {
+  FirebaseUser _user = await FirebaseAuth.instance.currentUser();
+  return _user;
 }
