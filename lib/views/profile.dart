@@ -4,6 +4,7 @@ import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/friends_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:piano_tile/views/home.dart';
 import 'package:piano_tile/views/logged_in_profile.dart';
 
 String name = "", email = "", imageUrl = "", text = "";
@@ -47,19 +48,16 @@ class _ProfileState extends State<Profile> {
                       height: 90,
                       child: FlatButton(
                         onPressed: () {
-                          if (getCurrentUser() != null) {
+                          setState(() {
+                            _handleSignIn(context);
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return FirstScreen();
+                                  return Home();
                                 },
                               ),
                             );
-                          } else {
-                            _handleSignIn().whenComplete(() {
-                              setState(() {});
-                            });
-                          }
+                          });
                         },
                         child: Row(
                           children: [
@@ -101,7 +99,7 @@ class _ProfileState extends State<Profile> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        name,
+                                        '$name',
                                         //"LOG IN GOOGLE TO:",
                                         style: TextStyle(
                                           color: Colors.white,
@@ -109,14 +107,14 @@ class _ProfileState extends State<Profile> {
                                         ),
                                       ),
                                       Text(
-                                        email,
+                                        '$email',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
                                         ),
                                       ),
                                       Text(
-                                        text,
+                                        '$text',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
@@ -203,10 +201,9 @@ class _ProfileState extends State<Profile> {
                       height: 90,
                       child: FlatButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FriendsList()));
+                          setState(() {
+                            toFriendsList(context);
+                          });
                         },
                         child: Row(
                           children: [
@@ -341,31 +338,30 @@ class _ProfileState extends State<Profile> {
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
-Future<FirebaseUser> _handleSignIn() async {
-  final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+Future<FirebaseUser> _handleSignIn(BuildContext context) async {
+  FirebaseUser user;
+  bool isSignedIn = await _googleSignIn.isSignedIn();
 
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
+  if (isSignedIn) {
+    user = await _auth.currentUser();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return FirstScreen();
+        },
+      ),
+    );
+  } else {
+    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
-  final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+    user = (await _auth.signInWithCredential(credential)).user;
+  }
 
-  assert(!user.isAnonymous);
-  assert(await user.getIdToken() != null);
-
-  final FirebaseUser currentUser = await _auth.currentUser();
-  assert(user.uid == currentUser.uid);
-  assert(user.email != null);
-  assert(user.displayName != null);
-  assert(user.photoUrl != null);
-
-  name = user.displayName;
-  email = user.email;
-  imageUrl = user.photoUrl;
-  text = "";
-
+  assignUserElements();
   return user;
 }
 
@@ -373,22 +369,29 @@ void signOutGoogle() async {
   await _googleSignIn.signOut();
 }
 
-Future getCurrentUser() async {
-  final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
-  return _user;
-}
-
 void assignUserElements() async {
-  final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
-  if (_user == null) {
+  bool isSignedIn = await _googleSignIn.isSignedIn();
+  if (!isSignedIn) {
+    imageUrl = "assets/images/google.png";
     name = "LOG IN GOOGLE TO:";
     email = "Play with friends";
-    imageUrl = "assets/images/google.png";
     text = "Save your progress";
   } else {
+    final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
+    imageUrl = _user.photoUrl;
     name = _user.displayName;
     email = _user.email;
-    imageUrl = _user.photoUrl;
     text = "";
+  }
+}
+
+void toFriendsList(BuildContext context) async {
+  bool isSignedIn = await _googleSignIn.isSignedIn();
+
+  if (isSignedIn) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => FriendsList()));
+  } else {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
   }
 }
