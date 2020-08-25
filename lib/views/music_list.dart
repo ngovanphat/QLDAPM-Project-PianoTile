@@ -21,12 +21,12 @@ import 'package:like_button/like_button.dart';
 import 'game_play.dart';
 
 List<Song> songs = [];
-List<String> favorites=[];
+List<String> favorites = [];
 bool _isVisible = true;
 bool _isLoading = false;
 bool _FavoritebtnEnabled = true;
 bool loadedAll = false;
-int tabIndex=0;
+int tabIndex = 0;
 
 class MusicList extends StatefulWidget {
   @override
@@ -49,94 +49,98 @@ class _MusicListState extends State<MusicList> {
           final TabController tabController = DefaultTabController.of(context);
           tabController.addListener(() {
             if (!tabController.indexIsChanging) {
-              if(tabController.index==2){
-                _fetchSongs(tabController.index,0,10);
+              if (tabController.index == 2) {
+                _fetchSongs(tabController.index, 0, 10);
               }
             }
           });
           return Scaffold(
-            resizeToAvoidBottomInset: false,
-            backgroundColor: Color(0xFF373737),
-            appBar: PreferredSize(
-              preferredSize: Size.fromHeight(displayHeight(context) * 0.15),
-              child: AppBar(
-                automaticallyImplyLeading: false, //Xóa dấu back
-                centerTitle:
-                    true, //Cho 2 mục trong title căn giữa - vẫn hơi lệch 1 chút so với Home
-                title: RowOnTop(context, 0, 0),
-                bottom: TabBar(
-                  onTap: (index) {
-                    tabIndex = index;
-                  },
-                  labelStyle: TextStyle(
-                    fontWeight: FontWeight.w900,
-                  ),
-                  indicatorColor: Colors.lightBlueAccent,
-                  indicatorWeight: displayHeight(context) * 0.01,
-                  labelColor: Colors.white,
-                  tabs: [
-                    Tab(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Vietnamese",
-                          style: TextStyle(
-                            fontSize: displayHeight(context) * 0.022,
+              body: SafeArea(
+                  top: false,
+                  child: Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      child: Stack(fit: StackFit.passthrough, children: [
+                        Image.asset('assets/images/background.jpg',
+                            fit: BoxFit.cover),
+                        RowOnTop(context, 0, 0),
+                        Container(
+                          margin: EdgeInsets.only(top: displayHeight(context)*0.08),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+
+                              Expanded(
+                                child: TabBarView(
+                                  children: [
+                                    Container(
+                                        child: BodyLayout(0)),
+                                    Container(
+                                        child: BodyLayout(1)),
+                                    Container(
+                                        child: BodyLayout(2)),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                height: displayHeight(context)*0.07,
+                                child: Material(
+                                  color: Color(0xff004466),
+                                  child: TabBar(
+                                    onTap: (index) {
+                                      tabIndex = index;
+                                    },
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                    indicatorColor: Colors.lightBlueAccent,
+                                    indicatorWeight: displayHeight(context) * 0.01,
+                                    labelColor: Colors.white,
+                                    tabs: [
+                                      Tab(
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            "Vietnamese",
+                                            style: TextStyle(
+                                              fontSize: displayHeight(context) * 0.022,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Tab(
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            "Foreign",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: displayHeight(context) * 0.022,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Tab(
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            "Favorite",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: displayHeight(context) * 0.022,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ),
-                    Tab(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Foreign",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: displayHeight(context) * 0.022,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Tab(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Favorite",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: displayHeight(context) * 0.022,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            body: TabBarView(
-              children: [
-                Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage('assets/images/background.jpg'),
-                            fit: BoxFit.cover)),
-                    child: BodyLayout(0)),
-                Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage('assets/images/background.jpg'),
-                            fit: BoxFit.cover)),
-                    child: BodyLayout(1)),
-                Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage('assets/images/background.jpg'),
-                            fit: BoxFit.cover)),
-                    child: BodyLayout(2)),
-              ],
-            ),
-          );
+                      ]))));
         }),
       ),
     );
@@ -145,16 +149,15 @@ class _MusicListState extends State<MusicList> {
 
 class BodyLayout extends StatefulWidget {
   //BodyLayout({Key key, this.tabIndex}) : super(key: key);
-  BodyLayout(int tabIndex) {
-  }
+  BodyLayout(int tabIndex) {}
 
   @override
   _BodyLayoutState createState() => _BodyLayoutState();
 }
 
 class _BodyLayoutState extends State<BodyLayout> {
-  List<int> listTracker=[-1,-1,-1];
-  int expListCounter=0;
+  List<int> listTracker = [-1, -1, -1];
+  int expListCounter = 0;
   int selected = 0;
   int visileItems = 8;
   final _scrollController = ScrollController();
@@ -163,7 +166,7 @@ class _BodyLayoutState extends State<BodyLayout> {
   @override
   void initState() {
     songs = getSongs(tabIndex);
-    listTracker[0]=selected;
+    listTracker[0] = selected;
     fetchFavorites();
     expListCounter++;
     _scrollController.addListener(() async {
@@ -194,6 +197,7 @@ class _BodyLayoutState extends State<BodyLayout> {
         return true;
       },
       child: ListView(
+        padding: EdgeInsets.all(0),
         controller: _scrollController,
         children: <Widget>[
           Container(
@@ -215,30 +219,28 @@ class _BodyLayoutState extends State<BodyLayout> {
 
   Widget _buildPanel() {
     return CustomExpansionPanel.ExpansionPanelList.radio(
-      initialOpenPanelValue: selected,
       expansionCallback: (int index, bool isExpanded) {
-        listTracker[expListCounter]=index;
+        listTracker[expListCounter] = index;
         expListCounter++;
-        if(isExpanded){
-          listTracker=[-1,-1,-1];
-          expListCounter=0;
-          selected=-1;
+        if (isExpanded) {
+          listTracker = [-1, -1, -1];
+          expListCounter = 0;
+          selected = -1;
           return;
         }
-        if(expListCounter==1){
-          selected=index;
+        if (expListCounter == 1) {
+          selected = index;
         }
-        if(expListCounter==3){
-          expListCounter=1;
-          if(listTracker[0]==listTracker[2]){
+        if (expListCounter == 3) {
+          expListCounter = 1;
+          if (listTracker[0] == listTracker[2]) {
             selected = listTracker[1];
-            int tmp=listTracker[1];
-            listTracker=[tmp,-1,-1];
-          }
-          else {
+            int tmp = listTracker[1];
+            listTracker = [tmp, -1, -1];
+          } else {
             int tmp = listTracker[2];
             listTracker = [tmp, -1, -1];
-            selected=tmp;
+            selected = tmp;
           }
         }
       },
@@ -326,6 +328,7 @@ class _BodyLayoutState extends State<BodyLayout> {
                     flex: 1,
                     child: LikeButton(
                       onTap: onFavoriteButtonTapped,
+                      isLiked: song.getFavorite()?true:false,
                       size: displayHeight(context) * 0.060,
                       bubblesSize: displayHeight(context) * 0.06,
                       circleSize: displayHeight(context) * 0.037,
@@ -338,7 +341,9 @@ class _BodyLayoutState extends State<BodyLayout> {
                       likeBuilder: (bool isLiked) {
                         return Icon(
                           Icons.favorite,
-                          color: song.getFavorite() ? Colors.redAccent : Colors.grey,
+                          color: isLiked
+                              ? Colors.redAccent
+                              : Colors.grey,
                           size: displayHeight(context) * 0.04,
                         );
                       },
@@ -350,31 +355,34 @@ class _BodyLayoutState extends State<BodyLayout> {
       }).toList(),
     );
   }
+
   void fetchFavorites() async {
+    if(favorites.isNotEmpty)
+      return;
     final FirebaseAuth auth = FirebaseAuth.instance;
     final FirebaseUser user = await auth.currentUser();
-    final uid = user.uid;
     if (user != null) {
+      final uid = user.uid;
       var db =
-      FirebaseDatabase.instance.reference().child('Favorites').child(uid);
-      await db.once().then((DataSnapshot snapshot){
-        if(snapshot.value==null)
-          return;
+          FirebaseDatabase.instance.reference().child('Favorites').child(uid);
+      await db.once().then((DataSnapshot snapshot) {
+        if (snapshot.value == null) return;
         Map<dynamic, dynamic> values = snapshot.value;
-        values.forEach((key,values) {
+        values.forEach((key, values) {
           favorites.add(key);
         });
       });
       debugPrint(favorites.join(','));
-      for(int i=0;i<songs.length;i++){
-        if(favorites.contains(songs[i].getId())){
+      for (int i = 0; i < songs.length; i++) {
+        if (favorites.contains(songs[i].getId()+"VN")) {
           songs[i].setFavorite(true);
         }
       }
     }
   }
+
   Future<bool> onFavoriteButtonTapped(bool isLiked) async {
-    debugPrint(_FavoritebtnEnabled.toString());
+    debugPrint(_FavoritebtnEnabled.toString()+" , "+isLiked.toString());
     if (_FavoritebtnEnabled == false) return isLiked;
     _FavoritebtnEnabled = false;
     Timer(Duration(seconds: 2), () => _FavoritebtnEnabled = true);
@@ -387,23 +395,32 @@ class _BodyLayoutState extends State<BodyLayout> {
         try {
           var db =
               FirebaseDatabase.instance.reference().child("Favorites/" + uid);
-          if(tabIndex==0)
-            await db.child(songs[selected].getId().padLeft(2, '0')+"VN").update({"name": songs[selected].getName()});
-          else if(tabIndex==1) await db.child(songs[selected].getId().padLeft(2, '0')+"NN").update({"name": songs[selected].getName()});
+          if (tabIndex == 0)
+            await db
+                .child(songs[selected].getId().padLeft(2, '0') + "VN")
+                .update({"name": songs[selected].getName()});
+          else if (tabIndex == 1)
+            await db
+                .child(songs[selected].getId().padLeft(2, '0') + "NN")
+                .update({"name": songs[selected].getName()});
           //Không check cho tabindex 2 vì khi unfavorite sẽ xóa đó khỏi tab
           songs[selected].setFavorite(true);
           return !isLiked;
         } catch (e) {
-          debugPrint(e.toString());
+          debugPrint("ERROR "+e.toString());
         }
       } else {
         try {
           var db =
               FirebaseDatabase.instance.reference().child("Favorites/" + uid);
-          await db.child(songs[selected].getId()).remove();
+          if (tabIndex == 0)
+            await db.child(songs[selected].getId()+ "VN").remove();
+          else if (tabIndex == 1) 
+            await db.child(songs[selected].getId()+ "NN").remove();
           songs[selected].setFavorite(false);
+          return !isLiked;
         } catch (e) {
-          debugPrint(e.toString());
+          debugPrint("ERROR "+e.toString());
         }
       }
     } else {
@@ -420,6 +437,7 @@ class _BodyLayoutState extends State<BodyLayout> {
 //TODO refine id system for music list
 
 }
+
 Future<List> _fetchSongs(tabIndex, pageNumber, pageSize) async {
   switch (tabIndex) {
     case 2:
@@ -429,7 +447,7 @@ Future<List> _fetchSongs(tabIndex, pageNumber, pageSize) async {
         final uid = user.uid;
         debugPrint(uid);
         var db =
-        FirebaseDatabase.instance.reference().child('Favorites/' + uid);
+            FirebaseDatabase.instance.reference().child('Favorites/' + uid);
         await db
             .orderByKey()
             .startAt((pageNumber * 10 + 1).toString())
@@ -452,9 +470,8 @@ Future<List> _fetchSongs(tabIndex, pageNumber, pageSize) async {
       break;
     case 1:
       {
-        var db = FirebaseDatabase.instance
-            .reference()
-            .child("Songs/NhacNuocNgoai");
+        var db =
+            FirebaseDatabase.instance.reference().child("Songs/NhacNuocNgoai");
         await db
             .orderByKey()
             .startAt((pageNumber * 10 + 1).toString())
@@ -472,8 +489,7 @@ Future<List> _fetchSongs(tabIndex, pageNumber, pageSize) async {
       break;
     default:
       {
-        var db =
-        FirebaseDatabase.instance.reference().child("Songs/NhacViet");
+        var db = FirebaseDatabase.instance.reference().child("Songs/NhacViet");
         await db
             .orderByKey()
             .startAt((pageNumber * 10 + 1).toString())
@@ -491,6 +507,7 @@ Future<List> _fetchSongs(tabIndex, pageNumber, pageSize) async {
       break;
   }
 }
+
 List getSongs(tabIndex) {
   //TODO fetch data from server
   //tên bài hát
@@ -533,8 +550,8 @@ List getSongs(tabIndex) {
 
   final List<Song> musicList = [];
   for (var i = 0; i < titles.length; i++) {
-    musicList.add(new Song(
-        i.toString().padLeft(2, '0'), titles[i], artists[i], difficulties[i], images[i],
+    musicList.add(new Song(i.toString().padLeft(2, '0'), titles[i], artists[i],
+        difficulties[i], images[i],
         notes_dir:
             "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/Shining_the_morning.mid.txt?alt=media&token=052c65bf-f531-40bc-9584-02f9cdb3f306"));
   }

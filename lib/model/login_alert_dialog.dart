@@ -63,13 +63,7 @@ class LoginDialog extends StatelessWidget {
               child: GestureDetector(
                 onTap: () {
                   signInWithGoogle().whenComplete(() {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return MusicList();
-                        },
-                      ),
-                    );
+                    Navigator.of(context).pop("complete");
                   });
                 },
                 child: new Container(
