@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:piano_tile/views/profile.dart';
 
+import 'home.dart';
+
 class FirstScreen extends StatefulWidget {
   @override
   _FirstScreenState createState() => _FirstScreenState();
@@ -65,8 +67,14 @@ class _FirstScreenState extends State<FirstScreen> {
                 onPressed: () {
                   setState(() {
                     signOutGoogle();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return Home();
+                        },
+                      ),
+                    );
                   });
-                  Navigator.of(context).pop();
                 },
                 color: Colors.deepPurple,
                 child: Padding(
