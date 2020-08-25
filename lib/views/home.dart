@@ -8,6 +8,7 @@ import 'package:piano_tile/views/logged_in_profile.dart';
 import 'package:piano_tile/views/profile.dart';
 import 'package:piano_tile/views/music_list.dart';
 import 'package:piano_tile/views/create_room.dart';
+import 'package:piano_tile/model/room.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -17,7 +18,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   int _currentIndex = 0;
-
+  TextEditingController roomKeyInput = new TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -112,10 +113,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         widthFactor: 0.80,
                                         child: Center(
                                           child: new Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
                                               children: <Widget>[
                                                 new FlatButton(
                                                     color: Colors.blue[900],
@@ -203,73 +202,45 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                       showDialog(
                                                         context: context,
                                                         builder: (_) => Material(
-                                                          type: MaterialType
-                                                              .transparency,
-                                                          child:
-                                                              FractionallySizedBox(
-                                                               heightFactor: 0.3,
+                                                          type: MaterialType.transparency,
+                                                          child: FractionallySizedBox(
+                                                                heightFactor: 0.3,
                                                                 widthFactor: 0.80,
-                                                            child: Container(
-                                                              padding:
-                                                                  new EdgeInsets
-                                                                      .all(25.0),
-                                                              decoration:
-                                                                  new BoxDecoration(
-                                                                color:
-                                                                    Colors.white,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            20),
-                                                              ),
-                                                              child: Center(
-                                                                child: new Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .center,
-                                                                  children: <
-                                                                      Widget>[
-                                                                    new TextField(
-                                                                      keyboardType: TextInputType.text,
-                                                                      decoration: new InputDecoration(
-                                                                          hintText:
-                                                                              "Enter room code"),
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              25),
-                                                                    ),
-                                                                    Padding(
-                                                                      padding: const EdgeInsets
-                                                                              .only(
-                                                                          top:
-                                                                              40),
-                                                                    ),
-                                                                    FlatButton(
-                                                                      color: Colors
-                                                                          .blueAccent,
-                                                                      child:
-                                                                          new Text(
-                                                                        "Join",
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                25),
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        print(
-                                                                            "Joined");
-                                                                      },
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(
-                                                                                  70),
-                                                                          side: BorderSide(
-                                                                              color:
-                                                                                  Colors.white,
-                                                                              width: 3)),
+                                                                child: Container(
+                                                                  padding: new EdgeInsets.all(25.0),
+                                                                  decoration: new BoxDecoration(
+                                                                    color: Colors.white,
+                                                                    borderRadius: BorderRadius.circular(20),
+                                                                  ),
+                                                                  child: Center(
+                                                                    child: new Column(
+                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                                      children: <Widget>[
+                                                                        new TextField(
+                                                                          controller: roomKeyInput,
+                                                                          keyboardType: TextInputType.text,
+                                                                          decoration: new InputDecoration(
+                                                                              hintText: "Enter room code"),
+                                                                          style: TextStyle(fontSize: 25),
+                                                                        ),
+                                                                        Padding(
+                                                                          padding: const EdgeInsets.only(top: 40),),
+                                                                        FlatButton(
+                                                                          color: Colors.blueAccent,
+                                                                          child: new Text("Join", style: TextStyle( fontSize: 25),),
+                                                                          onPressed: () {
+                                                                            Room.joinRoom(context,'lmquan2',roomKeyInput.text);
+                                                                            Navigator.of(context).pop();
+                                                                            },
+                                                                          shape: RoundedRectangleBorder(
+                                                                              borderRadius:
+                                                                                  BorderRadius.circular(
+                                                                                      70),
+                                                                              side: BorderSide(
+                                                                                  color:
+                                                                                      Colors.white,
+                                                                                  width: 3)),
                                                                     )
                                                                   ],
                                                                 ),

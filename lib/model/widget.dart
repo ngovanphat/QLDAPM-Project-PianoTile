@@ -71,3 +71,52 @@ Widget userInRoom(BuildContext context, String username){
     ),
   );
 }
+
+Widget customAlertDialog(BuildContext context, String text){
+  return Material(
+    type: MaterialType.transparency,
+    child: FractionallySizedBox(
+      heightFactor: 0.3,
+      widthFactor: 0.7,
+      child: Container(
+        padding: new EdgeInsets.all(25.0),
+        decoration: new BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(
+                  '$text',
+                  style: TextStyle(
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+              FlatButton(
+                color: Colors.blueAccent,
+                child: new Text("Close", style: TextStyle( fontSize: 25),),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.circular(
+                        70),
+                    side: BorderSide(
+                        color:
+                        Colors.white,
+                        width: 3)),
+              )
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
