@@ -201,10 +201,9 @@ class _ProfileState extends State<Profile> {
                       height: 90,
                       child: FlatButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FriendsList()));
+                          setState(() {
+                            toFriendsList(context);
+                          });
                         },
                         child: Row(
                           children: [
@@ -383,5 +382,16 @@ void assignUserElements() async {
     name = _user.displayName;
     email = _user.email;
     text = "";
+  }
+}
+
+void toFriendsList(BuildContext context) async {
+  bool isSignedIn = await _googleSignIn.isSignedIn();
+
+  if (isSignedIn) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => FriendsList()));
+  } else {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
   }
 }

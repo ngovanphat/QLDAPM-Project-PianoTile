@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/friend.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class FriendsList extends StatefulWidget {
   @override
@@ -262,7 +263,16 @@ List loadFriend() {
   return friendList;
 }
 
+final GoogleSignIn _googleSignIn = GoogleSignIn();
+
 Future getCurrentUser() async {
-  FirebaseUser _user = await FirebaseAuth.instance.currentUser();
-  return _user;
+  FirebaseUser user;
+  bool isSignedIn = await _googleSignIn.isSignedIn();
+
+  if (isSignedIn) {
+    user = await FirebaseAuth.instance.currentUser();
+  } else {
+    user = null;
+  }
+  return user;
 }
