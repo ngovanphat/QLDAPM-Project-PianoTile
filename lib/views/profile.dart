@@ -50,13 +50,6 @@ class _ProfileState extends State<Profile> {
                         onPressed: () {
                           setState(() {
                             _handleSignIn(context);
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return Home();
-                                },
-                              ),
-                            );
                           });
                         },
                         child: Row(
@@ -359,6 +352,13 @@ Future<FirebaseUser> _handleSignIn(BuildContext context) async {
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
     user = (await _auth.signInWithCredential(credential)).user;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Home();
+        },
+      ),
+    );
   }
 
   assignUserElements();
@@ -389,9 +389,20 @@ void toFriendsList(BuildContext context) async {
   bool isSignedIn = await _googleSignIn.isSignedIn();
 
   if (isSignedIn) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => FriendsList()));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return FriendsList();
+        },
+      ),
+    );
   } else {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Home();
+        },
+      ),
+    );
   }
 }

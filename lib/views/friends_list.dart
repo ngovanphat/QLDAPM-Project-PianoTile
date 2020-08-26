@@ -1,8 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/friend.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class FriendsList extends StatefulWidget {
   @override
@@ -121,18 +119,10 @@ class _FriendsListState extends State<FriendsList> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content;
-
-    if (getCurrentUser() == null) {
-      content = new Center(
-        child: new CircularProgressIndicator(),
-      );
-    } else {
-      content = new ListView.builder(
-        itemCount: _friends.length,
-        itemBuilder: _buildFriendListTile,
-      );
-    }
+    Widget content = new ListView.builder(
+      itemCount: _friends.length,
+      itemBuilder: _buildFriendListTile,
+    );
 
     return new Scaffold(
       backgroundColor: const Color(0xff004466),
@@ -261,18 +251,4 @@ List loadFriend() {
   }
 
   return friendList;
-}
-
-final GoogleSignIn _googleSignIn = GoogleSignIn();
-
-Future getCurrentUser() async {
-  FirebaseUser user;
-  bool isSignedIn = await _googleSignIn.isSignedIn();
-
-  if (isSignedIn) {
-    user = await FirebaseAuth.instance.currentUser();
-  } else {
-    user = null;
-  }
-  return user;
 }
