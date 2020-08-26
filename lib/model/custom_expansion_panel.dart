@@ -124,7 +124,7 @@ class ExpansionPanelRadio extends ExpansionPanel {
     @required ExpansionPanelHeaderBuilder headerBuilder,
     @required Widget body,
     bool canTapOnHeader = false,
-    Song song=null,
+    Song song,
   }) : assert(value != null),
       super(
         body: body,

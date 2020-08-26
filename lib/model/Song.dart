@@ -19,9 +19,9 @@ class Song {
   int highscore; //mặc định =0
   bool isFavorited;
   //mặc định = false - dùng để hiển thị bài hát yêu thích trong danh sách bài hát chung
-  Song(id, name, artists, difficulty, image,
+  Song(String id, name, artists, difficulty, image,
       {music_dir = '', notes_dir = '', highscore, isFavorited}) {
-    this.id = id;
+    this.id = id.trim();
     this.name = name;
     this.artists = artists;
     this.difficulty = difficulty;
@@ -123,6 +123,7 @@ class Song {
       return 0;
     } catch (e) {
       debugPrint(e.toString());
+      return 0;
     }
   }
 
