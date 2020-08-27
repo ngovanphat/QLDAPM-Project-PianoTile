@@ -397,12 +397,40 @@ void toFriendsList(BuildContext context) async {
       ),
     );
   } else {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return Home();
-        },
-      ),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.white, width: 1),
+          ),
+          backgroundColor: Colors.black,
+          title: Center(
+            child: Text(
+              "Sorry",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          content: Text(
+            "Please log in to activate this feature!",
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            FlatButton(
+              child: Text(
+                "OK",
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
