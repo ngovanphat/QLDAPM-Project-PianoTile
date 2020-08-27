@@ -101,8 +101,10 @@ class Room{
       }
     }
     room.updateToDatabase(key);
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => JoinRoom(),
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+      builder: (context) => JoinRoom(roomKey: key,),
     ));
     return true;
   }
