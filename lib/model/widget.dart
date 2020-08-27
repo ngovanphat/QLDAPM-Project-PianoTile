@@ -20,7 +20,7 @@ Widget PointRowTop(BuildContext context, int point, String image) {
               ),
             ),
             Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 5),
                 alignment: Alignment.center,
                 child: Text(
                   '$point',
@@ -41,6 +41,29 @@ Widget RowOnTop(BuildContext context, int level, int gems) {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         PointRowTop(context, level, 'assets/images/one.png'),
+        PointRowTop(context, gems, 'assets/images/gems.png'),
+      ],
+    ),
+  );
+}
+
+Widget RowOnTop_v2(BuildContext context, int level, int gems, int currentExp, int nextExp) {
+
+  Map<int, String> mapLevelImage = {
+    1: 'assets/images/one.png',
+    2: 'assets/images/two.png',
+    3: 'assets/images/three.png',
+    4: 'assets/images/four.png',
+    5: 'assets/images/five.png',
+  };
+
+  return Container(
+    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        PointRowTop(context, currentExp, mapLevelImage[level]),
         PointRowTop(context, gems, 'assets/images/gems.png'),
       ],
     ),

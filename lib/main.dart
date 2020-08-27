@@ -73,8 +73,14 @@ void main() async {
 
   // save exp, gem
   prefs.setInt(sharedPrefKeys.getExpKey(), exp);
+//  prefs.setInt(sharedPrefKeys.getExpKey(), 5000);
+
   prefs.setInt(sharedPrefKeys.getGemKey(), gem);
+//  prefs.setInt(sharedPrefKeys.getGemKey(), 4586);
+
   prefs.setInt(sharedPrefKeys.getLevelKey(), levelValue);
+//  prefs.setInt(sharedPrefKeys.getLevelKey(), 2);
+
   prefs.setInt(sharedPrefKeys.getNextExpKey(), nextExpValue);
 
 

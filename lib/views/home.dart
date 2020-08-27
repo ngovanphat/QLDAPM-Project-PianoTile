@@ -9,6 +9,9 @@ import 'package:piano_tile/views/profile.dart';
 import 'package:piano_tile/views/music_list.dart';
 import 'package:piano_tile/views/create_room.dart';
 import 'package:piano_tile/model/room.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
+
 
 class Home extends StatefulWidget {
   @override
@@ -19,12 +22,42 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   int _currentIndex = 0;
   TextEditingController roomKeyInput = new TextEditingController();
+
+  // exp, gem, level
+  int currentExp = 0;
+  int nextExp = 0;
+  int gem = 0;
+  int level = 1;
+
+
   @override
   void initState() {
     super.initState();
     _animationController =
         new AnimationController(vsync: this, duration: Duration(seconds: 1))
           ..repeat();
+
+
+
+    //
+    getExpGem();
+  }
+
+  Future<String> getExpGem () async{
+
+    // get exp, next exp, gem from local file
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // set states
+    setState(() {
+      this.currentExp = prefs.getInt(sharedPrefKeys.getExpKey());
+      this.nextExp = prefs.getInt(sharedPrefKeys.getNextExpKey());
+      this.gem = prefs.getInt(sharedPrefKeys.getGemKey());
+      this.level = prefs.getInt(sharedPrefKeys.getLevelKey());
+
+    });
+
+    return 'done';
   }
 
   @override
@@ -46,7 +79,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               fit: StackFit.passthrough,
               children: [
                 Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
-                RowOnTop(context, 0, 0),
+                RowOnTop_v2(context, this.level, this.gem, this.currentExp, this.nextExp),
                 Container(
                     margin: EdgeInsets.only(top: 100),
                     child: SingleChildScrollView(
