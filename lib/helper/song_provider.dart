@@ -171,6 +171,28 @@ Future<List<Note>> convertToNotes(String fileContent) async{
 
 
 
+  // calculate heights for all notes
+  // calculate first note
+  Note note = notes[0];
+  note.index = 0;
+  note.height = 1;
+  int velocityThreshold = 55;
+  if(note.velocityValue[0] < velocityThreshold){
+    note.height = 2;    // take 2 tile
+  }
+
+  // the rest notes based on first note
+  for(var i = 1; i < notes.length; i++){
+    Note postNote = notes[i];
+    postNote.height = 1;
+    if(note.velocityValue[0] < velocityThreshold){
+      postNote.height = 2;
+    }
+
+    postNote.index = notes[i - 1].index + notes[i - 1].height;
+  }
+
+
   return notes;
   // end of function
 }

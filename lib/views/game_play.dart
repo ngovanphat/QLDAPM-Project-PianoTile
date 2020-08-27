@@ -131,23 +131,34 @@ class GamePlayState<T extends GamePlay> extends State<T>
       midi.prepare(sf2: sf2, name: "piano.sf2");
     });
 
+    // milli-second = time to pass a single tile (1/4 screen)
     animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
 
     animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed && isPlaying) {
-        if (notes[currentNoteIndex].state != NoteState.tapped) {
+
+        // animation complete means 1 tileHeight has passed
+        notes[currentNoteIndex].pass++;
+
+        if (notes[currentNoteIndex].state != NoteState.tapped
+            && notes[currentNoteIndex].pass == notes[currentNoteIndex].height) {
+
           // end game
           setState(() {
             isPlaying = false;
             notes[currentNoteIndex].state = NoteState.missed;
           });
           animationController.reverse().then((_) => showFinishDialog(status: "game_over"));
+
         }
         else {
-          setState(() {
-            ++currentNoteIndex;
-          });
+
+          if(notes[currentNoteIndex].pass == notes[currentNoteIndex].height){
+            setState(() {
+              ++currentNoteIndex;
+            });
+          }
 
           if(currentNoteIndex >= notes.length){
             // song completed here
