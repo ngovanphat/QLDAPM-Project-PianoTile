@@ -16,22 +16,25 @@ import 'package:permissions_plugin/permissions_plugin.dart';
 
 Future<List<Note>> initNotes(String songName) async{
 
-  // check if song already in local
-  // ...
-
-  // if not, download file from firebase storage
+  // firebase storage
   var storage = FirebaseStorage.instance;
-//  StorageReference ref = storage.ref().child('canond.mid.txt');
   StorageReference ref = storage.ref().child(songName);
 
+  // song name
   var dir = await getExternalStorageDirectory();
   var name = await ref.getName();
   String pathToSave = '${dir.path}/${name}';
 
-  await downloadFile(ref, pathToSave);
+  // check if song already in local folder
+  final File tempFile = File(pathToSave);
+  if (tempFile.existsSync() == false) {
+
+    // if not, download song
+    await downloadFile(ref, pathToSave);
+  }
+
 
   // read file data
-//  String content = await loadAsset('assets/song/jingle_bells.mid.txt');
   String content = await loadFile(pathToSave);
 
   // convert data to list of notes
