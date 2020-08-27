@@ -23,7 +23,7 @@ class Room{
   updateToDatabase(String key){
     database.reference().child("Room")
         .child(key)
-        .set(this.toJson())
+        .update(this.toJson())
         .then((value) {print(key);})
         .catchError((onError){
         print(onError);
