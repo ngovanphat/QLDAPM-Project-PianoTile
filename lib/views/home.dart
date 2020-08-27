@@ -19,12 +19,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   int _currentIndex = 0;
   TextEditingController roomKeyInput = new TextEditingController();
+  FirebaseUser user;
+  Future<void> getUser() async {
+    user = await FirebaseAuth.instance.currentUser();
+  }
+
   @override
   void initState() {
     super.initState();
     _animationController =
         new AnimationController(vsync: this, duration: Duration(seconds: 1))
           ..repeat();
+    getUser();
   }
 
   @override
@@ -35,6 +41,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: const Color(0xff004466),
       body: SafeArea(
@@ -153,11 +160,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                       ),
                                                     ),
                                                     onPressed: () {
+                                                      if(user==null){
+                                                        customAlertDialog(context, 'Please login');
+                                                      }
+                                                      else{
                                                       Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
                                                               builder: (context) =>
                                                                   CreateRoom()));
+                                                      }
                                                     }),
                                                 Padding(
                                                     padding:
@@ -229,8 +241,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                                         FlatButton(
                                                                           color: Colors.blueAccent,
                                                                           child: new Text("Join", style: TextStyle( fontSize: 25),),
-                                                                          onPressed: () {
-                                                                            Room.joinRoom(context,'lmquan2',roomKeyInput.text);
+                                                                          onPressed: () async {
+                                                                            if(user==null){
+                                                                              customAlertDialog(context, 'Please login');
+                                                                            }else{
+                                                                            Room.joinRoom(context,'${user.displayName}',roomKeyInput.text);
+                                                                            }
                                                                             Navigator.of(context).pop();
                                                                             },
                                                                           shape: RoundedRectangleBorder(

@@ -1,6 +1,8 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:marquee_flutter/marquee_flutter.dart';
 import 'package:piano_tile/helper/sizes_helpers.dart';
 import 'package:piano_tile/model/room.dart';
@@ -15,7 +17,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:piano_tile/model/custom_expansion_panel.dart' as CustomExpansionPanel;
 import 'package:piano_tile/model/Song.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class CreateRoom extends StatefulWidget {
   @override
@@ -25,10 +28,13 @@ class CreateRoom extends StatefulWidget {
 class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   String musicName = "Tìm lại bầu trời";
-  String username = 'ngophat99';
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  String username = '';
   Room room;
   bool isInRoom = true;
+  bool isLoading = false;
   List<Song> songs = [];
+  Timer timer;
 
   List getSongs() {
     //TODO fetch data from server
@@ -78,21 +84,37 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
     return musicList;
   }
 
+
+  getUser() async {
+    FirebaseUser user = await auth.currentUser();
+    username = user.displayName;
+  }
+
+  Future<void> createRoom(String key) async {
+  await getUser();
+  room = new Room(key, musicName, username, '', '', '');
+  room.updateToDatabase(key);
+  saveAdditionalFields(roomId: key);
+  savePreferences(userId: username, roomId: key, isHost: true);
+  setState(() {
+    isLoading = true;
+  });
+  }
   @override
   void initState() {
     super.initState();
+
     _animationController =
     new AnimationController(vsync: this, duration: Duration(seconds: 1))
       ..repeat();
     String key= randomString(6,from: 65,to: 90);
-    room = new Room(key, musicName, username, '', '', '');
-    room.updateToDatabase(key);
+    createRoom(key);
     songs = getSongs();
 
     // update additional fields: usernameOnePoints, usernameTwoPoints,...
     // for storing user points
-    saveAdditionalFields(roomId: key);
 
+    saveAdditionalFields(roomId: key);
     // write to preferences
     // for later retrieving in other screens
     savePreferences(userId: username, roomId: key, isHost: true);
@@ -120,26 +142,37 @@ class _CreateRoomState extends State<CreateRoom> with SingleTickerProviderStateM
   @override
   void deactivate() {
     super.deactivate();
-
     room.removeUserByName(username);
-  }
-  dialogContent(BuildContext context){
-    return Stack(
-      children: <Widget>[
-        Text("sorry"),
-      ],
-    );
+    timer.cancel();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    Timer.periodic(Duration(seconds: 5), (timer) {
-      room.triggerReadFromDB(room.keyOfRoom);
-      this.setState(() {
-        this.isInRoom = true;
+  backgroundFunction(){
+    room.triggerReadFromDB(room.keyOfRoom);
+    setState(() {
+      this.isInRoom = true;
+    });
+  }
+
+  startTime(){
+    setState(() {
+      timer = Timer.periodic(Duration(seconds: 5), (timer) {
+        backgroundFunction();
       });
     });
-    return Scaffold(
+  }
+  @override
+  Widget build(BuildContext context) {
+    startTime();
+    return isLoading==false ? Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          SpinKitWave(color: Colors.blue,
+            size: 50.0,),
+        ],
+      ),
+    ) : Scaffold(
       backgroundColor: const Color(0xff004466),
       body: Container(
         height: MediaQuery.of(context).size.height,
