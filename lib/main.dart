@@ -21,7 +21,7 @@ void main() async {
   if(type == sharedPrefValues.USER){
 
     // get info from firebase database
-    String userId = prefs.getString(sharedPrefKeys.userId);
+    String userId = prefs.getString(sharedPrefKeys.getIdKey());
     DataSnapshot user = await FirebaseDatabase.instance.reference()
         .child('account/$userId')
         .once();
@@ -37,9 +37,6 @@ void main() async {
       exp = rows['exp'];
       gem = rows['gem'];
 
-      // save exp, gem
-      prefs.setInt(sharedPrefKeys.userExp, exp);
-      prefs.setInt(sharedPrefKeys.userGem, gem);
     }
 
   }
@@ -48,14 +45,37 @@ void main() async {
     // type == GUEST
 
     // get info from local preferences
-    int exp = prefs.getInt(sharedPrefKeys.guestExp) ?? 0;
-    int gem = prefs.getInt(sharedPrefKeys.guestGem) ?? 0;
+    exp = prefs.getInt(sharedPrefKeys.getExpKey()) ?? 0;
+    gem = prefs.getInt(sharedPrefKeys.getGemKey()) ?? 0;
     print('[main] local exp: $exp, gem: $gem');
 
-    // save exp, gem
-    prefs.setInt(sharedPrefKeys.guestExp, exp);
-    prefs.setInt(sharedPrefKeys.guestGem, gem);
   }
+
+  // resolve level and get next-exp value
+  int levelValue = 1;
+  int nextExpValue = 0;
+  DataSnapshot data = await FirebaseDatabase.instance.reference()
+      .child('levelDefinition')
+      .once();
+  List<dynamic> levels = data.value;
+  print('[main] levels: $levels');
+  for(int i = 0; i < levels.length; i++){
+
+    Map<dynamic, dynamic> level = levels[i];
+    if(level['expRequired'] > exp){
+      levelValue = level['level'] - 1;
+      nextExpValue = level['expRequired'];
+      break;
+    }
+
+  }
+  print('[main] level: $levelValue, next exp: $nextExpValue');
+
+  // save exp, gem
+  prefs.setInt(sharedPrefKeys.getExpKey(), exp);
+  prefs.setInt(sharedPrefKeys.getGemKey(), gem);
+  prefs.setInt(sharedPrefKeys.getLevelKey(), levelValue);
+  prefs.setInt(sharedPrefKeys.getNextExpKey(), nextExpValue);
 
 
   runApp(MyApp());
