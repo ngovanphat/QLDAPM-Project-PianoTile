@@ -29,11 +29,10 @@ class Room {
         .reference()
         .child("Room")
         .child(key)
-        .set(this.toJson())
-        .then((value) {
-      print(key);
-    }).catchError((onError) {
-      print(onError);
+        .update(this.toJson())
+        .then((value) {print(key);})
+        .catchError((onError){
+        print(onError);
     });
   }
 
@@ -121,8 +120,10 @@ class Room {
       }
     }
     room.updateToDatabase(key);
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => JoinRoom(),
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+      builder: (context) => JoinRoom(roomKey: key,),
     ));
     return true;
   }
