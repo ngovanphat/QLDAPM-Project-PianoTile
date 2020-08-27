@@ -430,22 +430,33 @@ class _BodyLayoutState extends State<BodyLayout> {
       debugPrint(favorites.join(','));
       //applied to loaded songs
       for (int i = 0; i < allSongs[0].length; i++) {
+        debugPrint("ID: "+allSongs[0][i].getId());
         if (favorites.contains(allSongs[0][i].getId())) {
-          allSongs[0][i].setFavorite(true);
-          songDAO.updateSong(allSongs[0][i]);
+          if(!allSongs[0][i].getFavorite()){
+            allSongs[0][i].setFavorite(true);
+            songDAO.updateSong(allSongs[0][i]);
+          }
+          favorites.remove(favorites.indexOf(allSongs[0][i].getId()));
         }
       }
       for (int i = 0; i < allSongs[1].length; i++) {
         if (favorites.contains(allSongs[1][i].getId())) {
-          allSongs[1][i].setFavorite(true);
-          songDAO.updateSong(allSongs[1][i]);
+          if(!allSongs[1][i].getFavorite()){
+            allSongs[1][i].setFavorite(true);
+            songDAO.updateSong(allSongs[1][i]);
+          }
+          favorites.remove(favorites.indexOf(allSongs[1][i].getId()));
         }
       }
-
+      songs=allSongs[tabIndex];
+      if(favorites.isEmpty){
+        setState(() {
+        });
+      }
       //get list of unloaded songs
       for (String i in favorites) {
         bool isLoaded = true;
-        songDAO.getSongById(i).then(
+        await songDAO.getSongById(i).then(
             (value) => value != null ? isLoaded = true : isLoaded = false);
         if (i.contains("NNDB") & !isLoaded) {
           var db = FirebaseDatabase.instance
@@ -493,6 +504,7 @@ class _BodyLayoutState extends State<BodyLayout> {
   }
 
   Future<bool> onFavoriteButtonTapped(bool isLiked) async {
+    debugPrint("Selected: "+selected.toString()+"- Song ID: "+songs[selected].getId());
     debugPrint(_FavoritebtnEnabled.toString() + " , " + isLiked.toString());
     if (_FavoritebtnEnabled == false) return isLiked;
     _FavoritebtnEnabled = false;
@@ -508,11 +520,11 @@ class _BodyLayoutState extends State<BodyLayout> {
               FirebaseDatabase.instance.reference().child("Favorites/" + uid);
           if (tabIndex == 0)
             await db
-                .child(songs[selected].getId().padLeft(2, '0'))
+                .child(songs[selected].getId())
                 .update({"name": songs[selected].getName()});
           else if (tabIndex == 1)
             await db
-                .child(songs[selected].getId().padLeft(2, '0'))
+                .child(songs[selected].getId())
                 .update({"name": songs[selected].getName()});
           //Không check cho tabindex 2 vì khi unfavorite sẽ xóa đó khỏi tab
           songs[selected].setFavorite(true);
@@ -617,11 +629,27 @@ class _BodyLayoutState extends State<BodyLayout> {
                 songDAO.insertSong(temp);
                 counter++;
               });
+              setState(() {
+                allSongs[tabIndex]=songs;
+              });
             });
           }
           else{
             debugPrint("Fetching from local");
-          }allSongs[tabIndex]=songs;
+           /* for(int i=0;i<pageSize;i++){
+              Song temp;
+              await songDAO
+                  .getSongById(
+                  ((pageNum * pageSize + 1).toString().padLeft(2, '0') +
+                      "NNDB"))
+                  .then((value) => temp = value);
+              if(temp==null){
+                break;
+              }else{
+
+              }
+            }*/
+          }
           if (counter == pageSize) pageNum++;
         } //Nhac Nuoc Ngoai
         break;
@@ -651,6 +679,9 @@ class _BodyLayoutState extends State<BodyLayout> {
                 songs.add(temp);
                 songDAO.insertSong(temp);
                 counter++;
+              });
+              setState(() {
+                allSongs[tabIndex]=songs;
               });
             });
           }

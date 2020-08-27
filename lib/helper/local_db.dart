@@ -66,9 +66,9 @@ class SongDAO {
 
   Future<int> countSongs(String type) async {
     var content = await exportDatabase(await _db);
-    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+    /*JsonEncoder encoder = new JsonEncoder.withIndent('  ');
     String prettyprint = encoder.convert(content);
-    prettyprint.split('\n').forEach((element) => print(element));
+    prettyprint.split('\n').forEach((element) => print(element));*/
     return await _songFolder.count(await _db,
         filter: Filter.matches("id", type));
   }
@@ -110,7 +110,6 @@ class SongDAO {
   }
 
   Future<List<Song>> getAllSongs(String type) async {
-    deleteAll();
     switch (type) {
       case "VN":
         {
