@@ -46,9 +46,11 @@ class GamePlayState<T extends GamePlay> extends State<T>
   int expReward = 0;
   int hard = 0;
 
+  SharedPreferences prefs = null;
+
   Future<String> doInitNotes() async {
 
-    // first, check if song required higher level then current level
+    // first, check if song requires higher level then current level
     DatabaseReference refSong = FirebaseDatabase
         .instance
         .reference()
@@ -82,7 +84,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
     print('[game_play] level need: $levelRequired, expReward: $expReward, hard: $hard');
 
     // here, already have song info
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     int currentLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
     if(currentLevel < this.levelRequired){
       // end, not allow to play
@@ -140,7 +142,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
             isPlaying = false;
             notes[currentNoteIndex].state = NoteState.missed;
           });
-          animationController.reverse().then((_) => showFinishDialog());
+          animationController.reverse().then((_) => showFinishDialog(status: "game_over"));
         }
         else {
           setState(() {
@@ -148,8 +150,8 @@ class GamePlayState<T extends GamePlay> extends State<T>
           });
 
           if(currentNoteIndex >= notes.length){
-            // song finished here
-            showFinishDialog();
+            // song completed here
+            showFinishDialog(status: "completed");
           }
           else{
             animationController.forward(from: 0);
@@ -253,31 +255,154 @@ class GamePlayState<T extends GamePlay> extends State<T>
     animationController.reset();
   }
 
-  void showFinishDialog() {
+  void showFinishDialog({String status}) async {
+
+    if(status == "game_over"){
+
+      // ask user if wan to recover game with ads, gems
+      showAskRecoveryDialog();
+    }
+    else{
+      showResultDialog();
+    }
+
+
+
+  }
+
+  void showAskRecoveryDialog() async{
+
+    // get number of gems for recovering
+    DataSnapshot data = await FirebaseDatabase.instance.reference().child('gemDefinition/continue').once();
+    int numGemToRecover = data.value;
+
     showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Score: $points"),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MusicList())),
-              child: Text("Exit"),
-            ),
-            FlatButton(
-              onPressed: () => restart(),
-              child: Text("Restart"),
-            ),
-            FlatButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text("Recover with ads")
-            )
-          ],
-        );
-      }
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Score: $points"),
+            actions: <Widget>[
+
+              FlatButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("Recover with ads")
+              ),
+              FlatButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("Recover with $numGemToRecover Gems")
+              ),
+              FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    showResultDialog();
+                  },
+                  child: Text("Exit")
+              ),
+            ],
+          );
+        }
     );
 
   }
+
+  void showResultDialog() async{
+
+    // calculate exp, level, gem
+    int expGot = (this.expReward * this.points/notes.length).round();
+    int newExp = prefs.getInt(sharedPrefKeys.getExpKey()) + expGot;
+    int newGem = prefs.getInt(sharedPrefKeys.getGemKey());
+    int newLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
+    int newNextExp = prefs.getInt(sharedPrefKeys.getNextExpKey());
+
+    bool isLevelUp = newExp > prefs.getInt(sharedPrefKeys.getNextExpKey());
+    int gemReward = 0;
+    if(isLevelUp){
+      // for convient, just increase 1 level
+      // maybe increase more...?
+
+      // resolve level and get next-exp value
+      int levelValue = 1;
+      int nextExpValue = 0;
+      gemReward = 0;
+      DataSnapshot data = await FirebaseDatabase.instance.reference()
+          .child('levelDefinition')
+          .once();
+      List<dynamic> levels = data.value;
+      for(int i = 0; i < levels.length; i++){
+
+        Map<dynamic, dynamic> level = levels[i];
+        if(level['expRequired'] > newExp){
+          levelValue = level['level'] - 1;
+          nextExpValue = level['expRequired'];
+          gemReward = level['gemReward'];
+          break;
+        }
+
+      }
+      print('[main] level: $levelValue, next exp: $nextExpValue, reward: $gemReward');
+
+      newGem += gemReward;
+      newLevel = levelValue;
+      newNextExp = nextExpValue;
+    }
+
+    // update local file
+    prefs.setInt(sharedPrefKeys.getExpKey(), newExp);
+    prefs.setInt(sharedPrefKeys.getGemKey(), newGem);
+    prefs.setInt(sharedPrefKeys.getLevelKey(), newLevel);
+    prefs.setInt(sharedPrefKeys.getNextExpKey(), newNextExp);
+
+    // save to firebase if user already logged-in
+    if(prefs.getInt(sharedPrefKeys.userType) == sharedPrefValues.USER){
+
+      String id = prefs.getString(sharedPrefKeys.getIdKey());
+      DatabaseReference user = FirebaseDatabase
+          .instance
+          .reference()
+          .child('account/$id');
+      user.update({'exp': newExp});
+      user.update({'gem': newGem});
+    }
+    print('[game_play] Score: $points\nExp: $newExp\nGem: $newGem'
+        '\nLevel: $newLevel\nNext exp: $newNextExp');
+
+    // show
+    String resultString = "Score: $points\nExp: +$expGot";
+    if(isLevelUp){
+      resultString += "\nNew level: $newLevel\nGem reward: +$gemReward";
+    }
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(resultString),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MusicList())),
+                child: Text("Play another song"),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  restart();
+                },
+                child: Text("Restart"),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pop(context);
+                },
+                child: Text("Go Home"),
+              ),
+            ],
+          );
+        }
+    );
+
+  }
+
 
   void onTap(Note note) {
     bool areAllPreviousTapped = notes
