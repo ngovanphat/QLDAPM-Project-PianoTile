@@ -114,7 +114,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               margin: EdgeInsets.only(top: 20),
                               child: FlatButton(
                                 onPressed: () {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => GamePlay()));

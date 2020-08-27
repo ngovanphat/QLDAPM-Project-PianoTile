@@ -11,7 +11,9 @@ import 'package:flutter_midi/flutter_midi.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:piano_tile/views/music_list.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class GamePlay extends StatefulWidget {
 
@@ -36,9 +38,81 @@ class GamePlayState<T extends GamePlay> extends State<T>
   // notes
   List<Note> notes = null;
   Future<String> statusOfInitNotes = null;
-  String songName = 'canond.mid.txt';
+
+  // song info
+//  String songName = 'canond.mid.txt';
+  String songName = 'tim_lai_bau_troi.mid.txt';
+  int levelRequired = 0;
+  int expReward = 0;
+  int hard = 0;
 
   Future<String> doInitNotes() async {
+
+    // first, check if song required higher level then current level
+    DatabaseReference refSong = FirebaseDatabase
+        .instance
+        .reference()
+        .child('Songs');
+
+    DataSnapshot snapshot1 = await refSong.child('NhacViet').once();
+    Map<dynamic,dynamic> songs = snapshot1.value;
+    bool isFound = false;
+    songs.forEach((key, value){
+
+      if(value['filename'] == songName){
+        this.levelRequired =  value['levelRequired'];
+        this.expReward = value['expReward'];
+        this.hard = value['hard'];
+        isFound = true;
+      }
+    });
+    if(isFound == false){
+      snapshot1 = await refSong.child('NhacNuocNgoai').once();
+      songs = snapshot1.value;
+      songs.forEach((key, value){
+
+        if(value['filename'] == songName){
+          this.levelRequired =  value['levelRequired'];
+          this.expReward = value['expReward'];
+          this.hard = value['hard'];
+          isFound = true;
+        }
+      });
+    }
+    print('[game_play] level need: $levelRequired, expReward: $expReward, hard: $hard');
+
+    // here, already have song info
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int currentLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
+    if(currentLevel < this.levelRequired){
+      // end, not allow to play
+
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("This song requires level ${this.levelRequired} or higher"),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("OK"),
+                )
+              ],
+            );
+          }
+      ).then((_) {
+
+        // return to previous page
+        Navigator.pop(context);
+
+      });
+
+
+      return 'fail_level_required';
+    }
+
+
+    // if ok, then get notes
     notes = await initNotes(songName);
     return 'done';
   }
@@ -47,16 +121,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
   void initState() {
     super.initState();
 
-    // init notes
-//    initNotes().then((value) {
-//      notes = value;
-//      setState(() {});
-//      print('success loading notes');
-//      print('length: ${notes.length}');
-//    });
     statusOfInitNotes = doInitNotes();
-
-
 
     // init midi player with sound font
     midi.unmute();
@@ -138,6 +203,11 @@ class GamePlayState<T extends GamePlay> extends State<T>
               ],
             );
           }
+          else if(snapshot.hasData && snapshot.data == 'fail_level_required'){
+
+            return Container();
+
+          }
           else{
             List<Widget> children;
             children = <Widget>[
@@ -206,6 +276,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
         );
       }
     );
+
   }
 
   void onTap(Note note) {
