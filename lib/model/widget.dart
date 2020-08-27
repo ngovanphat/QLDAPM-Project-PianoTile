@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+
 
 Widget PointRowTop(BuildContext context, int point, String image) {
   return Row(
@@ -26,6 +28,45 @@ Widget PointRowTop(BuildContext context, int point, String image) {
                   '$point',
                   style: TextStyle(fontSize: 20, color: Colors.black),
                 ))
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget PointRowTop_percentBar(BuildContext context, int exp, int nextExp, String image) {
+  return Row(
+    children: <Widget>[
+      Container(
+        width: 200,
+        height: 40,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20), color: Colors.white),
+        child: Row(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Image.asset(
+                '$image',
+                width: 35,
+                height: 35,
+              ),
+            ),
+            Container(
+                padding: EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                child: new LinearPercentIndicator(
+                  width: 140,
+                  animation: true,
+                  lineHeight: 20.0,
+                  animationDuration: 2000,
+                  percent: exp/nextExp,
+                  center: Text('$exp/$nextExp'),
+                  linearStrokeCap: LinearStrokeCap.roundAll,
+                  progressColor: Colors.lightBlue,
+                ),
+            )
           ],
         ),
       ),
@@ -63,7 +104,7 @@ Widget RowOnTop_v2(BuildContext context, int level, int gems, int currentExp, in
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        PointRowTop(context, currentExp, mapLevelImage[level]),
+        PointRowTop_percentBar(context, currentExp, nextExp, mapLevelImage[level]),
         PointRowTop(context, gems, 'assets/images/gems.png'),
       ],
     ),
