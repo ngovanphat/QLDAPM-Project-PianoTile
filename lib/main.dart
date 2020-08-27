@@ -88,7 +88,8 @@ void main() async {
   runApp(MyApp());
 }
 
-
+// Register the RouteObserver as a navigation observer.
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -109,6 +110,7 @@ class MyApp extends StatelessWidget {
         '/gameplay': (context) => GamePlay(),
         '/gameplayonline': (context) => GamePlayOnline(),
       },
+      navigatorObservers: [routeObserver],
     );
   }
 }

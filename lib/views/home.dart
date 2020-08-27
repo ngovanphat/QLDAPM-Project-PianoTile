@@ -11,14 +11,14 @@ import 'package:piano_tile/views/create_room.dart';
 import 'package:piano_tile/model/room.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
-
+import 'package:piano_tile/main.dart';
 
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteAware  {
   AnimationController _animationController;
   int _currentIndex = 0;
   TextEditingController roomKeyInput = new TextEditingController();
@@ -40,7 +40,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
 
 
-    //
+    // update exp, gem,...
     getExpGem();
   }
 
@@ -62,8 +62,30 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context));
+  }
+
+
+  @override
+  void didPush() {
+    // Route was pushed onto navigator and is now topmost route.
+    // update exp, gem,...
+    getExpGem();
+  }
+
+  @override
+  void didPopNext() {
+    // Covering route was popped off the navigator.
+    // update exp, gem,...
+    getExpGem();
+  }
+
+  @override
   dispose() {
     _animationController.dispose(); // you need this
+    routeObserver.unsubscribe(this);
     super.dispose();
   }
 
