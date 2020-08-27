@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
+import 'package:piano_tile/views/join_room.dart';
 
 class Room{
   String keyOfRoom;
@@ -22,7 +23,7 @@ class Room{
   updateToDatabase(String key){
     database.reference().child("Room")
         .child(key)
-        .set(this.toJson())
+        .update(this.toJson())
         .then((value) {print(key);})
         .catchError((onError){
         print(onError);
@@ -71,12 +72,12 @@ class Room{
     });
   }
 
-  static joinRoom(BuildContext context,String username, String key) async {
+  static Future<bool> joinRoom(BuildContext context,String username, String key) async {
     Room room = new Room(key,'','','','','');
     await room.getRoomByID(key);
     if(room.usernameOne==''&&room.usernameTwo==''&&room.usernameThree==''&&room.usernameFour==''){
       showDialog(context: context, builder: (_) => customAlertDialog(context, 'Room is not exist'));
-      return;
+      return false;
     }
     if(room.usernameOne == ''){
       room.usernameOne = username;
@@ -96,9 +97,14 @@ class Room{
               context: context,
               builder: (_) => customAlertDialog(context, 'Room is full')
           );
+          return false;
       }
     }
     room.updateToDatabase(key);
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => JoinRoom(),
+    ));
+    return true;
   }
 
 

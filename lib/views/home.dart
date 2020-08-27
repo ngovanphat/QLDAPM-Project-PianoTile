@@ -23,6 +23,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
   int _currentIndex = 0;
   TextEditingController roomKeyInput = new TextEditingController();
 
+
   // exp, gem, level
   int currentExp = 0;
   int nextExp = 0;
@@ -31,12 +32,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
 
 
 
+  FirebaseUser user;
+  Future<void> getUser() async {
+    user = await FirebaseAuth.instance.currentUser();
+  }
+
+
   @override
   void initState() {
     super.initState();
     _animationController =
         new AnimationController(vsync: this, duration: Duration(seconds: 1))
           ..repeat();
+    
+    getUser();
+
 
 
 
@@ -80,6 +90,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
     // Covering route was popped off the navigator.
     // update exp, gem,...
     getExpGem();
+
   }
 
   @override
@@ -169,18 +180,24 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
                                         widthFactor: 0.80,
                                         child: Center(
                                           child: new Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
                                               children: <Widget>[
                                                 new FlatButton(
                                                     color: Colors.blue[900],
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                                70),
-                                                        side: BorderSide(
-                                                            color: Colors.white,
-                                                            width: 3)),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        70),
+                                                            side:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    width: 3)),
                                                     child: Container(
                                                       height: 50,
                                                       child: new Row(
@@ -192,28 +209,40 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
                                                                 .center,
                                                         children: <Widget>[
                                                           Padding(
-                                                            padding: const EdgeInsets.only(right: 8.0),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    right: 8.0),
                                                             child: Icon(
                                                                 Icons
                                                                     .add_circle_outline,
-                                                                color: Colors.white,
+                                                                color: Colors
+                                                                    .white,
                                                                 size: 30),
                                                           ),
                                                           Text(
                                                             "Create room",
                                                             style: TextStyle(
-                                                                color: Colors.white,
+                                                                color: Colors
+                                                                    .white,
                                                                 fontSize: 25),
                                                           )
                                                         ],
                                                       ),
                                                     ),
                                                     onPressed: () {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  CreateRoom()));
+                                                      if (user == null) {
+                                                        customAlertDialog(
+                                                            context,
+                                                            'Please login');
+                                                      } else {
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        CreateRoom()));
+                                                      }
                                                     }),
                                                 Padding(
                                                     padding:
@@ -221,13 +250,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
                                                             top: 30)),
                                                 new FlatButton(
                                                     color: Colors.blue[900],
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                                70),
-                                                        side: BorderSide(
-                                                            color: Colors.white,
-                                                            width: 3)),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        70),
+                                                            side:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    width: 3)),
                                                     child: Container(
                                                       height: 50,
                                                       child: new Row(
@@ -239,16 +272,23 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
                                                                 .center,
                                                         children: <Widget>[
                                                           Padding(
-                                                            padding: const EdgeInsets.only(right: 14.0),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    right:
+                                                                        14.0),
                                                             child: new Icon(
-                                                                Icons.exit_to_app,
-                                                                color: Colors.white,
+                                                                Icons
+                                                                    .exit_to_app,
+                                                                color: Colors
+                                                                    .white,
                                                                 size: 30),
                                                           ),
                                                           new Text(
                                                             "Join room",
                                                             style: TextStyle(
-                                                                color: Colors.white,
+                                                                color: Colors
+                                                                    .white,
                                                                 fontSize: 25),
                                                           )
                                                         ],
@@ -257,46 +297,90 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
                                                     onPressed: () {
                                                       showDialog(
                                                         context: context,
-                                                        builder: (_) => Material(
-                                                          type: MaterialType.transparency,
-                                                          child: FractionallySizedBox(
-                                                                heightFactor: 0.3,
-                                                                widthFactor: 0.80,
-                                                                child: Container(
-                                                                  padding: new EdgeInsets.all(25.0),
-                                                                  decoration: new BoxDecoration(
-                                                                    color: Colors.white,
-                                                                    borderRadius: BorderRadius.circular(20),
-                                                                  ),
-                                                                  child: Center(
-                                                                    child: new Column(
-                                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                                                      children: <Widget>[
-                                                                        new TextField(
-                                                                          controller: roomKeyInput,
-                                                                          keyboardType: TextInputType.text,
-                                                                          decoration: new InputDecoration(
+                                                        builder: (_) =>
+                                                            Material(
+                                                          type: MaterialType
+                                                              .transparency,
+                                                          child:
+                                                              FractionallySizedBox(
+                                                            heightFactor: 0.3,
+                                                            widthFactor: 0.80,
+                                                            child: Container(
+                                                              padding:
+                                                                  new EdgeInsets
+                                                                          .all(
+                                                                      25.0),
+                                                              decoration:
+                                                                  new BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                              ),
+                                                              child: Center(
+                                                                child:
+                                                                    new Column(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .center,
+                                                                  children: <
+                                                                      Widget>[
+                                                                    new TextField(
+                                                                      controller:
+                                                                          roomKeyInput,
+                                                                      keyboardType:
+                                                                          TextInputType
+                                                                              .text,
+                                                                      decoration:
+                                                                          new InputDecoration(
                                                                               hintText: "Enter room code"),
-                                                                          style: TextStyle(fontSize: 25),
-                                                                        ),
-                                                                        Padding(
-                                                                          padding: const EdgeInsets.only(top: 40),),
-                                                                        FlatButton(
-                                                                          color: Colors.blueAccent,
-                                                                          child: new Text("Join", style: TextStyle( fontSize: 25),),
-                                                                          onPressed: () {
-                                                                            Room.joinRoom(context,'lmquan2',roomKeyInput.text);
-                                                                            Navigator.of(context).pop();
-                                                                            },
-                                                                          shape: RoundedRectangleBorder(
-                                                                              borderRadius:
-                                                                                  BorderRadius.circular(
-                                                                                      70),
-                                                                              side: BorderSide(
-                                                                                  color:
-                                                                                      Colors.white,
-                                                                                  width: 3)),
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              25),
+                                                                    ),
+                                                                    Padding(
+                                                                      padding: const EdgeInsets
+                                                                              .only(
+                                                                          top:
+                                                                              40),
+                                                                    ),
+                                                                    FlatButton(
+                                                                      color: Colors
+                                                                          .blueAccent,
+                                                                      child:
+                                                                          new Text(
+                                                                        "Join",
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                25),
+                                                                      ),
+                                                                      onPressed:
+                                                                          () async {
+                                                                        if (user ==
+                                                                            null) {
+                                                                          customAlertDialog(
+                                                                              context,
+                                                                              'Please login');
+                                                                        } else {
+                                                                          Room.joinRoom(
+                                                                              context,
+                                                                              '${user.displayName}',
+                                                                              roomKeyInput.text);
+                                                                        }
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                      },
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              70),
+                                                                          side: BorderSide(
+                                                                              color: Colors.white,
+                                                                              width: 3)),
                                                                     )
                                                                   ],
                                                                 ),
@@ -363,4 +447,3 @@ const List<Destination> allDestinations = <Destination>[
   Destination('Songs', Icons.music_note),
   Destination('Profile', Icons.person),
 ];
-
