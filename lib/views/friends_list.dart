@@ -8,8 +8,49 @@ class FriendsList extends StatefulWidget {
 }
 
 class _FriendsListState extends State<FriendsList> {
+  Friend friend = new Friend('','','');
+  Widget content;
   TextEditingController nameController = TextEditingController();
-  List<Friend> _friends = loadFriend();
+  List<Friend> _friends = [];
+
+  List loadFriend() {
+    final names = [
+      'Phat Ngo',
+      'Thuan Nam',
+      'Hanh Dung',
+      'Thang Bui',
+      'Minh Thuong',
+      'Minh Quann',
+      'Phat Ngo',
+      'Thuan Nam',
+      'Hanh Dung',
+      'Thang Bui',
+      'Minh Thuong',
+      'Minh Quann'
+    ];
+    final levels = ['1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6'];
+    final avatars = [
+      'assets/images/male.png',
+      'assets/images/male.png',
+      'assets/images/female.png',
+      'assets/images/male.png',
+      'assets/images/male.png',
+      'assets/images/male.png',
+      'assets/images/male.png',
+      'assets/images/male.png',
+      'assets/images/female.png',
+      'assets/images/male.png',
+      'assets/images/male.png',
+      'assets/images/male.png',
+    ];
+
+    final List<Friend> friendList = [];
+    for (var i = 0; i < names.length; i++) {
+      friendList.add(new Friend(names[i], levels[i], avatars[i]));
+    }
+
+    return friendList;
+  }
 
   void addItemToList() {
     setState(() {
@@ -28,11 +69,11 @@ class _FriendsListState extends State<FriendsList> {
         child: new CircleAvatar(
           radius: 30,
           backgroundColor: Colors.white,
-          backgroundImage: new AssetImage(friend.avatar),
+          backgroundImage: new AssetImage(friend.getAvatar()),
         ),
       ),
       title: new Text(
-        friend.name,
+        friend.getName(),
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -40,7 +81,7 @@ class _FriendsListState extends State<FriendsList> {
         ),
       ),
       subtitle: new Text(
-        'Lv. ' + friend.level,
+        'Lv. ' + friend.getLevel(),
         style: TextStyle(
           color: Colors.white,
           fontSize: 18,
@@ -119,7 +160,10 @@ class _FriendsListState extends State<FriendsList> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = new ListView.builder(
+    friend.getUserByID();
+    _friends = loadFriend();
+
+    content = new ListView.builder(
       itemCount: _friends.length,
       itemBuilder: _buildFriendListTile,
     );
@@ -212,43 +256,4 @@ class _FriendsListState extends State<FriendsList> {
       ),
     );
   }
-}
-
-List loadFriend() {
-  final names = [
-    'Phat Ngo',
-    'Thuan Nam',
-    'Hanh Dung',
-    'Thang Bui',
-    'Minh Thuong',
-    'Minh Quann',
-    'Phat Ngo',
-    'Thuan Nam',
-    'Hanh Dung',
-    'Thang Bui',
-    'Minh Thuong',
-    'Minh Quann'
-  ];
-  final levels = ['1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6'];
-  final avatars = [
-    'assets/images/male.png',
-    'assets/images/male.png',
-    'assets/images/female.png',
-    'assets/images/male.png',
-    'assets/images/male.png',
-    'assets/images/male.png',
-    'assets/images/male.png',
-    'assets/images/male.png',
-    'assets/images/female.png',
-    'assets/images/male.png',
-    'assets/images/male.png',
-    'assets/images/male.png',
-  ];
-
-  final List<Friend> friendList = [];
-  for (var i = 0; i < names.length; i++) {
-    friendList.add(new Friend(names[i], levels[i], avatars[i]));
-  }
-
-  return friendList;
 }

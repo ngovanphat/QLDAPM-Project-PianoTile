@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
@@ -365,10 +366,6 @@ Future<FirebaseUser> _handleSignIn(BuildContext context) async {
   return user;
 }
 
-void signOutGoogle() async {
-  await _googleSignIn.signOut();
-}
-
 void assignUserElements() async {
   bool isSignedIn = await _googleSignIn.isSignedIn();
   if (!isSignedIn) {
@@ -385,8 +382,29 @@ void assignUserElements() async {
   }
 }
 
+void updateFireBase() async {
+  final FirebaseDatabase database = FirebaseDatabase.instance;
+  final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
+
+  database
+      .reference()
+      .child("Friendships")
+      .child(_user.uid)
+      .child("friend_1")
+      .set({
+    "avatar": _user.photoUrl,
+    "name": _user.displayName,
+    "lv": "Lv. 1"
+  }).then((value) {
+    print("");
+  }).catchError((onError) {
+    print(onError);
+  });
+}
+
 void toFriendsList(BuildContext context) async {
   bool isSignedIn = await _googleSignIn.isSignedIn();
+  updateFireBase();
 
   if (isSignedIn) {
     Navigator.of(context).push(
