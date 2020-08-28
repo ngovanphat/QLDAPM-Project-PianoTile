@@ -199,15 +199,14 @@ class _CreateRoomState extends State<CreateRoom>
                 fit: StackFit.passthrough,
                 children: [
                   Image.asset('assets/images/background.jpg', fit: BoxFit.fill),
-                  RowOnTop(context, 0, 0),
                   Container(
-                      margin: EdgeInsets.only(top: 70),
+                      margin: EdgeInsets.only(top: 30),
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Container(
-                              margin: EdgeInsets.only(bottom: 20),
+                              margin: EdgeInsets.only(bottom: 50),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
