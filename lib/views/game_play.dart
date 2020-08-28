@@ -212,7 +212,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
                   ],
                 ),
                 drawPoints(),
-                _pauseButton(),
+                pauseButton(),
               ],
             );
           }
@@ -255,11 +255,10 @@ class GamePlayState<T extends GamePlay> extends State<T>
     setState(() {
       hasStarted = false;
       isPlaying = true;
-//      notes = initNotes();
+
       notes.forEach((note) {
         note.reset();
       });
-
       points = 0;
       currentNoteIndex = 0;
     });
@@ -299,7 +298,11 @@ class GamePlayState<T extends GamePlay> extends State<T>
                   child: Text("Recover with ads")
               ),
               FlatButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    recoverWithGems(numGemToRecover);
+
+                  },
                   child: Text("Recover with $numGemToRecover Gems")
               ),
               FlatButton(
@@ -414,18 +417,102 @@ class GamePlayState<T extends GamePlay> extends State<T>
 
   }
 
+  void recoverWithGems(int gemRequired){
+
+    // check if enough gem to recover
+    int currentGems = prefs.get(sharedPrefKeys.getGemKey());
+
+    // if not
+    if(currentGems < gemRequired){
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("$currentGems gems is not enough! Recovery required $gemRequired gems"),
+              actions: <Widget>[
+
+                FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      showAskRecoveryDialog();
+                    },
+                    child: Text("OK")
+                ),
+
+              ],
+            );
+          }
+      );
+      return;
+    }
+
+
+
+
+    // if enough
+    // subtract gems
+    currentGems -= gemRequired;
+    // update local file
+    prefs.setInt(sharedPrefKeys.getGemKey(), currentGems);
+    // update firebase if user logged in
+    String userId = prefs.getString(sharedPrefKeys.getIdKey());
+    FirebaseDatabase
+        .instance
+        .reference()
+        .child('account/$userId')
+        .update({'gem': currentGems});
+
+    // show result
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Your gems: $currentGems (-$gemRequired)"),
+            actions: <Widget>[
+
+              FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    recoverNoteMissed();
+                  },
+                  child: Text("OK")
+              ),
+
+            ],
+          );
+        }
+    );
+
+  }
+
+  void recoverNoteMissed(){
+
+    setState(() {
+
+      // need to subtract pass by 1
+      // because animation maybe add 1 in previous completion
+      notes[currentNoteIndex].pass -= 1;
+      notes[currentNoteIndex].state = NoteState.ready;
+
+      hasStarted = false;
+      isPlaying = true;
+    });
+  }
 
   void onTap(Note note) {
     bool areAllPreviousTapped = notes
         .sublist(0, note.orderNumber)
         .every((n) => n.state == NoteState.tapped);
+
     if (areAllPreviousTapped) {
+
       if (!hasStarted) {
         setState(() {
           hasStarted = true;
         });
-        animationController.forward();
+        animationController.forward(from: 0);
       }
+
       _playNote(note);
       setState(() {
         note.state = NoteState.tapped;
@@ -476,7 +563,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
     );
   }
 
-  _pauseButton() {
+  pauseButton() {
     return Align(
       alignment: Alignment.topRight,
       child: PauseButton(
