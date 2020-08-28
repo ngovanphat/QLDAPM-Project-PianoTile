@@ -66,16 +66,21 @@ class SongDAO {
 
   Future<int> countSongs(String type) async {
     var content = await exportDatabase(await _db);
-    /*JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
     String prettyprint = encoder.convert(content);
-    prettyprint.split('\n').forEach((element) => print(element));*/
+    prettyprint.split('\n').forEach((element) => print(element));
     return await _songFolder.count(await _db,
         filter: Filter.matches("id", type));
   }
 
   Future insertSong(Song song) async {
-    await _songFolder.add(await _db, song.toJson());
-    print('Song Inserted successfully !!');
+    List<String> existingSongs=await getIdList(song.typeOfSong());
+    if(existingSongs.contains(song.getId()))
+      updateSong(song);
+    else{
+      await _songFolder.add(await _db, song.toJson());
+      print('Song Inserted successfully !!');
+    }
   }
 
   Future updateSong(Song song) async {
@@ -101,9 +106,8 @@ class SongDAO {
   }
 
   Future<Song> getSongById(String id) async {
-    final finder = Finder(filter: Filter.matchesRegExp('id', new RegExp('^'+id+r'$')));
-    final recordSnapshot =
-        await _songFolder.findFirst(await _db, finder: finder);
+    final finder = Finder(filter: Filter.matchesRegExp('id', new RegExp('^' + id + r'$')));
+    final recordSnapshot = await _songFolder.findFirst(await _db, finder: finder);
     debugPrint("Finding ID " + id);
     if (recordSnapshot != null) return Song.fromJson(recordSnapshot.value);
     return null;
@@ -135,11 +139,12 @@ class SongDAO {
         break;
       case "YT":
         {
-          final finder = Finder(filter: Filter.equals("isFavorited", true));
+          final finder = Finder(filter: Filter.equals("isFavorited", true ,anyInList: false));
           final recordSnapshot =
               await _songFolder.find(await _db, finder: finder);
           return recordSnapshot.map((snapshot) {
             final song = Song.fromJson(snapshot.value);
+            debugPrint("Fav Song Id"+song.getId());
             return song;
           }).toList();
         }

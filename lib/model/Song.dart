@@ -130,4 +130,12 @@ class Song {
   void setFavorite(bool newState) {
     this.isFavorited = newState;
   }
+
+  String typeOfSong(){
+    if(this.id.contains("VN"))
+      return "VN";
+    if(this.id.contains("NN"))
+      return "NN";
+    else return "";
+  }
 }

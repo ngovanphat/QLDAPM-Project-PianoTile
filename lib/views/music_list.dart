@@ -190,7 +190,7 @@ class BodyLayout extends StatefulWidget {
   _BodyLayoutState createState() => _BodyLayoutState();
 }
 
-class _BodyLayoutState extends State<BodyLayout> {
+class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMixin{
   List<Song> songs;
   List<int> listTracker = [-1, -1, -1];
   int expListCounter = 0;
@@ -203,15 +203,31 @@ class _BodyLayoutState extends State<BodyLayout> {
   List<int> itemsPerPage = [2, 2, 2];
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     songs = widget.songs;
     tabIndex = widget.tabIndex;
     gTabIndex = widget.tabIndex;
-    getSongs(tabIndex).then((value) {
-      setState(() {
-        songs = value;
+    if(tabIndex!=2){
+      getSongs(tabIndex).then((value) {
+        if (!mounted) return;
+        setState(() {
+          songs = value;
+          if(tabIndex==1)
+            fetchFavorites();
+        });
       });
-    });
+    }else{
+      fetchFavorites().then((value) async {
+        await _fetchSongs(tabIndex, pageNumber, itemsPerPage).then((value){
+          setState(() {
+            songs=value;
+          });
+        });
+      });
+    }
     super.initState();
     allSongs[tabIndex] = songs;
     addIntToSF("tabIndex", gTabIndex);
@@ -231,9 +247,7 @@ class _BodyLayoutState extends State<BodyLayout> {
         });
       }
     });
-
     listTracker[0] = selected;
-    fetchFavorites();
     expListCounter++;
   }
 
@@ -412,8 +426,9 @@ class _BodyLayoutState extends State<BodyLayout> {
     );
   }
 
-  void fetchFavorites() async {
-    if (favorites.isNotEmpty) return;
+  Future<List<Song>> fetchFavorites() async {
+    debugPrint("favorites.isNotEmpty: "+favorites.isNotEmpty.toString());
+    if (favorites.isNotEmpty) return songs;
     final FirebaseAuth auth = FirebaseAuth.instance;
     final FirebaseUser user = await auth.currentUser();
     if (user != null) {
@@ -436,71 +451,29 @@ class _BodyLayoutState extends State<BodyLayout> {
             allSongs[0][i].setFavorite(true);
             songDAO.updateSong(allSongs[0][i]);
           }
-          favorites.remove(favorites.indexOf(allSongs[0][i].getId()));
+          favorites.removeWhere((item) => item == allSongs[0][i].getId());
+          debugPrint("After "+favorites.join(','));
         }
       }
       for (int i = 0; i < allSongs[1].length; i++) {
+        debugPrint("ID: "+allSongs[1][i].getId());
         if (favorites.contains(allSongs[1][i].getId())) {
           if(!allSongs[1][i].getFavorite()){
             allSongs[1][i].setFavorite(true);
             songDAO.updateSong(allSongs[1][i]);
           }
-          favorites.remove(favorites.indexOf(allSongs[1][i].getId()));
+          favorites.removeWhere((item) => item == allSongs[1][i].getId());
+          debugPrint("After "+favorites.join(','));
         }
       }
-      songs=allSongs[tabIndex];
+
       if(favorites.isEmpty){
         setState(() {
+          songs=allSongs[tabIndex];
         });
       }
-      //get list of unloaded songs
-      for (String i in favorites) {
-        bool isLoaded = true;
-        await songDAO.getSongById(i).then(
-            (value) => value != null ? isLoaded = true : isLoaded = false);
-        if (i.contains("NNDB") & !isLoaded) {
-          var db = FirebaseDatabase.instance
-              .reference()
-              .child("Songs/NhacNuocNgoai/" + i.replaceAll("NNDB", ''));
-          await db.once().then((DataSnapshot snapshot) {
-            Map<dynamic, dynamic> values = snapshot.value;
-            if (snapshot.value == null) {
-              debugPrint("Song not found");
-              return;
-            }
-            Song temp = new Song(
-                snapshot.key + "NNDB",
-                snapshot.value["name"],
-                snapshot.value["artists"],
-                snapshot.value["difficulty"],
-                snapshot.value["image"],
-                notes_dir: snapshot.value["notes_dir"],
-                isFavorited: true);
-            allSongs[1].add(temp);
-          });
-        } else if (i.contains("VNDB") & !isLoaded) {
-          var db = FirebaseDatabase.instance
-              .reference()
-              .child("Songs/NhacViet/" + i.replaceAll("VNDB", ''));
-          await db.once().then((DataSnapshot snapshot) {
-            Map<dynamic, dynamic> values = snapshot.value;
-            if (snapshot.value == null) {
-              debugPrint("Song not found");
-              return;
-            }
-            Song temp = new Song(
-                snapshot.key + "VNDB",
-                snapshot.value["name"],
-                snapshot.value["artists"],
-                snapshot.value["difficulty"],
-                snapshot.value["image"],
-                notes_dir: snapshot.value["notes_dir"],
-                isFavorited: true);
-            allSongs[1].add(temp);
-          });
-        }
-      }
     }
+    return songs;
   }
 
   Future<bool> onFavoriteButtonTapped(bool isLiked) async {
@@ -562,33 +535,70 @@ class _BodyLayoutState extends State<BodyLayout> {
     switch (tabIndex) {
       case 2:
         {
-          final FirebaseAuth auth = FirebaseAuth.instance;
-          final FirebaseUser user = await auth.currentUser();
-          if (user != null) {
-            final uid = user.uid;
-            List<String> favorited_ids = [];
-            var db =
-                FirebaseDatabase.instance.reference().child('Favorites/' + uid);
-            await db
-                .orderByKey()
-                .startAt((pageNum * pageSize + 1).toString())
-                .limitToFirst(pageSize)
-                .once()
-                .then((DataSnapshot snapshot) {
-              Map<dynamic, dynamic> values = snapshot.value;
-              values.forEach((key, values) {
-                //songs.add(new Song(key, values["name"], values["artists"],values["difficulty"], values["image"],notes_dir: values["notes_dir"]));
-                favorited_ids.add(key);
-              });
-            });
-            List<String> tempFav = List.from(favorited_ids);
-            List<String> localFav = await songDAO.getIdList("YT");
-            List<String> notDownloaded =
-                tempFav.toSet().difference(localFav.toSet()).toList();
+          if (favorites.isNotEmpty) {
+            //get list of unloaded songs
+            for (String i in favorites) {
+              bool isLoaded = true;
+              await songDAO.getSongById(i).then(
+                      (value) => value != null ? isLoaded = true : isLoaded = false);
+              if (i.contains("NNDB") & !isLoaded) {
+                var db = FirebaseDatabase.instance
+                    .reference()
+                    .child("Songs/NhacNuocNgoai/" + i.replaceAll("NNDB", ''));
+                await db.once().then((DataSnapshot snapshot) {
+                  Map<dynamic, dynamic> values = snapshot.value;
+                  if (snapshot.value == null) {
+                    debugPrint("Song not found");
+                    return;
+                  }
+                  Song temp = new Song(
+                      snapshot.key + "NNDB",
+                      snapshot.value["name"],
+                      snapshot.value["artists"],
+                      snapshot.value["difficulty"],
+                      snapshot.value["image"],
+                      notes_dir: snapshot.value["notes_dir"],
+                      isFavorited: true);
+                  allSongs[1].add(temp);
+                });
+              } else if (i.contains("VNDB") & !isLoaded) {
+                var db = FirebaseDatabase.instance
+                    .reference()
+                    .child("Songs/NhacViet/" + i.replaceAll("VNDB", ''));
+                await db.once().then((DataSnapshot snapshot) {
+                  Map<dynamic, dynamic> values = snapshot.value;
+                  if (snapshot.value == null) {
+                    debugPrint("Song not found");
+                    return;
+                  }
+                  Song temp = new Song(
+                      snapshot.key + "VNDB",
+                      snapshot.value["name"],
+                      snapshot.value["artists"],
+                      snapshot.value["difficulty"],
+                      snapshot.value["image"],
+                      notes_dir: snapshot.value["notes_dir"],
+                      isFavorited: true);
+                  allSongs[1].add(temp);
+                  favorites.removeWhere((item) => item == i);
+                });
+              }
+            }
           }
-          if (songs.isEmpty) {
+          debugPrint("favorited list"+favorites.join('-'));
+          debugPrint("favorited.isEmpty "+favorites.isEmpty.toString());
+          if (favorites.isEmpty) {
+            final List<Song> musicList = [];
+            await musicList.addAll(await songDAO.getAllSongs("YT"));
+            String dbug="Yeu Thich";
+            for(var item in musicList )
+            {
+              dbug+=item.getId();
+            }
+            debugPrint(dbug);
             loadedAll = true;
             _isVisible = false;
+            return allSongs[tabIndex] = musicList;
           }
         } //Yeu thich
         break;
@@ -805,8 +815,15 @@ Future<List> getSongs(tabIndex) async {
     });
     return allSongs[tabIndex] = musicList;
   } else if (tabIndex == 2) {
-    List<Song> tmp = [];
-    return allSongs[tabIndex] = tmp;
+    final List<Song> musicList = [];
+    musicList.addAll(await songDAO.getAllSongs("YT"));
+    String dbug="Yeu Thich";
+    for(var item in musicList )
+      {
+        dbug+=item.getId();
+      }
+    debugPrint(dbug);
+    return allSongs[tabIndex] = musicList;
   }
   List<Song> tmp = [];
   return allSongs[tabIndex] = tmp;
