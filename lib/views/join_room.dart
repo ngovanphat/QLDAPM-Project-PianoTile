@@ -50,18 +50,6 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
     animationController = new AnimationController(vsync: this, duration: Duration(seconds: 1))..repeat();
     //print(widget.roomKey+" is room key");
     loadRoom(widget.roomKey);
-
-  }
-
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    room.removeUserByName(user.displayName);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     try
     {
       Timer.periodic(Duration(seconds: 10), (timer) {
@@ -81,6 +69,18 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
     }catch(e){
       print(e);
     }
+  }
+
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    animationController.dispose();
+    room.removeUserByName(user.displayName);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return isLoading ? Container(
       color: Colors.white,
       child: Center(

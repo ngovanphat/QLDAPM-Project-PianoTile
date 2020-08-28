@@ -120,6 +120,7 @@ class _CreateRoomState extends State<CreateRoom>
     // for later retrieving in other screens
     savePreferences(userId: username, roomId: key, isHost: true);
     print('[create_room] done update database and save preferences');
+    startTime();
   }
 
   Future<void> saveAdditionalFields({String roomId}) async {
@@ -141,6 +142,7 @@ class _CreateRoomState extends State<CreateRoom>
   @override
   void deactivate() {
     super.deactivate();
+    _animationController.dispose();
     room.removeUserByName(username);
     timer.cancel();
   }
@@ -172,14 +174,9 @@ class _CreateRoomState extends State<CreateRoom>
                 GamePlayOnline()));
   }
 
-  onBackToScreen(){
-    room.isPlaying = false;
-    room.updateToDatabase(room.keyOfRoom);
-  }
 
   @override
   Widget build(BuildContext context) {
-    startTime();
     return isLoading == false
         ? Center(
             child: Column(
