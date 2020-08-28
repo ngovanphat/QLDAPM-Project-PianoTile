@@ -3,13 +3,15 @@ import 'package:firebase_database/firebase_database.dart';
 
 class Friend {
   String myUID;
+  String friendUID;
   String name;
   String level;
   String avatar;
   List<Friend> _friends = [];
   final FirebaseDatabase database = FirebaseDatabase.instance;
 
-  Friend(name, level, avatar) {
+  Friend(friendUID, name, level, avatar) {
+    this.friendUID = friendUID;
     this.name = name;
     this.level = level;
     this.avatar = avatar;
@@ -23,8 +25,12 @@ class Friend {
     return this.name;
   }
 
-  String getUID() {
+  String getMyUID() {
     return this.myUID;
+  }
+
+  String getFriendUID() {
+    return this.friendUID;
   }
 
   void setName(String name) {
@@ -48,6 +54,7 @@ class Friend {
   }
 
   getUserFriendsListByID() async {
+    _friends.clear();
     final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
     myUID = _user.uid;
     await database
@@ -61,7 +68,8 @@ class Friend {
   fromSnapshot(DataSnapshot snapshot) {
     try {
       for (var value in snapshot.value.values) {
-        _friends.add(new Friend(value["name"], value["lv"], value["avatar"]));
+        _friends.add(new Friend(
+            value["id"], value["name"], value["lv"], value["avatar"]));
       }
     } catch (e) {
       print(e);
