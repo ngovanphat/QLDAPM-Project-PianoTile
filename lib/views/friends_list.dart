@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/friend.dart';
+import 'package:random_string/random_string.dart';
 
 class FriendsList extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class FriendsList extends StatefulWidget {
 class _FriendsListState extends State<FriendsList> {
   final FirebaseDatabase database = FirebaseDatabase.instance;
   String myUID;
-  Friend friend = new Friend('', '', '');
+  Friend friend = new Friend('', '', '', '');
   Widget content;
   TextEditingController nameController = TextEditingController();
   List<Friend> _friends = [];
@@ -20,16 +21,20 @@ class _FriendsListState extends State<FriendsList> {
     _friends.clear();
     await friend.getUserFriendsListByID();
     _friends = friend.getFriendList();
-    myUID = friend.getUID();
+    myUID = friend.getMyUID();
     return _friends;
   }
 
   addItemToList() {
-    setState(() {
-      _friends.insert(
-        0,
-        new Friend(nameController.text, '1', 'assets/images/female.png'),
-      );
+    String key = randomString(6, from: 65, to: 90);
+    database.reference().child("Friendships").child(myUID).child(key).set({
+      "id": key,
+      "name": nameController.text,
+      "avatar":
+          "https://lh3.googleusercontent.com/-jwSGuQYRPHE/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucknrPQRplNYMm5KC9i8H9ovrxZKnw/s96-c/photo.jpg",
+      "lv": "10"
+    }).then((_) {
+      setState(() {});
     });
   }
 
@@ -38,7 +43,7 @@ class _FriendsListState extends State<FriendsList> {
         .reference()
         .child("Friendships")
         .child(myUID)
-        .child("friend_${index+1}")
+        .child(_friends[index].getFriendUID())
         .remove()
         .then((_) {
       setState(() {
@@ -115,16 +120,15 @@ class _FriendsListState extends State<FriendsList> {
               });
               return AlertDialog(
                   shape: CircleBorder(
-                    side: BorderSide(
-                        color: Colors.white, width: 2),
+                    side: BorderSide(color: Colors.white, width: 2),
                   ),
                   backgroundColor: const Color(0xff004d00),
                   content: Container(
                       child: Icon(
-                        Icons.done,
-                        color: Colors.white,
-                        size: 50,
-                      )));
+                    Icons.done,
+                    color: Colors.white,
+                    size: 50,
+                  )));
             });
       },
     );
@@ -201,6 +205,17 @@ class _FriendsListState extends State<FriendsList> {
                       ),
                     ),
                     actions: [
+                      FlatButton(
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
                       FlatButton(
                         child: Text("Send Request"),
                         onPressed: () {
