@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:piano_tile/model/room.dart';
 import 'package:piano_tile/model/widget.dart';
+import 'package:piano_tile/views/home.dart';
 
 class JoinRoom extends StatefulWidget {
   final String roomKey;
@@ -57,6 +58,9 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
         setState(() {
           isInRoom = true;
         });
+        if(room.usernameOne=='')Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => Home()
+        ));
       });
     }catch(e){
       print(e);
