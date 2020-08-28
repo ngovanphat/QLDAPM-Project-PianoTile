@@ -391,15 +391,14 @@ void updateFireBase() async {
       .child("Friendships")
       .child(_user.uid)
       .child("friend_1")
-      .set({
-    "avatar": _user.photoUrl,
-    "name": _user.displayName,
-    "lv": "Lv. 1"
-  }).then((value) {
-    print("");
-  }).catchError((onError) {
-    print(onError);
-  });
+      .set({"avatar": _user.photoUrl, "name": _user.displayName, "lv": "1"});
+
+  database
+      .reference()
+      .child("Friendships")
+      .child(_user.uid)
+      .child("friend_2")
+      .set({"avatar": _user.photoUrl, "name": _user.displayName, "lv": "2"});
 }
 
 void toFriendsList(BuildContext context) async {
