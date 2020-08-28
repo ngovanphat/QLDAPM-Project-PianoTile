@@ -4,24 +4,31 @@ import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/join_room.dart';
 
-class Room{
+class Room {
   String keyOfRoom;
-  String usernameOne,usernameTwo,usernameThree,usernameFour;
+  String usernameOne, usernameTwo, usernameThree, usernameFour;
   String musicName;
+  bool isPlaying=false;
   final FirebaseDatabase database = FirebaseDatabase.instance;
-  Room(this.keyOfRoom,this.musicName,this.usernameOne,this.usernameTwo,this.usernameThree,this.usernameFour);
+  Room(this.keyOfRoom, this.musicName, this.usernameOne, this.usernameTwo,
+      this.usernameThree, this.usernameFour);
 
-   getRoomByID(String key) async{
-    await database.reference().child("Room")
+  getRoomByID(String key) async {
+    await database
+        .reference()
+        .child("Room")
         .child(key)
         .once()
         .then((value) => fromSnapshot(value))
-        .catchError((onError){
-          print(onError);
-        });
+        .catchError((onError) {
+      print(onError);
+    });
   }
-  updateToDatabase(String key){
-    database.reference().child("Room")
+
+  updateToDatabase(String key) {
+    database
+        .reference()
+        .child("Room")
         .child(key)
         .update(this.toJson())
         .then((value) {print(key);})
@@ -29,8 +36,8 @@ class Room{
         print(onError);
     });
   }
-  fromSnapshot(DataSnapshot snapshot)
-  {
+
+  fromSnapshot(DataSnapshot snapshot) {
     try {
       keyOfRoom = snapshot.value["keyOfRoom"];
       musicName = snapshot.value["musicName"];
@@ -38,23 +45,32 @@ class Room{
       usernameTwo = snapshot.value["usernameTwo"];
       usernameThree = snapshot.value["usernameThree"];
       usernameFour = snapshot.value["usernameFour"];
-    }
-    catch (e){
+      isPlaying = snapshot.value["isPlaying"];
+    } catch (e) {
       print(e);
     }
   }
-  removeUserByName (String username) async{
+
+  removeUserByName(String username) async {
     await getRoomByID(this.keyOfRoom);
-    if(usernameOne == username) usernameOne = '';
-    else if(usernameTwo == username) usernameTwo='';
-    else if(usernameThree == username) usernameThree='';
-    else if(usernameFour == username) usernameFour = '';
+    if (usernameOne == username)
+      usernameOne = '';
+    else if (usernameTwo == username)
+      usernameTwo = '';
+    else if (usernameThree == username)
+      usernameThree = '';
+    else if (usernameFour == username) usernameFour = '';
     updateToDatabase(keyOfRoom);
-    if(usernameOne==''&&usernameTwo==''&&usernameThree==''&&usernameFour=='')removeRoom();
+    if (usernameOne == '' &&
+        usernameTwo == '' &&
+        usernameThree == '' &&
+        usernameFour == '') removeRoom();
   }
-  removeRoom(){
+
+  removeRoom() {
     database.reference().child("Room").child(keyOfRoom).remove();
   }
+
   toJson() {
     return {
       "keyOfRoom": keyOfRoom,
@@ -63,49 +79,55 @@ class Room{
       "usernameTwo": usernameTwo,
       "usernameThree": usernameThree,
       "usernameFour": usernameFour,
+      "isPlaying": isPlaying,
     };
   }
-  triggerReadFromDB(String key){
+
+  triggerReadFromDB(String key) {
     database.reference().child("Room").child(key).onValue.listen((event) {
       DataSnapshot snapshot = event.snapshot;
       fromSnapshot(snapshot);
     });
   }
 
-  static Future<bool> joinRoom(BuildContext context,String username, String key) async {
-    Room room = new Room(key,'','','','','');
+  static Future<bool> joinRoom(
+      BuildContext context, String username, String key) async {
+    Room room = new Room(key, '', '', '', '', '');
     await room.getRoomByID(key);
-    if(room.usernameOne==''&&room.usernameTwo==''&&room.usernameThree==''&&room.usernameFour==''){
-      showDialog(context: context, builder: (_) => customAlertDialog(context, 'Room is not exist'));
+    if (room.usernameOne == '' &&
+        room.usernameTwo == '' &&
+        room.usernameThree == '' &&
+        room.usernameFour == '') {
+      showDialog(
+          context: context,
+          builder: (_) => customAlertDialog(context, 'Room is not exist'));
       return false;
     }
-    if(room.usernameOne == ''){
+    if (room.usernameOne == '') {
       room.usernameOne = username;
-    }
-    else if (room.usernameTwo == '') {
+    } else if (room.usernameTwo == '') {
       room.usernameTwo = username;
-    }
-    else if (room.usernameThree == ''){
+    } else if (room.usernameThree == '') {
       room.usernameThree = username;
-    }
-    else if (room.usernameFour == ''){
+    } else if (room.usernameFour == '') {
       room.usernameFour = username;
-    }
-    else {
-      if(room.usernameOne!=''&&room.usernameTwo!=''&&room.usernameThree!=''&&room.usernameFour!=''){
-          showDialog(
-              context: context,
-              builder: (_) => customAlertDialog(context, 'Room is full')
-          );
-          return false;
+    } else {
+      if (room.usernameOne != '' &&
+          room.usernameTwo != '' &&
+          room.usernameThree != '' &&
+          room.usernameFour != '') {
+        showDialog(
+            context: context,
+            builder: (_) => customAlertDialog(context, 'Room is full'));
+        return false;
       }
     }
     room.updateToDatabase(key);
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => JoinRoom(),
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+      builder: (context) => JoinRoom(roomKey: key,),
     ));
     return true;
   }
-
-
 }

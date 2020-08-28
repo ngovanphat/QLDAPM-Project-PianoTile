@@ -18,11 +18,11 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteAware  {
+class _HomeState extends State<Home>
+    with SingleTickerProviderStateMixin, RouteAware {
   AnimationController _animationController;
   int _currentIndex = 0;
   TextEditingController roomKeyInput = new TextEditingController();
-
 
   // exp, gem, level
   int currentExp = 0;
@@ -30,13 +30,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
   int gem = 0;
   int level = 1;
 
-
-
   FirebaseUser user;
   Future<void> getUser() async {
     user = await FirebaseAuth.instance.currentUser();
   }
-
 
   @override
   void initState() {
@@ -44,18 +41,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
     _animationController =
         new AnimationController(vsync: this, duration: Duration(seconds: 1))
           ..repeat();
-    
+
     getUser();
-
-
-
 
     // update exp, gem,...
     getExpGem();
   }
 
-  Future<String> getExpGem () async{
-
+  Future<String> getExpGem() async {
     // get exp, next exp, gem from local file
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -65,7 +58,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
       this.nextExp = prefs.getInt(sharedPrefKeys.getNextExpKey());
       this.gem = prefs.getInt(sharedPrefKeys.getGemKey());
       this.level = prefs.getInt(sharedPrefKeys.getLevelKey());
-
     });
 
     return 'done';
@@ -76,7 +68,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context));
   }
-
 
   @override
   void didPush() {
@@ -90,7 +81,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
     // Covering route was popped off the navigator.
     // update exp, gem,...
     getExpGem();
-
   }
 
   @override
@@ -113,7 +103,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteA
               fit: StackFit.passthrough,
               children: [
                 Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
-                RowOnTop_v2(context, this.level, this.gem, this.currentExp, this.nextExp),
+                RowOnTop_v2(context, this.level, this.gem, this.currentExp,
+                    this.nextExp),
                 Container(
                     margin: EdgeInsets.only(top: 100),
                     child: SingleChildScrollView(

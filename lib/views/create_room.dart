@@ -120,6 +120,7 @@ class _CreateRoomState extends State<CreateRoom>
     // for later retrieving in other screens
     savePreferences(userId: username, roomId: key, isHost: true);
     print('[create_room] done update database and save preferences');
+    startTime();
   }
 
   Future<void> saveAdditionalFields({String roomId}) async {
@@ -141,9 +142,12 @@ class _CreateRoomState extends State<CreateRoom>
   @override
   void deactivate() {
     super.deactivate();
+    _animationController.dispose();
     room.removeUserByName(username);
     timer.cancel();
   }
+
+
 
   backgroundFunction() {
     room.triggerReadFromDB(room.keyOfRoom);
@@ -160,9 +164,19 @@ class _CreateRoomState extends State<CreateRoom>
     });
   }
 
+  onClickPlayButton(BuildContext context){
+    room.isPlaying = true;
+    room.updateToDatabase(room.keyOfRoom);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                GamePlayOnline()));
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    startTime();
     return isLoading == false
         ? Center(
             child: Column(
@@ -185,15 +199,14 @@ class _CreateRoomState extends State<CreateRoom>
                 fit: StackFit.passthrough,
                 children: [
                   Image.asset('assets/images/background.jpg', fit: BoxFit.fill),
-                  RowOnTop(context, 0, 0),
                   Container(
-                      margin: EdgeInsets.only(top: 70),
+                      margin: EdgeInsets.only(top: 30),
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Container(
-                              margin: EdgeInsets.only(bottom: 20),
+                              margin: EdgeInsets.only(bottom: 50),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
@@ -396,12 +409,7 @@ class _CreateRoomState extends State<CreateRoom>
                               margin: EdgeInsets.only(top: 20),
                               child: FlatButton(
                                 onPressed: () {
-//                            Navigator.pushReplacement(
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              GamePlayOnline()));
+                                  onClickPlayButton(context);
                                 },
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(70),

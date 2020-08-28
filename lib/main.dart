@@ -7,7 +7,6 @@ import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 void main() async {
-
   // if change main to async
   // app needs this line to run properly
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,30 +17,27 @@ void main() async {
   int exp = null;
   int gem = null;
 
-  if(type == sharedPrefValues.USER){
-
+  if (type == sharedPrefValues.USER) {
     // get info from firebase database
     String userId = prefs.getString(sharedPrefKeys.getIdKey());
-    DataSnapshot user = await FirebaseDatabase.instance.reference()
+    DataSnapshot user = await FirebaseDatabase.instance
+        .reference()
         .child('account/$userId')
         .once();
 
-    if(user == null) {
+    if (user == null) {
       type = sharedPrefValues.GUEST;
       print('[main] get_user_from_firebase: failed, changed type to guest');
-    }
-    else {
+    } else {
       print('[main] user: $user');
       Map<dynamic, dynamic> rows = user.value;
       // get exp, gems
       exp = rows['exp'];
       gem = rows['gem'];
-
     }
-
   }
 
-  if(type == sharedPrefValues.GUEST){
+  if (type == sharedPrefValues.GUEST) {
     // type == GUEST
 
     // in-case first time install app
@@ -57,26 +53,24 @@ void main() async {
     exp = prefs.getInt(sharedPrefKeys.getExpKey()) ?? levels[0]['expRequired'];
     gem = prefs.getInt(sharedPrefKeys.getGemKey()) ?? levels[0]['gemReward'];
     print('[main] local exp: $exp, gem: $gem');
-
   }
 
   // resolve level and get next-exp value
   int levelValue = 1;
   int nextExpValue = 0;
-  DataSnapshot data = await FirebaseDatabase.instance.reference()
+  DataSnapshot data = await FirebaseDatabase.instance
+      .reference()
       .child('levelDefinition')
       .once();
   List<dynamic> levels = data.value;
   print('[main] levels: $levels');
-  for(int i = 0; i < levels.length; i++){
-
+  for (int i = 0; i < levels.length; i++) {
     Map<dynamic, dynamic> level = levels[i];
-    if(level['expRequired'] > exp){
+    if (level['expRequired'] > exp) {
       levelValue = level['level'] - 1;
       nextExpValue = level['expRequired'];
       break;
     }
-
   }
   print('[main] level: $levelValue, next exp: $nextExpValue');
 
@@ -87,12 +81,12 @@ void main() async {
   prefs.setInt(sharedPrefKeys.getLevelKey(), levelValue);
   prefs.setInt(sharedPrefKeys.getNextExpKey(), nextExpValue);
 
-
   runApp(MyApp());
 }
 
 // Register the RouteObserver as a navigation observer.
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -117,4 +111,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
- 
