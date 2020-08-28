@@ -184,70 +184,75 @@ class GamePlayState<T extends GamePlay> extends State<T>
   Widget build(BuildContext context) {
     
 
-    return Material(
-      child: FutureBuilder<String>(
+    return WillPopScope(
+      child: Material(
+        child: FutureBuilder<String>(
 
-        future: statusOfInitNotes,
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          future: statusOfInitNotes,
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
 
-          if(snapshot.hasData && snapshot.data == 'done'){
+            if(snapshot.hasData && snapshot.data == 'done'){
 
-            return Stack(
-              fit: StackFit.passthrough,
-              children:
-              <Widget>[
-                Image.asset(
-                  'assets/images/background.jpg',
-                  fit: BoxFit.cover,
+              return Stack(
+                fit: StackFit.passthrough,
+                children:
+                <Widget>[
+                  Image.asset(
+                    'assets/images/background.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      _drawLine(0),
+                      LineDivider(),
+                      _drawLine(1),
+                      LineDivider(),
+                      _drawLine(2),
+                      LineDivider(),
+                      _drawLine(3)
+                    ],
+                  ),
+                  drawPoints(),
+                  _pauseButton(),
+                ],
+              );
+            }
+            else if(snapshot.hasData && snapshot.data == 'fail_level_required'){
+
+              return Container();
+
+            }
+            else{
+              List<Widget> children;
+              children = <Widget>[
+
+              SpinKitWave(
+              color: Colors.blue,
+              size: 50.0,
+              )
+              ];
+
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: children,
                 ),
-                Row(
-                  children: <Widget>[
-                    _drawLine(0),
-                    LineDivider(),
-                    _drawLine(1),
-                    LineDivider(),
-                    _drawLine(2),
-                    LineDivider(),
-                    _drawLine(3)
-                  ],
-                ),
-                drawPoints(),
-                _pauseButton(),
-              ],
-            );
-          }
-          else if(snapshot.hasData && snapshot.data == 'fail_level_required'){
-
-            return Container();
-
-          }
-          else{
-            List<Widget> children;
-            children = <Widget>[
-
-            SpinKitWave(
-            color: Colors.blue,
-            size: 50.0,
-            )
-            ];
-
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: children,
-              ),
-            );
-
-       
+              );
 
 
-          }
-        },
-
-      )
 
 
+            }
+          },
+
+        )
+
+
+      ),
+      onWillPop: () async {
+        return false;
+      },
     );
   }
 

@@ -8,6 +8,7 @@ class Room {
   String keyOfRoom;
   String usernameOne, usernameTwo, usernameThree, usernameFour;
   String musicName;
+  bool isPlaying=false;
   final FirebaseDatabase database = FirebaseDatabase.instance;
   Room(this.keyOfRoom, this.musicName, this.usernameOne, this.usernameTwo,
       this.usernameThree, this.usernameFour);
@@ -44,6 +45,7 @@ class Room {
       usernameTwo = snapshot.value["usernameTwo"];
       usernameThree = snapshot.value["usernameThree"];
       usernameFour = snapshot.value["usernameFour"];
+      isPlaying = snapshot.value["isPlaying"];
     } catch (e) {
       print(e);
     }
@@ -77,6 +79,7 @@ class Room {
       "usernameTwo": usernameTwo,
       "usernameThree": usernameThree,
       "usernameFour": usernameFour,
+      "isPlaying": isPlaying,
     };
   }
 

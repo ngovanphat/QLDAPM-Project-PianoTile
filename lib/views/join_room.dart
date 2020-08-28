@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:piano_tile/model/room.dart';
 import 'package:piano_tile/model/widget.dart';
+import 'package:piano_tile/views/game_play_online.dart';
 import 'package:piano_tile/views/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JoinRoom extends StatefulWidget {
   final String roomKey;
@@ -28,10 +30,18 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
     room =  new Room(key,'','','','','');
     await room.getRoomByID(key);
     user = await FirebaseAuth.instance.currentUser();
+    await savePreferences(userId: user.displayName,roomId: widget.roomKey,isHost: false);
     setState(() {
       print("load done");
       isLoading = false;
     });
+  }
+  Future<void> savePreferences(
+      {String userId, String roomId, bool isHost}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('userId', userId);
+    prefs.setString('roomId', roomId);
+    prefs.setBool('isRoomHost', isHost);
   }
 
   @override
@@ -40,6 +50,7 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
     animationController = new AnimationController(vsync: this, duration: Duration(seconds: 1))..repeat();
     //print(widget.roomKey+" is room key");
     loadRoom(widget.roomKey);
+
   }
 
 
@@ -58,9 +69,14 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
         setState(() {
           isInRoom = true;
         });
-        if(room.usernameOne=='')Navigator.pushReplacement(context, MaterialPageRoute(
-          builder: (context) => Home()
-        ));
+        if (room.usernameOne == '')
+          Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) => Home()
+          ));
+        else if (room.isPlaying == true)
+          Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) => GamePlayOnline()
+          ));
       });
     }catch(e){
       print(e);
