@@ -1,11 +1,14 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
+import 'package:piano_tile/views/friends_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:piano_tile/views/friends_list.dart';
+import 'package:piano_tile/views/home.dart';
+import 'package:piano_tile/views/logged_in_profile.dart';
 
-import 'home.dart';
+String name = "", email = "", imageUrl = "", text = "";
 
 class Profile extends StatefulWidget {
   @override
@@ -13,6 +16,10 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  _ProfileState() {
+    assignUserElements();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,19 +49,13 @@ class _ProfileState extends State<Profile> {
                       height: 90,
                       child: FlatButton(
                         onPressed: () {
-                          _handleSignIn().whenComplete(() {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return Home();
-                                },
-                              ),
-                            );
+                          setState(() {
+                            _handleSignIn(context);
                           });
                         },
                         child: Row(
                           children: [
-                            Image.asset('assets/images/google.png',
+                            Image.asset("assets/images/google.png",
                                 fit: BoxFit.cover),
                             Container(
                               margin: EdgeInsets.only(left: 20),
@@ -67,7 +68,6 @@ class _ProfileState extends State<Profile> {
                               height: double.infinity,
                               color: const Color(0xffffd11a),
                             ),
-
                             Container(
                               width: 3,
                               height: double.infinity,
@@ -89,24 +89,26 @@ class _ProfileState extends State<Profile> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(15.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "LOG IN GOOGLE TO:",
+                                        '$name',
+                                        //"LOG IN GOOGLE TO:",
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
                                         ),
                                       ),
                                       Text(
-                                        "Play with friends",
+                                        '$email',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
                                         ),
                                       ),
                                       Text(
-                                        "Save your progress",
+                                        '$text',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
@@ -157,7 +159,8 @@ class _ProfileState extends State<Profile> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "FREE DIAMONDS",
@@ -192,10 +195,9 @@ class _ProfileState extends State<Profile> {
                       height: 90,
                       child: FlatButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FriendsList()));
+                          setState(() {
+                            toFriendsList(context);
+                          });
                         },
                         child: Row(
                           children: [
@@ -223,7 +225,8 @@ class _ProfileState extends State<Profile> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "FRIENDS LIST",
@@ -284,7 +287,8 @@ class _ProfileState extends State<Profile> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "FAVORITE SONGS",
@@ -328,20 +332,123 @@ class _ProfileState extends State<Profile> {
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
-Future<FirebaseUser> _handleSignIn() async {
-  final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+Future<FirebaseUser> _handleSignIn(BuildContext context) async {
+  FirebaseUser user;
+  bool isSignedIn = await _googleSignIn.isSignedIn();
 
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
+  if (isSignedIn) {
+    user = await _auth.currentUser();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return FirstScreen();
+        },
+      ),
+    );
+  } else {
+    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
-  final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+    user = (await _auth.signInWithCredential(credential)).user;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Home();
+        },
+      ),
+    );
+  }
+
+  assignUserElements();
   return user;
 }
 
-void signOutGoogle() async{
-  await _googleSignIn.signOut();
+void assignUserElements() async {
+  bool isSignedIn = await _googleSignIn.isSignedIn();
+  if (!isSignedIn) {
+    imageUrl = "assets/images/google.png";
+    name = "LOG IN GOOGLE TO:";
+    email = "Play with friends";
+    text = "Save your progress";
+  } else {
+    final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
+    imageUrl = _user.photoUrl;
+    name = _user.displayName;
+    email = _user.email;
+    text = "";
+  }
 }
 
+void updateFireBase() async {
+  final FirebaseDatabase database = FirebaseDatabase.instance;
+  final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
+
+  database
+      .reference()
+      .child("Friendships")
+      .child(_user.uid)
+      .child("friend_1")
+      .set({
+    "avatar": _user.photoUrl,
+    "name": _user.displayName,
+    "lv": "Lv. 1"
+  }).then((value) {
+    print("");
+  }).catchError((onError) {
+    print(onError);
+  });
+}
+
+void toFriendsList(BuildContext context) async {
+  bool isSignedIn = await _googleSignIn.isSignedIn();
+  updateFireBase();
+
+  if (isSignedIn) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return FriendsList();
+        },
+      ),
+    );
+  } else {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.white, width: 1),
+          ),
+          backgroundColor: Colors.black,
+          title: Center(
+            child: Text(
+              "Sorry",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          content: Text(
+            "Please log in to activate this feature!",
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            FlatButton(
+              child: Text(
+                "OK",
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}

@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "754135347462-8up4gopp3v8s5oj7teurtmulml4vs9hg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.piano_tile",
+            "certificate_hash": "8314c3558eac7fb804fde7d3e38ec2ba6a7e1010"
+          }
+        },
+        {
+          "client_id": "754135347462-di2scoghgcp4nf5pahc6dqqjsmq7eete.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.piano_tile",
+            "certificate_hash": "c32cf6e10d9c25f13ca93ecf33d0fc3d5bf36901"
+          }
+        },
+        {
           "client_id": "754135347462-487376t3g6u4bf16uba88u95va2uf3ri.apps.googleusercontent.com",
           "client_type": 3
         }
