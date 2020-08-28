@@ -323,7 +323,7 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
   }
 
   @override
-  void showFinishDialog() {
+  void showFinishDialog({String status}) async {
 
     calculateFinalRank().then((value) {
 

@@ -9,20 +9,34 @@ import 'package:piano_tile/views/profile.dart';
 import 'package:piano_tile/views/music_list.dart';
 import 'package:piano_tile/views/create_room.dart';
 import 'package:piano_tile/model/room.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
+import 'package:piano_tile/main.dart';
 
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin, RouteAware  {
   AnimationController _animationController;
   int _currentIndex = 0;
   TextEditingController roomKeyInput = new TextEditingController();
+
+
+  // exp, gem, level
+  int currentExp = 0;
+  int nextExp = 0;
+  int gem = 0;
+  int level = 1;
+
+
+
   FirebaseUser user;
   Future<void> getUser() async {
     user = await FirebaseAuth.instance.currentUser();
   }
+
 
   @override
   void initState() {
@@ -30,12 +44,59 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     _animationController =
         new AnimationController(vsync: this, duration: Duration(seconds: 1))
           ..repeat();
+    
     getUser();
+
+
+
+
+    // update exp, gem,...
+    getExpGem();
+  }
+
+  Future<String> getExpGem () async{
+
+    // get exp, next exp, gem from local file
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // set states
+    setState(() {
+      this.currentExp = prefs.getInt(sharedPrefKeys.getExpKey());
+      this.nextExp = prefs.getInt(sharedPrefKeys.getNextExpKey());
+      this.gem = prefs.getInt(sharedPrefKeys.getGemKey());
+      this.level = prefs.getInt(sharedPrefKeys.getLevelKey());
+
+    });
+
+    return 'done';
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context));
+  }
+
+
+  @override
+  void didPush() {
+    // Route was pushed onto navigator and is now topmost route.
+    // update exp, gem,...
+    getExpGem();
+  }
+
+  @override
+  void didPopNext() {
+    // Covering route was popped off the navigator.
+    // update exp, gem,...
+    getExpGem();
+
   }
 
   @override
   dispose() {
     _animationController.dispose(); // you need this
+    routeObserver.unsubscribe(this);
     super.dispose();
   }
 
@@ -52,7 +113,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               fit: StackFit.passthrough,
               children: [
                 Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
-                RowOnTop(context, 0, 0),
+                RowOnTop_v2(context, this.level, this.gem, this.currentExp, this.nextExp),
                 Container(
                     margin: EdgeInsets.only(top: 100),
                     child: SingleChildScrollView(
@@ -87,7 +148,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               margin: EdgeInsets.only(top: 20),
                               child: FlatButton(
                                 onPressed: () {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => GamePlay()));
