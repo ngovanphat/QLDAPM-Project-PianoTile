@@ -145,6 +145,8 @@ class _CreateRoomState extends State<CreateRoom>
     timer.cancel();
   }
 
+
+
   backgroundFunction() {
     room.triggerReadFromDB(room.keyOfRoom);
     setState(() {
@@ -158,6 +160,21 @@ class _CreateRoomState extends State<CreateRoom>
         backgroundFunction();
       });
     });
+  }
+
+  onClickPlayButton(BuildContext context){
+    room.isPlaying = true;
+    room.updateToDatabase(room.keyOfRoom);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                GamePlayOnline()));
+  }
+
+  onBackToScreen(){
+    room.isPlaying = false;
+    room.updateToDatabase(room.keyOfRoom);
   }
 
   @override
@@ -396,12 +413,7 @@ class _CreateRoomState extends State<CreateRoom>
                               margin: EdgeInsets.only(top: 20),
                               child: FlatButton(
                                 onPressed: () {
-//                            Navigator.pushReplacement(
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              GamePlayOnline()));
+                                  onClickPlayButton(context);
                                 },
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(70),
