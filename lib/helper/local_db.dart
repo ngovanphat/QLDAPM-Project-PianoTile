@@ -66,9 +66,9 @@ class SongDAO {
 
   Future<int> countSongs(String type) async {
     var content = await exportDatabase(await _db);
-    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+    /*JsonEncoder encoder = new JsonEncoder.withIndent('  ');
     String prettyprint = encoder.convert(content);
-    prettyprint.split('\n').forEach((element) => print(element));
+    prettyprint.split('\n').forEach((element) => print(element));*/
     return await _songFolder.count(await _db,
         filter: Filter.matches("id", type));
   }
@@ -100,7 +100,7 @@ class SongDAO {
   Future<List<String>> getIdList(String type) async {
     final recordSnapshot = await _songFolder.find(await _db);
     return recordSnapshot.map((snapshot) {
-      final songId = snapshot.value["id"];
+      final String songId = snapshot.value["id"];
       return songId;
     }).toList();
   }
@@ -139,7 +139,7 @@ class SongDAO {
         break;
       case "YT":
         {
-          final finder = Finder(filter: Filter.equals("isFavorited", true ,anyInList: false));
+          final finder = Finder(filter: Filter.equals("isFavorited", true ,anyInList: false),sortOrders: [SortOrder('id'),SortOrder('highscore')]);
           final recordSnapshot =
               await _songFolder.find(await _db, finder: finder);
           return recordSnapshot.map((snapshot) {

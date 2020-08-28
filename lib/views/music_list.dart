@@ -27,6 +27,9 @@ Từ DB : +DB
 vd :01VN, 01VNDB,...
 */
 
+Map<int,GlobalKey> bodyKeys ={
+0:GlobalKey(),1:GlobalKey(),2:GlobalKey()};
+
 List<List<Song>> allSongs = new List.filled(3, []);
 List<String> favorites = [];
 bool _isVisible = true;
@@ -74,6 +77,12 @@ class _MusicListState extends State<MusicList> {
           tabController.addListener(() {
             if (!tabController.indexIsChanging) {
               loadedAll = false;
+              /*if(tabController.index==2){
+                getSongs(tabController.index).then((value){
+                  bodyKeys[tabController.index].currentState.setState(() {
+                  });
+                });
+              }*/
               _isLoading = false;
               _isVisible = true;
             }
@@ -100,15 +109,15 @@ class _MusicListState extends State<MusicList> {
                                   children: [
                                     Container(
                                         child: BodyLayout(
-                                      tabIndex: 0,
+
+                                          key:bodyKeys[0],tabIndex: 0,
                                       songs: allSongs[0],
                                     )),
                                     Container(
                                         child: BodyLayout(
-                                            tabIndex: 1, songs: allSongs[1])),
+                                            key:bodyKeys[1],tabIndex: 1, songs: allSongs[1])),
                                     Container(
-                                        child: BodyLayout(
-                                            tabIndex: 2, songs: allSongs[2])),
+                                        child: BodyLayout(key:bodyKeys[2],tabIndex: 2, songs: allSongs[2])),
                                   ],
                                 ),
                               ),
@@ -191,7 +200,7 @@ class BodyLayout extends StatefulWidget {
 }
 
 class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMixin{
-  List<Song> songs;
+  List<Song> songs=[];
   List<int> listTracker = [-1, -1, -1];
   int expListCounter = 0;
   int selected = 0;
@@ -201,7 +210,6 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
   final GlobalKey datakey = GlobalKey();
   List<int> pageNumber = [0, 0, 0];
   List<int> itemsPerPage = [2, 2, 2];
-
   @override
   bool get wantKeepAlive => true;
 
@@ -223,7 +231,7 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
       fetchFavorites().then((value) async {
         await _fetchSongs(tabIndex, pageNumber, itemsPerPage).then((value){
           setState(() {
-            songs=value;
+            songs=value??[];
           });
         });
       });
@@ -247,6 +255,12 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
         });
       }
     });
+    int value = PageStorage.of(context).readState(context);
+    if (value == null) {
+      PageStorage.of(context).writeState(context, selected);
+    } else {
+      selected = value;
+    }
     listTracker[0] = selected;
     expListCounter++;
   }
@@ -291,6 +305,7 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
   Widget _buildPanel() {
     return CustomExpansionPanel.ExpansionPanelList.radio(
       key: new PageStorageKey('tab' + tabIndex.toString()),
+      initialOpenPanelValue: 0,
       expansionCallback: (int index, bool isExpanded) {
         listTracker[expListCounter] = index;
         expListCounter++;
@@ -315,6 +330,7 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
             selected = tmp;
           }
         }
+        debugPrint("Selected: "+selected.toString()+"- Song ID: "+songs[selected].getId());
       },
       children:
           songs.map<CustomExpansionPanel.ExpansionPanelRadio>((Song song) {
@@ -500,7 +516,18 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
                 .child(songs[selected].getId())
                 .update({"name": songs[selected].getName()});
           //Không check cho tabindex 2 vì khi unfavorite sẽ xóa đó khỏi tab
+          debugPrint("here 0");
           songs[selected].setFavorite(true);
+          await songDAO.updateSong(songs[selected]);
+          debugPrint("here");
+          _BodyLayoutState caller=bodyKeys[2].currentState as _BodyLayoutState;
+          if(caller!=null)
+          caller._fetchSongs(caller.tabIndex, caller.pageNumber, caller.itemsPerPage).then((value){
+            caller.setState(() {
+              caller.songs=value;
+            });});
+
+          debugPrint("here 3");
           return !isLiked;
         } catch (e) {
           debugPrint("ERROR " + e.toString());
@@ -508,12 +535,43 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
       } else {
         try {
           var db =
-              FirebaseDatabase.instance.reference().child("Favorites/" + uid);
-          if (tabIndex == 0)
-            await db.child(songs[selected].getId()).remove();
-          else if (tabIndex == 1)
-            await db.child(songs[selected].getId()).remove();
+          FirebaseDatabase.instance.reference().child("Favorites/" + uid);
+          await db.child(songs[selected].getId()).remove();
           songs[selected].setFavorite(false);
+          await songDAO.updateSong(songs[selected]);
+          if(tabIndex==2){
+            //lưu lên db rồi xóa khỏi danh sách yêu thích & cập nhập 2 danh sách còn lại
+            if(songs[selected].getId().contains("VN")){
+              allSongs[0][selected].setFavorite(false);
+            }else if(songs[selected].getId().contains("NN")){
+              allSongs[1][selected].setFavorite(false);
+            }
+            setState(() {
+              songs.removeAt(selected);
+              _isVisible=false;
+            });
+            _BodyLayoutState tabNV=bodyKeys[0].currentState;
+            _BodyLayoutState tabNN=bodyKeys[1].currentState;
+            getSongs(0).then((value) {
+              if (!tabNV.mounted) return;
+              tabNV.setState(() {
+                tabNV.songs = value;
+              });
+            });
+            getSongs(1).then((value) {
+              if (!tabNN.mounted) return;
+              tabNN.setState(() {
+                tabNN.songs = value;
+              });
+            });
+          }else{
+            _BodyLayoutState caller=bodyKeys[2].currentState as _BodyLayoutState;
+            debugPrint("here 2");
+            caller._fetchSongs(caller.tabIndex, caller.pageNumber, caller.itemsPerPage).then((value){
+              caller.setState(() {
+                caller.songs=value;
+              });});
+          }
           return !isLiked;
         } catch (e) {
           debugPrint("ERROR " + e.toString());
@@ -529,6 +587,11 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
       );
     }
     return isLiked;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<List> _fetchSongs(tabIndex, pageNum, pageSize) async {
