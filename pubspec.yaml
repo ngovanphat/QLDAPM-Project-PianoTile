@@ -44,6 +44,7 @@ dependencies:
   permissions_plugin: ^1.1.4
 
   shared_preferences: ^0.5.8
+  percent_indicator: "^2.1.5"
 
 
   # The following adds the Cupertino Icons font to your application.
