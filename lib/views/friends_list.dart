@@ -1,6 +1,8 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/friend.dart';
+import 'package:random_string/random_string.dart';
 
 class FriendsList extends StatefulWidget {
   @override
@@ -8,7 +10,47 @@ class FriendsList extends StatefulWidget {
 }
 
 class _FriendsListState extends State<FriendsList> {
-  List<Friend> _friends = loadFriend();
+  final FirebaseDatabase database = FirebaseDatabase.instance;
+  String myUID;
+  Friend friend = new Friend('', '', '', '');
+  Widget content;
+  TextEditingController nameController = TextEditingController();
+  List<Friend> _friends = [];
+
+  loadFriend() async {
+    _friends.clear();
+    await friend.getUserFriendsListByID();
+    _friends = friend.getFriendList();
+    myUID = friend.getMyUID();
+    return _friends;
+  }
+
+  addItemToList() {
+    String key = randomString(6, from: 65, to: 90);
+    database.reference().child("Friendships").child(myUID).child(key).set({
+      "id": key,
+      "name": nameController.text,
+      "avatar":
+          "https://lh3.googleusercontent.com/-jwSGuQYRPHE/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucknrPQRplNYMm5KC9i8H9ovrxZKnw/s96-c/photo.jpg",
+      "lv": "10"
+    }).then((_) {
+      setState(() {});
+    });
+  }
+
+  removeItemFromList(int index) {
+    database
+        .reference()
+        .child("Friendships")
+        .child(myUID)
+        .child(_friends[index].getFriendUID())
+        .remove()
+        .then((_) {
+      setState(() {
+        _friends.removeAt(index);
+      });
+    });
+  }
 
   Widget _buildFriendListTile(BuildContext context, int index) {
     var friend = _friends[index];
@@ -18,11 +60,11 @@ class _FriendsListState extends State<FriendsList> {
         child: new CircleAvatar(
           radius: 30,
           backgroundColor: Colors.white,
-          backgroundImage: new AssetImage(friend.avatar),
+          backgroundImage: new NetworkImage(friend.getAvatar()),
         ),
       ),
       title: new Text(
-        friend.name,
+        friend.getName(),
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -30,30 +72,101 @@ class _FriendsListState extends State<FriendsList> {
         ),
       ),
       subtitle: new Text(
-        'Lv. ' + friend.level,
+        'Lv. ' + friend.getLevel(),
         style: TextStyle(
           color: Colors.white,
           fontSize: 18,
         ),
       ),
+      trailing: FlatButton(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.white, width: 1)),
+        child: Text(
+          'Remove',
+          style: TextStyle(fontSize: 14, color: Colors.white),
+        ),
+        color: Colors.white24,
+        onPressed: () {
+          showAlertDialog(context, index);
+        },
+      ),
+    );
+  }
+
+  showAlertDialog(BuildContext context, int index) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text(
+        "Remove",
+        style: TextStyle(
+          color: Colors.red,
+        ),
+      ),
+      onPressed: () {
+        removeItemFromList(index);
+        Navigator.of(context).pop();
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              Future.delayed(Duration(seconds: 1), () {
+                Navigator.of(context).pop(true);
+              });
+              return AlertDialog(
+                  shape: CircleBorder(
+                    side: BorderSide(color: Colors.white, width: 2),
+                  ),
+                  backgroundColor: const Color(0xff004d00),
+                  content: Container(
+                      child: Icon(
+                    Icons.done,
+                    color: Colors.white,
+                    size: 50,
+                  )));
+            });
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: Colors.white, width: 1),
+      ),
+      backgroundColor: Colors.black,
+      title: Center(
+        child: Text(
+          "Remove Friend?",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      content: Text(
+        "Are you sure you want to remove this friend from your list?",
+        style: TextStyle(color: Colors.white),
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget content;
-
-    if (_friends.isEmpty) {
-      content = new Center(
-        child: new CircularProgressIndicator(),
-      );
-    } else {
-      content = new ListView.builder(
-        itemCount: _friends.length,
-        itemBuilder: _buildFriendListTile,
-      );
-    }
-
     return new Scaffold(
       backgroundColor: const Color(0xff004466),
       appBar: new AppBar(
@@ -62,48 +175,107 @@ class _FriendsListState extends State<FriendsList> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         backgroundColor: const Color(0xff004466),
-        title: new Text('FRIENDS'),
-      ),
-      body: SafeArea(
-        child: Container(
-          height: double.infinity,
-          width: double.infinity,
-          child: Stack(
-            fit: StackFit.passthrough,
-            children: <Widget>[
-              Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
-              content,
-            ],
-          ),
+        title: Center(
+          child: new Text('FRIENDS'),
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add, color: Colors.white, size: 30),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: Colors.black, width: 2),
+                    ),
+                    backgroundColor: Colors.white,
+                    title: Center(
+                      child: Text(
+                        "Add Friend?",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    content: TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'User Name',
+                      ),
+                    ),
+                    actions: [
+                      FlatButton(
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      FlatButton(
+                        child: Text("Send Request"),
+                        onPressed: () {
+                          addItemToList();
+                          nameController.clear();
+                          Navigator.of(context).pop();
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                Future.delayed(Duration(seconds: 1), () {
+                                  Navigator.of(context).pop(true);
+                                });
+                                return AlertDialog(
+                                    shape: CircleBorder(
+                                      side: BorderSide(
+                                          color: Colors.white, width: 2),
+                                    ),
+                                    backgroundColor: const Color(0xff004d00),
+                                    content: Container(
+                                        child: Icon(
+                                      Icons.done,
+                                      color: Colors.white,
+                                      size: 50,
+                                    )));
+                              });
+                        },
+                      )
+                    ],
+                  );
+                },
+              );
+            },
+          )
+        ],
       ),
+      body: FutureBuilder(
+          future: loadFriend(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData) {
+              return Center(child: CircularProgressIndicator());
+            } else {
+              return SafeArea(
+                child: Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: Stack(
+                    fit: StackFit.passthrough,
+                    children: <Widget>[
+                      Image.asset('assets/images/background.jpg',
+                          fit: BoxFit.cover),
+                      ListView.builder(
+                        itemCount: _friends.length,
+                        itemBuilder: _buildFriendListTile,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }),
     );
   }
-}
-
-List loadFriend() {
-  final names = [
-    'Phat Ngo',
-    'Thuan Nam',
-    'Hanh Dung',
-    'Thang Bui',
-    'Minh Thuong',
-    'Minh Quann'
-  ];
-  final levels = ['1', '2', '3', '4', '5', '6'];
-  final avatars = [
-    'assets/images/male.png',
-    'assets/images/male.png',
-    'assets/images/female.png',
-    'assets/images/male.png',
-    'assets/images/male.png',
-    'assets/images/male.png',
-  ];
-
-  final List<Friend> friendList = [];
-  for (var i = 0; i < names.length; i++) {
-    friendList.add(new Friend(names[i], levels[i], avatars[i]));
-  }
-
-  return friendList;
 }

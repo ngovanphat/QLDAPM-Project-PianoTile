@@ -3,6 +3,9 @@ class Note {
   final int orderNumber;
   final int line;
   NoteState state = NoteState.ready;
+  int index;
+  int height;
+  int pass = 0;
 
   // values for playing sound
   int tickValue;

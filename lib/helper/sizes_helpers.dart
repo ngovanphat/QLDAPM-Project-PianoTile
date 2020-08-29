@@ -6,11 +6,11 @@ Size displaySize(BuildContext context) {
 }
 
 double displayHeight(BuildContext context) {
-  //debugPrint('Height = ' + displaySize(context).height.toString());
+//  debugPrint('Height = ' + displaySize(context).height.toString());
   return displaySize(context).height;
 }
 
 double displayWidth(BuildContext context) {
-  //debugPrint('Width = ' + displaySize(context).width.toString());
+ // debugPrint('Width = ' + displaySize(context).width.toString());
   return displaySize(context).width;
 }
