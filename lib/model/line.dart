@@ -39,7 +39,7 @@ class Line extends AnimatedWidget {
 
       // relative index are init when init notes
       int index = note.index - currentNote[0].index;
-      debugPrint('note order: ${note.orderNumber} , index: $index');
+//      debugPrint('note order: ${note.orderNumber} , index: $index');
 
       // in case some tile longer
       // we need to make room for tile

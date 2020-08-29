@@ -382,6 +382,13 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
     subscriptionPoints.cancel();
   }
 
+
+  // disable pause in online-mode
+  @override
+  pauseButton() {
+    return Container();
+  }
+
 }
 
 
