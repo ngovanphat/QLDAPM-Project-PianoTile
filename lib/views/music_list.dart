@@ -863,7 +863,7 @@ Future<List> getSongs(tabIndex) async {
           musicList.add(new Song(i.toString().padLeft(2, '0') + "VN", titles[i],
               artists[i], difficulties[i], images[i],
               notes_dir:
-                  "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/Shining_the_morning.mid.txt?alt=media&token=052c65bf-f531-40bc-9584-02f9cdb3f306"));
+                  "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/canond.mid.txt?alt=media&token=0d3fbea0-61be-4e9e-832e-dcec4bf16727"));
         }
         for (var i = 0; i < musicList.length; i++) {
           songDAO.insertSong(musicList[i]);

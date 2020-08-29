@@ -317,7 +317,7 @@ class _CreateRoomState extends State<CreateRoom>
                                                                                 30,
                                                                             child:
                                                                                 new MarqueeWidget(
-                                                                              text: songs[index].getArtists().join('-'),
+                                                                              text: songs[index].getArtists(),
                                                                               textStyle: new TextStyle(fontSize: 16.0),
                                                                               scrollAxis: Axis.horizontal,
                                                                             ),
