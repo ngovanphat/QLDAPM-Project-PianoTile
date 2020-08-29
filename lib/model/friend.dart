@@ -72,7 +72,7 @@ class Friend {
             value["id"], value["name"], value["lv"], value["avatar"]));
       }
     } catch (e) {
-      print(e);
+      //print(e);
     }
   }
 }

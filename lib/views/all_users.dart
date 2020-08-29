@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/user.dart';
 import 'package:piano_tile/views/add_friend_profile.dart';
+import 'package:piano_tile/model/friend.dart';
 
 class AllUsers extends StatefulWidget {
   @override
@@ -13,17 +14,27 @@ class _AllUsersState extends State<AllUsers> {
   final FirebaseDatabase database = FirebaseDatabase.instance;
   String myUID;
   User user = new User('', '', '', '');
+  Friend friend = new Friend('', '', '', '');
   Widget content;
   TextEditingController nameController = TextEditingController();
   List<User> _users = [];
+  List<Friend> _friends = [];
 
   loadUsers() async {
     _users.clear();
     await user.getAllUsers();
     _users = user.getFriendList();
-    
+
+    _friends.clear();
+    await friend.getUserFriendsListByID();
+    _friends = friend.getFriendList();
+
     myUID = user.getMyUID();
     _users.removeWhere((item) => item.getMyUID() == myUID);
+
+    for (int i = 0; i < _friends.length; i++) {
+      _users.removeWhere((item) => item.getMyUID() == _friends[i].getFriendUID());
+    }
 
     return _users;
   }

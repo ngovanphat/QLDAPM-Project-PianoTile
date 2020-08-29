@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/user.dart';
@@ -15,6 +16,7 @@ class AddFriendProfile extends StatefulWidget {
 }
 
 class _AddFriendProfileState extends State<AddFriendProfile> {
+  FirebaseUser _user;
   final FirebaseDatabase database = FirebaseDatabase.instance;
 
   Widget requestButton;
@@ -23,6 +25,7 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
 
   buttonState() async {
     try {
+      _user = await FirebaseAuth.instance.currentUser();
       await database
           .reference()
           .child("FriendRequest")
@@ -35,13 +38,16 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
           if (temp == 'sent') {
             state = 'request_sent';
             text = 'CANCEL FRIEND REQUEST';
+          } else if (temp == 'received') {
+            state = 'request_received';
+            text = 'ACCEPT FRIEND REQUEST';
           }
         } catch (e) {
-          print(e);
+          //print(e);
         }
       });
     } catch (e) {
-      print(e);
+      //print(e);
     }
     return true;
   }
@@ -81,6 +87,47 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
 
       state = 'not_friends';
       text = 'SEND FRIEND REQUEST';
+    } else if (state == 'request_received') {
+      database
+          .reference()
+          .child("Friendships")
+          .child(widget.myUID)
+          .child(widget.user.getMyUID())
+          .set({
+        "id": widget.user.getMyUID(),
+        "name": widget.user.getName(),
+        "avatar": widget.user.getAvatar(),
+        "lv": "10"
+      });
+
+      database
+          .reference()
+          .child("Friendships")
+          .child(widget.user.getMyUID())
+          .child(widget.myUID)
+          .set({
+        "id": _user.uid,
+        "name": _user.displayName,
+        "avatar": _user.photoUrl,
+        "lv": "10"
+      });
+
+      database
+          .reference()
+          .child("FriendRequest")
+          .child(widget.myUID)
+          .child(widget.user.getMyUID())
+          .remove();
+
+      database
+          .reference()
+          .child("FriendRequest")
+          .child(widget.user.getMyUID())
+          .child(widget.myUID)
+          .remove();
+
+      state = 'friends';
+      text = 'WE ARE FRIENDS!';
     }
   }
 

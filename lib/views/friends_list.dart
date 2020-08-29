@@ -1,9 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/friend.dart';
-import 'package:piano_tile/views/all_users.dart';
-import 'package:random_string/random_string.dart';
 
 class FriendsList extends StatefulWidget {
   @override
@@ -11,49 +10,28 @@ class FriendsList extends StatefulWidget {
 }
 
 class _FriendsListState extends State<FriendsList> {
+  FirebaseUser _user;
   final FirebaseDatabase database = FirebaseDatabase.instance;
-  String myUID;
   Friend friend = new Friend('', '', '', '');
   Widget content;
   TextEditingController nameController = TextEditingController();
   List<Friend> _friends = [];
 
   loadFriend() async {
+    _user = await FirebaseAuth.instance.currentUser();
+
     _friends.clear();
     await friend.getUserFriendsListByID();
     _friends = friend.getFriendList();
-    myUID = friend.getMyUID();
+
     return _friends;
   }
 
-//  addItemToList() {
-//    String key = randomString(6, from: 65, to: 90);
-//    database.reference().child("Friendships").child(myUID).child(key).set({
-//      "id": key,
-//      "name": nameController.text,
-//      "avatar":
-//          "https://lh3.googleusercontent.com/-jwSGuQYRPHE/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucknrPQRplNYMm5KC9i8H9ovrxZKnw/s96-c/photo.jpg",
-//      "lv": "10"
-//    }).then((_) {
-//      setState(() {});
-//    });
-//  }
-
-  addItem() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return AllUsers();
-        },
-      ),
-    );
-  }
-
-  removeItemFromList(int index) {
+  removeFriend(int index) {
     database
         .reference()
         .child("Friendships")
-        .child(myUID)
+        .child(_user.uid)
         .child(_friends[index].getFriendUID())
         .remove()
         .then((_) {
@@ -61,6 +39,13 @@ class _FriendsListState extends State<FriendsList> {
         _friends.removeAt(index);
       });
     });
+
+    database
+        .reference()
+        .child("Friendships")
+        .child(_friends[index].getFriendUID())
+        .child(_user.uid)
+        .remove();
   }
 
   Widget _buildFriendListTile(BuildContext context, int index) {
@@ -121,7 +106,7 @@ class _FriendsListState extends State<FriendsList> {
         ),
       ),
       onPressed: () {
-        removeItemFromList(index);
+        removeFriend(index);
         Navigator.of(context).pop();
         showDialog(
             context: context,
@@ -186,82 +171,7 @@ class _FriendsListState extends State<FriendsList> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         backgroundColor: const Color(0xff004466),
-        title: Center(
-          child: new Text('FRIENDS'),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add, color: Colors.white, size: 30),
-            onPressed: () {
-              addItem();
-//              showDialog(
-//                context: context,
-//                builder: (BuildContext context) {
-//                  return AlertDialog(
-//                    shape: RoundedRectangleBorder(
-//                      borderRadius: BorderRadius.circular(10),
-//                      side: BorderSide(color: Colors.black, width: 2),
-//                    ),
-//                    backgroundColor: Colors.white,
-//                    title: Center(
-//                      child: Text(
-//                        "Add Friend?",
-//                        style: TextStyle(color: Colors.black),
-//                      ),
-//                    ),
-//                    content: TextField(
-//                      controller: nameController,
-//                      decoration: InputDecoration(
-//                        border: OutlineInputBorder(),
-//                        labelText: 'User Name',
-//                      ),
-//                    ),
-//                    actions: [
-//                      FlatButton(
-//                        child: Text(
-//                          "Cancel",
-//                          style: TextStyle(
-//                            color: Colors.red,
-//                          ),
-//                        ),
-//                        onPressed: () {
-//                          Navigator.of(context).pop();
-//                        },
-//                      ),
-//                      FlatButton(
-//                        child: Text("Send Request"),
-//                        onPressed: () {
-//                          addItem();
-//                          nameController.clear();
-//                          Navigator.of(context).pop();
-//                          showDialog(
-//                              context: context,
-//                              builder: (BuildContext context) {
-//                                Future.delayed(Duration(seconds: 1), () {
-//                                  Navigator.of(context).pop(true);
-//                                });
-//                                return AlertDialog(
-//                                    shape: CircleBorder(
-//                                      side: BorderSide(
-//                                          color: Colors.white, width: 2),
-//                                    ),
-//                                    backgroundColor: const Color(0xff004d00),
-//                                    content: Container(
-//                                        child: Icon(
-//                                      Icons.done,
-//                                      color: Colors.white,
-//                                      size: 50,
-//                                    )));
-//                              });
-//                        },
-//                      )
-//                    ],
-//                  );
-//                },
-//              );
-            },
-          )
-        ],
+        title: new Text('FRIENDS'),
       ),
       body: FutureBuilder(
           future: loadFriend(),
