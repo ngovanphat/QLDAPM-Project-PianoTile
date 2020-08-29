@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:piano_tile/views/gem_shop.dart';
 
 
 Widget PointRowTop(BuildContext context, int point, String image) {
@@ -28,6 +29,54 @@ Widget PointRowTop(BuildContext context, int point, String image) {
                   '$point',
                   style: TextStyle(fontSize: 20, color: Colors.black),
                 ))
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget PointRowTop_plusButton(BuildContext context, int point, String image) {
+  return Row(
+    children: <Widget>[
+      Container(
+        width: 120,
+        height: 40,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20), color: Colors.white),
+        child: Row(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Image.asset(
+                '$image',
+                width: 35,
+                height: 35,
+              ),
+            ),
+            Container(
+                padding: EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                child: Text(
+                  '$point',
+                  style: TextStyle(fontSize: 20, color: Colors.black),
+                )
+            ),
+            GestureDetector(
+              onTap: () {
+
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => GemShop()));
+
+              }, // handle your image tap here
+              child: Image.asset(
+                'assets/images/plus.png',
+                width: 20,
+                height: 20,
+              ),
+            ),
           ],
         ),
       ),
@@ -105,7 +154,7 @@ Widget RowOnTop_v2(BuildContext context, int level, int gems, int currentExp, in
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         PointRowTop_percentBar(context, currentExp, nextExp, mapLevelImage[level]),
-        PointRowTop(context, gems, 'assets/images/gems.png'),
+        PointRowTop_plusButton(context, gems, 'assets/images/gems.png'),
       ],
     ),
   );
