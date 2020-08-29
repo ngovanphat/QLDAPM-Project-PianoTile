@@ -40,9 +40,18 @@ void main() async {
   if (type == sharedPrefValues.GUEST) {
     // type == GUEST
 
+    // in-case first time install app
+    // user will receive gems and exp of level 1
+    // so get info of level 1 from firebase
+    DataSnapshot data = await FirebaseDatabase.instance.reference()
+        .child('levelDefinition')
+        .once();
+    List<dynamic> levels = data.value;
+
+
     // get info from local preferences
-    exp = prefs.getInt(sharedPrefKeys.getExpKey()) ?? 0;
-    gem = prefs.getInt(sharedPrefKeys.getGemKey()) ?? 0;
+    exp = prefs.getInt(sharedPrefKeys.getExpKey()) ?? levels[0]['expRequired'];
+    gem = prefs.getInt(sharedPrefKeys.getGemKey()) ?? levels[0]['gemReward'];
     print('[main] local exp: $exp, gem: $gem');
   }
 
@@ -68,14 +77,8 @@ void main() async {
   // save exp, gem
   prefs.setInt(sharedPrefKeys.userType, type);
   prefs.setInt(sharedPrefKeys.getExpKey(), exp);
-//  prefs.setInt(sharedPrefKeys.getExpKey(), 5000);
-
   prefs.setInt(sharedPrefKeys.getGemKey(), gem);
-//  prefs.setInt(sharedPrefKeys.getGemKey(), 4586);
-
   prefs.setInt(sharedPrefKeys.getLevelKey(), levelValue);
-//  prefs.setInt(sharedPrefKeys.getLevelKey(), 2);
-
   prefs.setInt(sharedPrefKeys.getNextExpKey(), nextExpValue);
 
   runApp(MyApp());
