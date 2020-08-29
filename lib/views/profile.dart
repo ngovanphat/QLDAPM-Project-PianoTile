@@ -390,9 +390,10 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 
 Future<FirebaseUser> _handleSignIn(BuildContext context) async {
   FirebaseUser user;
+  final FirebaseDatabase database = FirebaseDatabase.instance;
   bool isSignedIn = await _googleSignIn.isSignedIn();
 
-  if (isSignedIn) {
+  if (!isSignedIn) {
     user = await _auth.currentUser();
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -409,6 +410,14 @@ Future<FirebaseUser> _handleSignIn(BuildContext context) async {
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
     user = (await _auth.signInWithCredential(credential)).user;
+
+    database.reference().child("Users").child(user.uid).set({
+      "id": user.uid,
+      "name": user.displayName,
+      "avatar": user.photoUrl,
+      "email": user.email,
+    });
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
