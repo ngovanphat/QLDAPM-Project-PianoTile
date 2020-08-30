@@ -43,11 +43,11 @@ void main() async {
     // in-case first time install app
     // user will receive gems and exp of level 1
     // so get info of level 1 from firebase
-    DataSnapshot data = await FirebaseDatabase.instance.reference()
+    DataSnapshot data = await FirebaseDatabase.instance
+        .reference()
         .child('levelDefinition')
         .once();
     List<dynamic> levels = data.value;
-
 
     // get info from local preferences
     exp = prefs.getInt(sharedPrefKeys.getExpKey()) ?? levels[0]['expRequired'];

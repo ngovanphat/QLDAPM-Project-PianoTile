@@ -472,7 +472,7 @@ Future<FirebaseUser> _handleSignIn(BuildContext context) async {
   final FirebaseDatabase database = FirebaseDatabase.instance;
   bool isSignedIn = await _googleSignIn.isSignedIn();
 
-  if (!isSignedIn) {
+  if (isSignedIn) {
     user = await _auth.currentUser();
     Navigator.of(context).push(
       MaterialPageRoute(

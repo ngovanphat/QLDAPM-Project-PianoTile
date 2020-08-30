@@ -19,7 +19,8 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
   FirebaseUser _user;
   final FirebaseDatabase database = FirebaseDatabase.instance;
 
-  Widget requestButton;
+  Widget requestButton, declineButton;
+  bool isVisible = false;
   String state = 'not_friends';
   String text = 'SEND FRIEND REQUEST';
 
@@ -41,8 +42,11 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
           } else if (temp == 'received') {
             state = 'request_received';
             text = 'ACCEPT FRIEND REQUEST';
+            isVisible = true;
           }
         } catch (e) {
+          //state = 'friends';
+          //text = 'WE ARE FRIENDS!';
           //print(e);
         }
       });
@@ -131,6 +135,27 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
     }
   }
 
+  declineFriendRequest() {
+    database
+        .reference()
+        .child("FriendRequest")
+        .child(widget.myUID)
+        .child(widget.user.getMyUID())
+        .remove();
+
+    database
+        .reference()
+        .child("FriendRequest")
+        .child(widget.user.getMyUID())
+        .child(widget.myUID)
+        .remove();
+
+    state = 'not_friends';
+    text = 'SEND FRIEND REQUEST';
+
+    isVisible = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,7 +163,11 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
       appBar: new AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            setState(() {
+              Navigator.of(context).pop();
+            });
+          },
         ),
         backgroundColor: const Color(0xff004466),
         title: new Text('PROFILE'),
@@ -220,6 +249,30 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
                                     handleFriendRequest();
                                   });
                                 },
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            declineButton = Visibility(
+                              visible: isVisible,
+                              child: SizedBox(
+                                width: 300,
+                                height: 50,
+                                child: new FlatButton(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                  child: Text(
+                                    'DECLINE FRIEND REQUEST',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                  color: Color(0xffff0000),
+                                  onPressed: () {
+                                    setState(() {
+                                      declineFriendRequest();
+                                    });
+                                  },
+                                ),
                               ),
                             ),
                           ],

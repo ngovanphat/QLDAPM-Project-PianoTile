@@ -33,8 +33,11 @@ class _AllUsersState extends State<AllUsers> {
     _users.removeWhere((item) => item.getMyUID() == myUID);
 
     for (int i = 0; i < _friends.length; i++) {
-      _users.removeWhere((item) => item.getMyUID() == _friends[i].getFriendUID());
+      _users
+          .removeWhere((item) => item.getMyUID() == _friends[i].getFriendUID());
     }
+
+
 
     return _users;
   }
@@ -103,7 +106,9 @@ class _AllUsersState extends State<AllUsers> {
       appBar: new AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
         backgroundColor: const Color(0xff004466),
         title: new Text('ALL USERS'),

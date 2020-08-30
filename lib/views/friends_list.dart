@@ -59,16 +59,20 @@ class _FriendsListState extends State<FriendsList> {
           backgroundImage: new NetworkImage(friend.getAvatar()),
         ),
       ),
-      title: new Text(
-        friend.getName(),
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-          fontSize: 20,
+      title: Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: new Text(
+          friend.getName(),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 22,
+          ),
         ),
       ),
       subtitle: new Text(
-        'Lv. ' + friend.getLevel(),
+        '',
+        //'Lv. ' + friend.getLevel(),
         style: TextStyle(
           color: Colors.white,
           fontSize: 18,
