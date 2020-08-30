@@ -8,7 +8,7 @@ class Room {
   String keyOfRoom;
   String usernameOne, usernameTwo, usernameThree, usernameFour;
   String musicName;
-  bool isPlaying=false;
+  bool isPlaying = false;
   final FirebaseDatabase database = FirebaseDatabase.instance;
   Room(this.keyOfRoom, this.musicName, this.usernameOne, this.usernameTwo,
       this.usernameThree, this.usernameFour);
@@ -31,9 +31,10 @@ class Room {
         .child("Room")
         .child(key)
         .update(this.toJson())
-        .then((value) {print(key);})
-        .catchError((onError){
-        print(onError);
+        .then((value) {
+      print(key);
+    }).catchError((onError) {
+      print(onError);
     });
   }
 
@@ -126,8 +127,10 @@ class Room {
     Navigator.push(
         context,
         MaterialPageRoute(
-      builder: (context) => JoinRoom(roomKey: key,),
-    ));
+          builder: (context) => JoinRoom(
+            roomKey: key,
+          ),
+        ));
     return true;
   }
 }

@@ -37,8 +37,6 @@ class _AllUsersState extends State<AllUsers> {
           .removeWhere((item) => item.getMyUID() == _friends[i].getFriendUID());
     }
 
-
-
     return _users;
   }
 

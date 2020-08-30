@@ -13,14 +13,15 @@ class Note {
   List<int> velocityValue;
 
   // constructor
-  Note({this.orderNumber,
+  Note(
+      {this.orderNumber,
       this.line,
       this.tickValue,
       this.midiValue,
       this.velocityValue});
 
   // reset method
-  void reset(){
+  void reset() {
     this.state = NoteState.ready;
   }
 }

@@ -119,13 +119,6 @@ class GamePlayState<T extends GamePlay> extends State<T>
   void initState() {
     super.initState();
     song = widget.song;
-    // init notes
-//    initNotes().then((value) {
-//      notes = value;
-//      setState(() {});
-//      print('success loading notes');
-//      print('length: ${notes.length}');
-//    });
     if (song == null) {
       //for home page song
       song = new Song("-1", "Shining The Morning", "abc", 1, " ",
@@ -187,52 +180,43 @@ class GamePlayState<T extends GamePlay> extends State<T>
   Widget build(BuildContext context) {
     return WillPopScope(
       child: Material(
-
-        child: FutureBuilder<String>(
-
-          future: statusOfInitNotes,
-          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-
-            if(snapshot.hasData && snapshot.data == 'done'){
-
-              return Stack(
-                fit: StackFit.passthrough,
-                children:
-                <Widget>[
-                  Image.asset(
-                    'assets/images/background.jpg',
-                    fit: BoxFit.cover,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      _drawLine(0),
-                      LineDivider(),
-                      _drawLine(1),
-                      LineDivider(),
-                      _drawLine(2),
-                      LineDivider(),
-                      _drawLine(3)
-                    ],
-                  ),
-                  drawPoints(),
-                  pauseButton(),
-                ],
-              );
-            }
-            else if(snapshot.hasData && snapshot.data == 'fail_level_required'){
-
-              return Container();
-
-            }
-            else{
-              List<Widget> children;
-              children = <Widget>[
-
+          child: FutureBuilder<String>(
+        future: statusOfInitNotes,
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.hasData && snapshot.data == 'done') {
+            return Stack(
+              fit: StackFit.passthrough,
+              children: <Widget>[
+                Image.asset(
+                  'assets/images/background.jpg',
+                  fit: BoxFit.cover,
+                ),
+                Row(
+                  children: <Widget>[
+                    _drawLine(0),
+                    LineDivider(),
+                    _drawLine(1),
+                    LineDivider(),
+                    _drawLine(2),
+                    LineDivider(),
+                    _drawLine(3)
+                  ],
+                ),
+                drawPoints(),
+                pauseButton(),
+              ],
+            );
+          } else if (snapshot.hasData &&
+              snapshot.data == 'fail_level_required') {
+            return Container();
+          } else {
+            List<Widget> children;
+            children = <Widget>[
               SpinKitWave(
                 color: Colors.blue,
                 size: 50.0,
               )
-          ];
+            ];
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -293,10 +277,8 @@ class GamePlayState<T extends GamePlay> extends State<T>
                   onPressed: () {
                     Navigator.of(context).pop();
                     recoverWithGems(numGemToRecover);
-
                   },
-                  child: Text("Recover with $numGemToRecover Gems")
-              ),
+                  child: Text("Recover with $numGemToRecover Gems")),
               FlatButton(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -401,37 +383,30 @@ class GamePlayState<T extends GamePlay> extends State<T>
         });
   }
 
-  void recoverWithGems(int gemRequired){
-
+  void recoverWithGems(int gemRequired) {
     // check if enough gem to recover
     int currentGems = prefs.get(sharedPrefKeys.getGemKey());
 
     // if not
-    if(currentGems < gemRequired){
+    if (currentGems < gemRequired) {
       showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text("$currentGems gems is not enough! Recovery required $gemRequired gems"),
+              title: Text(
+                  "$currentGems gems is not enough! Recovery required $gemRequired gems"),
               actions: <Widget>[
-
                 FlatButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                       showAskRecoveryDialog();
                     },
-                    child: Text("OK")
-                ),
-
+                    child: Text("OK")),
               ],
             );
-          }
-      );
+          });
       return;
     }
-
-
-
 
     // if enough
     // subtract gems
@@ -440,8 +415,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
     prefs.setInt(sharedPrefKeys.getGemKey(), currentGems);
     // update firebase if user logged in
     String userId = prefs.getString(sharedPrefKeys.getIdKey());
-    FirebaseDatabase
-        .instance
+    FirebaseDatabase.instance
         .reference()
         .child('account/$userId')
         .update({'gem': currentGems});
@@ -453,26 +427,19 @@ class GamePlayState<T extends GamePlay> extends State<T>
           return AlertDialog(
             title: Text("Your gems: $currentGems (-$gemRequired)"),
             actions: <Widget>[
-
               FlatButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     recoverNoteMissed();
                   },
-                  child: Text("OK")
-              ),
-
+                  child: Text("OK")),
             ],
           );
-        }
-    );
-
+        });
   }
 
-  void recoverNoteMissed(){
-
+  void recoverNoteMissed() {
     setState(() {
-
       // need to subtract pass by 1
       // because animation maybe add 1 in previous completion
       notes[currentNoteIndex].pass -= 1;
@@ -489,7 +456,6 @@ class GamePlayState<T extends GamePlay> extends State<T>
         .every((n) => n.state == NoteState.tapped);
 
     if (areAllPreviousTapped) {
-
       if (!hasStarted) {
         setState(() {
           hasStarted = true;

@@ -1,5 +1,3 @@
-
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,14 +14,12 @@ import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
 import 'package:piano_tile/main.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-
 class GemShop extends StatefulWidget {
   @override
   GemShopState createState() => GemShopState();
 }
 
 class GemShopState extends State<GemShop> {
-
   List<Widget> listCard = <Widget>[];
   Future<String> taskMakeCard;
 
@@ -35,8 +31,8 @@ class GemShopState extends State<GemShop> {
   }
 
   Future<String> getGemPackInfo() async {
-
-    DataSnapshot data = await FirebaseDatabase.instance.reference()
+    DataSnapshot data = await FirebaseDatabase.instance
+        .reference()
         .child('gemDefinition/pack')
         .once();
     Map<dynamic, dynamic> packs = data.value;
@@ -48,8 +44,7 @@ class GemShopState extends State<GemShop> {
     return 'done';
   }
 
-  Card createCard(key, value){
-
+  Card createCard(key, value) {
     String packName = key;
     Map<dynamic, dynamic> content = value;
     String title = "${content['gemReward']} gems";
@@ -61,37 +56,28 @@ class GemShopState extends State<GemShop> {
         children: <Widget>[
           ListTile(
             leading: Image.asset('assets/images/gems.png'),
-            title: Text(
-                title,
+            title: Text(title,
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                )
-            ),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                )),
             subtitle: Text(packName),
           ),
-
           ButtonBar(
             children: <Widget>[
               FlatButton(
                 child: Text('BUY with ${price}'),
                 onPressed: () {/* ... */},
-
               ),
             ],
           ),
         ],
       ),
     );
-
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
-
 //    return Center(
 //      child: Card(
 //        child: Column(
@@ -115,7 +101,6 @@ class GemShopState extends State<GemShop> {
 //      ),
 //    );
 
-
     return Scaffold(
       backgroundColor: const Color(0xff004466),
       body: Container(
@@ -127,58 +112,37 @@ class GemShopState extends State<GemShop> {
             Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
             Column(
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Image.asset(
-                        'assets/images/basket.png',
-                        width: 70,
-                        height: 70,
-                    ),
-                    Text(
-                        'Gem Shop',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 48,
-                            color: Colors.white
-                        )
-                    ),
-                  ]
-                ),
-
-
+                Row(children: <Widget>[
+                  Image.asset(
+                    'assets/images/basket.png',
+                    width: 70,
+                    height: 70,
+                  ),
+                  Text('Gem Shop',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 48,
+                          color: Colors.white)),
+                ]),
                 FutureBuilder<String>(
-
                     future: taskMakeCard,
-                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-
-                      if(snapshot.hasData && snapshot.data == 'done'){
-
-                        return
-                          Column(
-                            children: listCard,
-                          );
-
-                      }
-                      else{
-
+                    builder:
+                        (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      if (snapshot.hasData && snapshot.data == 'done') {
+                        return Column(
+                          children: listCard,
+                        );
+                      } else {
                         return Center(
                           child: Text('The Enchanted Nightingale'),
                         );
-
                       }
-
-                    }
-                ),
-
-
+                    }),
               ],
             ),
-
           ],
         ),
       ),
     );
-
   }
 }
-

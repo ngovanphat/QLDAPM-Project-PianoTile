@@ -26,9 +26,16 @@ Nhạc yêu thích: Không thay đổi id
 Từ DB : +DB
 vd :01VN, 01VNDB,...
 */
+class Keys {
+  static final tabVNKey = new GlobalKey<_BodyLayoutState>();
+  static final tabNNKey = new GlobalKey<_BodyLayoutState>();
+  static final tabYTKey = new GlobalKey<_BodyLayoutState>();
+}
 
-Map<int,GlobalKey> bodyKeys ={
-0:GlobalKey(),1:GlobalKey(),2:GlobalKey()
+Map<int, GlobalKey> bodyKeys = {
+  0: Keys.tabVNKey,
+  1: Keys.tabNNKey,
+  2: Keys.tabYTKey
 };
 
 List<List<Song>> allSongs = new List.filled(3, []);
@@ -39,13 +46,15 @@ bool _FavoritebtnEnabled = true;
 bool loadedAll = false;
 int gTabIndex = 0;
 SongDAO songDAO = new SongDAO();
+Map newHighscores = Map<String, int>();
 
 class MusicList extends StatefulWidget {
   @override
   _MusicListState createState() => _MusicListState();
 }
 
-class _MusicListState extends State<MusicList> {
+class _MusicListState extends State<MusicList> with WidgetsBindingObserver {
+  AppLifecycleState _lastLifecycleState;
   @override
   void initState() {
     /*allSongs[0].isEmpty?getSongs(0).then((value){
@@ -58,7 +67,27 @@ class _MusicListState extends State<MusicList> {
     getIntValuesSF("tabIndex").then((value) {
       if (value != null) gTabIndex = value;
     });
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        await updateAllHighscores();
+        break;
+      case AppLifecycleState.resumed:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -106,11 +135,21 @@ class _MusicListState extends State<MusicList> {
                                 child: TabBarView(
                                   children: [
                                     Container(
-                                        child: BodyLayout(key:bodyKeys[0],tabIndex: 0, songs: allSongs[0],)),
+                                        child: BodyLayout(
+                                      key: bodyKeys[0],
+                                      tabIndex: 0,
+                                      songs: allSongs[0],
+                                    )),
                                     Container(
-                                        child: BodyLayout(key:bodyKeys[1],tabIndex: 1, songs: allSongs[1])),
+                                        child: BodyLayout(
+                                            key: bodyKeys[1],
+                                            tabIndex: 1,
+                                            songs: allSongs[1])),
                                     Container(
-                                        child: BodyLayout(key:bodyKeys[2],tabIndex: 2, songs: allSongs[2])),
+                                        child: BodyLayout(
+                                            key: bodyKeys[2],
+                                            tabIndex: 2,
+                                            songs: allSongs[2])),
                                   ],
                                 ),
                               ),
@@ -192,15 +231,15 @@ class BodyLayout extends StatefulWidget {
   _BodyLayoutState createState() => _BodyLayoutState();
 }
 
-class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMixin{
-  List<Song> songs=[];
+class _BodyLayoutState extends State<BodyLayout>
+    with AutomaticKeepAliveClientMixin {
+  List<Song> songs = [];
   List<int> listTracker = [-1, -1, -1];
   int expListCounter = 0;
   int selected = 0;
   int visileItems = 8;
   int tabIndex;
   final _scrollController = ScrollController();
-  final GlobalKey datakey = GlobalKey();
   List<int> pageNumber = [0, 0, 0];
   List<int> itemsPerPage = [2, 2, 2];
   @override
@@ -211,28 +250,30 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
     songs = widget.songs;
     tabIndex = widget.tabIndex;
     gTabIndex = widget.tabIndex;
-    if(tabIndex!=2){
-      getSongs(tabIndex).then((value) {
+    if (tabIndex != 2) {
+      getSongs(tabIndex).then((value) async {
         if (!mounted) return;
         setState(() {
           songs = value;
-          if(tabIndex==1)
+          if (tabIndex == 1) {
+            fetchHighscore();
             fetchFavorites();
+          }
         });
       });
-    }else{
+    } else {
       fetchFavorites().then((value) async {
-        await _fetchSongs(tabIndex, pageNumber, itemsPerPage).then((value){
+        await _fetchSongs(tabIndex, pageNumber, itemsPerPage).then((value) {
           setState(() {
-            songs=value??[];
+            songs = value ?? [];
           });
         });
       });
     }
-    super.initState();
     allSongs[tabIndex] = songs;
     addIntToSF("tabIndex", gTabIndex);
     _scrollController.addListener(() async {
+      if (tabIndex == 2) return;
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
           _isLoading == false) {
@@ -256,10 +297,12 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
     }
     listTracker[0] = selected;
     expListCounter++;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return songs.isNotEmpty
         ? NotificationListener<OverscrollIndicatorNotification>(
             // tắt hiệu ứng glow khi cuộn tới cuối list/ đầu list
@@ -323,7 +366,10 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
             selected = tmp;
           }
         }
-        debugPrint("Selected: "+selected.toString()+"- Song ID: "+songs[selected].getId());
+        debugPrint("Selected: " +
+            selected.toString() +
+            "- Song ID: " +
+            songs[selected].getId());
       },
       children:
           songs.map<CustomExpansionPanel.ExpansionPanelRadio>((Song song) {
@@ -436,7 +482,7 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
   }
 
   Future<List<Song>> fetchFavorites() async {
-    debugPrint("favorites.isNotEmpty: "+favorites.isNotEmpty.toString());
+    debugPrint("favorites.isNotEmpty: " + favorites.isNotEmpty.toString());
     if (favorites.isNotEmpty) return songs;
     final FirebaseAuth auth = FirebaseAuth.instance;
     final FirebaseUser user = await auth.currentUser();
@@ -454,39 +500,94 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
       debugPrint(favorites.join(','));
       //applied to loaded songs
       for (int i = 0; i < allSongs[0].length; i++) {
-        debugPrint("ID: "+allSongs[0][i].getId());
+        debugPrint("ID: " + allSongs[0][i].getId());
         if (favorites.contains(allSongs[0][i].getId())) {
-          if(!allSongs[0][i].getFavorite()){
+          if (!allSongs[0][i].getFavorite()) {
             allSongs[0][i].setFavorite(true);
             songDAO.updateSong(allSongs[0][i]);
           }
           favorites.removeWhere((item) => item == allSongs[0][i].getId());
-          debugPrint("After "+favorites.join(','));
+          debugPrint("After " + favorites.join(','));
         }
       }
       for (int i = 0; i < allSongs[1].length; i++) {
-        debugPrint("ID: "+allSongs[1][i].getId());
+        debugPrint("ID: " + allSongs[1][i].getId());
         if (favorites.contains(allSongs[1][i].getId())) {
-          if(!allSongs[1][i].getFavorite()){
+          if (!allSongs[1][i].getFavorite()) {
             allSongs[1][i].setFavorite(true);
             songDAO.updateSong(allSongs[1][i]);
           }
           favorites.removeWhere((item) => item == allSongs[1][i].getId());
-          debugPrint("After "+favorites.join(','));
+          debugPrint("After " + favorites.join(','));
         }
       }
 
-      if(favorites.isEmpty){
+      if (favorites.isEmpty) {
         setState(() {
-          songs=allSongs[tabIndex];
+          songs = allSongs[tabIndex];
         });
       }
     }
     return songs;
   }
 
+  Future<List<Song>> fetchHighscore() async {
+    Map dbHighscores = Map<String, int>.from(newHighscores);
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseUser user = await auth.currentUser();
+    if (user != null) {
+      final uid = user.uid;
+      var db =
+          FirebaseDatabase.instance.reference().child('Highscores').child(uid);
+      await db.once().then((DataSnapshot snapshot) {
+        if (snapshot.value == null) return;
+        Map<dynamic, dynamic> values = snapshot.value;
+        values.forEach((key, value) {
+          dbHighscores[key] = value;
+          debugPrint("highscore: " + key + " - " + value.toString());
+        });
+      });
+      if (dbHighscores.isEmpty) return songs;
+      //applied to loaded songs
+      for (int i = 0; i < allSongs[0].length; i++) {
+        //debugPrint("ID: "+allSongs[0][i].getId());
+        if (dbHighscores.keys.contains(allSongs[0][i].getId())) {
+          var thisKey =
+              dbHighscores.keys.firstWhere((k) => k == allSongs[0][i].getId());
+          var newScore = dbHighscores[thisKey];
+          if (allSongs[0][i].getHighscore() < newScore) {
+            allSongs[0][i].setHighscore(newScore);
+            songDAO.updateSong(allSongs[0][i]);
+          }
+          dbHighscores.remove(allSongs[0][i].getId());
+        }
+      }
+      for (int i = 0; i < allSongs[1].length; i++) {
+        //debugPrint("ID: "+allSongs[1][i].getId());
+        if (dbHighscores.keys.contains(allSongs[1][i].getId())) {
+          var thisKey =
+              dbHighscores.keys.firstWhere((k) => k == allSongs[1][i].getId());
+          var newScore = dbHighscores[thisKey];
+          if (allSongs[1][i].getHighscore() < newScore) {
+            allSongs[1][i].setHighscore(newScore);
+            songDAO.updateSong(allSongs[1][i]);
+          }
+          dbHighscores.remove(allSongs[1][i].getId());
+        }
+      }
+
+      setState(() {
+        songs = allSongs[tabIndex];
+      });
+    }
+    return songs;
+  }
+
   Future<bool> onFavoriteButtonTapped(bool isLiked) async {
-    debugPrint("Selected: "+selected.toString()+"- Song ID: "+songs[selected].getId());
+    debugPrint("Selected: " +
+        selected.toString() +
+        "- Song ID: " +
+        songs[selected].getId());
     debugPrint(_FavoritebtnEnabled.toString() + " , " + isLiked.toString());
     if (_FavoritebtnEnabled == false) return isLiked;
     _FavoritebtnEnabled = false;
@@ -513,12 +614,17 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
           songs[selected].setFavorite(true);
           await songDAO.updateSong(songs[selected]);
           debugPrint("here");
-          _BodyLayoutState caller=bodyKeys[2].currentState as _BodyLayoutState;
-          if(caller!=null)
-          caller._fetchSongs(caller.tabIndex, caller.pageNumber, caller.itemsPerPage).then((value){
-            caller.setState(() {
-              caller.songs=value;
-            });});
+          _BodyLayoutState caller =
+              bodyKeys[2].currentState as _BodyLayoutState;
+          if (caller != null)
+            caller
+                ._fetchSongs(
+                    caller.tabIndex, caller.pageNumber, caller.itemsPerPage)
+                .then((value) {
+              caller.setState(() {
+                caller.songs = value;
+              });
+            });
 
           debugPrint("here 3");
           return !isLiked;
@@ -528,23 +634,23 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
       } else {
         try {
           var db =
-          FirebaseDatabase.instance.reference().child("Favorites/" + uid);
+              FirebaseDatabase.instance.reference().child("Favorites/" + uid);
           await db.child(songs[selected].getId()).remove();
           songs[selected].setFavorite(false);
           await songDAO.updateSong(songs[selected]);
-          if(tabIndex==2){
+          if (tabIndex == 2) {
             //lưu lên db rồi xóa khỏi danh sách yêu thích & cập nhập 2 danh sách còn lại
-            if(songs[selected].getId().contains("VN")){
+            if (songs[selected].getId().contains("VN")) {
               allSongs[0][selected].setFavorite(false);
-            }else if(songs[selected].getId().contains("NN")){
+            } else if (songs[selected].getId().contains("NN")) {
               allSongs[1][selected].setFavorite(false);
             }
             setState(() {
               songs.removeAt(selected);
-              _isVisible=false;
+              _isVisible = false;
             });
-            _BodyLayoutState tabNV=bodyKeys[0].currentState;
-            _BodyLayoutState tabNN=bodyKeys[1].currentState;
+            _BodyLayoutState tabNV = bodyKeys[0].currentState;
+            _BodyLayoutState tabNN = bodyKeys[1].currentState;
             getSongs(0).then((value) {
               if (!tabNV.mounted) return;
               tabNV.setState(() {
@@ -557,13 +663,18 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
                 tabNN.songs = value;
               });
             });
-          }else{
-            _BodyLayoutState caller=bodyKeys[2].currentState as _BodyLayoutState;
+          } else {
+            _BodyLayoutState caller =
+                bodyKeys[2].currentState as _BodyLayoutState;
             debugPrint("here 2");
-            caller._fetchSongs(caller.tabIndex, caller.pageNumber, caller.itemsPerPage).then((value){
+            caller
+                ._fetchSongs(
+                    caller.tabIndex, caller.pageNumber, caller.itemsPerPage)
+                .then((value) {
               caller.setState(() {
-                caller.songs=value;
-              });});
+                caller.songs = value;
+              });
+            });
           }
           return !isLiked;
         } catch (e) {
@@ -587,6 +698,7 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
     super.dispose();
   }
 
+  // ignore: missing_return
   Future<List> _fetchSongs(tabIndex, pageNum, pageSize) async {
     switch (tabIndex) {
       case 2:
@@ -595,8 +707,8 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
             //get list of unloaded songs
             for (String i in favorites) {
               bool isLoaded = true;
-              await songDAO.getSongById(i).then(
-                      (value) => value != null ? isLoaded = true : isLoaded = false);
+              await songDAO.getSongById(i).then((value) =>
+                  value != null ? isLoaded = true : isLoaded = false);
               if (i.contains("NNDB") & !isLoaded) {
                 var db = FirebaseDatabase.instance
                     .reference()
@@ -641,15 +753,14 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
               }
             }
           }
-          debugPrint("favorited list"+favorites.join('-'));
-          debugPrint("favorited.isEmpty "+favorites.isEmpty.toString());
+          debugPrint("favorited list" + favorites.join('-'));
+          debugPrint("favorited.isEmpty " + favorites.isEmpty.toString());
           if (favorites.isEmpty) {
             final List<Song> musicList = [];
             await musicList.addAll(await songDAO.getAllSongs("YT"));
-            String dbug="Yeu Thich";
-            for(var item in musicList )
-            {
-              dbug+=item.getId();
+            String dbug = "Yeu Thich";
+            for (var item in musicList) {
+              dbug += item.getId();
             }
             debugPrint(dbug);
             loadedAll = true;
@@ -696,13 +807,12 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
                 counter++;
               });
               setState(() {
-                allSongs[tabIndex]=songs;
+                allSongs[tabIndex] = songs;
               });
             });
-          }
-          else{
+          } else {
             debugPrint("Fetching from local");
-           /* for(int i=0;i<pageSize;i++){
+            /* for(int i=0;i<pageSize;i++){
               Song temp;
               await songDAO
                   .getSongById(
@@ -747,41 +857,14 @@ class _BodyLayoutState extends State<BodyLayout> with AutomaticKeepAliveClientMi
                 counter++;
               });
               setState(() {
-                allSongs[tabIndex]=songs;
+                allSongs[tabIndex] = songs;
               });
             });
           }
-          allSongs[tabIndex]=songs;
+          allSongs[tabIndex] = songs;
           if (counter == pageSize) pageNum++;
         } //Nhac Viet
         break;
-    }
-  }
-
-  Future<List> _fetchSongById(String id) async {
-    if (id.contains("VNDB")) {
-      var db = FirebaseDatabase.instance
-          .reference()
-          .child("Songs/NhacViet/" + id.replaceAll("VNDB", ''));
-      await db.once().then((DataSnapshot snapshot) {
-        if (snapshot.value == null) {
-          debugPrint("Song not found");
-          return;
-        }
-        Song temp = new Song(
-            snapshot.key + "VNDB",
-            snapshot.value["name"],
-            snapshot.value["artists"],
-            snapshot.value["difficulty"],
-            snapshot.value["image"],
-            notes_dir: snapshot.value["notes_dir"],
-            isFavorited: true);
-        songs.add(temp);
-      });
-    } else if (id.contains("NNDB")) {
-    } else if (!id.contains("DB")) {
-      if (id.contains("VN")) {
-      } else if (id.contains("NN")) {}
     }
   }
 }
@@ -873,14 +956,37 @@ Future<List> getSongs(tabIndex) async {
   } else if (tabIndex == 2) {
     final List<Song> musicList = [];
     musicList.addAll(await songDAO.getAllSongs("YT"));
-    String dbug="Yeu Thich";
-    for(var item in musicList )
-      {
-        dbug+=item.getId();
-      }
+    String dbug = "Yeu Thich";
+    for (var item in musicList) {
+      dbug += item.getId();
+    }
     debugPrint(dbug);
     return allSongs[tabIndex] = musicList;
   }
   List<Song> tmp = [];
   return allSongs[tabIndex] = tmp;
+}
+
+Future<int> updateAllHighscores() async {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseUser user = await auth.currentUser();
+  if (user != null) {
+    final uid = user.uid;
+    var db =
+        FirebaseDatabase.instance.reference().child('Highscores').child(uid);
+    List<Song> updatingSongs = await songDAO.getAllSongs("Highscore");
+    var localHighscores = Map.fromIterable(updatingSongs,
+        key: (s) => s.getId(), value: (s) => s.getHighscore());
+    newHighscores.removeWhere(
+        (key, value) => newHighscores[key] == localHighscores[key]);
+    newHighscores.updateAll((key, value) =>
+        newHighscores[key] < localHighscores[key]
+            ? value = localHighscores[key]
+            : value = newHighscores[key]);
+    newHighscores.forEach((key, value) async {
+      await db.child(key).update(value);
+    });
+    return 0;
+  }
+  return 1;
 }

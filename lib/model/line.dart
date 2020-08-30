@@ -45,10 +45,9 @@ class Line extends AnimatedWidget {
       // we need to make room for tile
       double myTileHeight = note.height * tileHeight;
       double additionalSpace = 0;
-      if(note.height == 2){
+      if (note.height == 2) {
         additionalSpace = tileHeight;
-      }
-      else if(note.height == 3) {
+      } else if (note.height == 3) {
         additionalSpace = 2 * tileHeight;
       }
 
@@ -56,18 +55,17 @@ class Line extends AnimatedWidget {
       // but new animation reset
       // so need to add padding for each current note
       double padding = 0;
-      if(currentNote[0].height > 1
-          && currentNote[0].pass > 0
-          && currentNote[0].pass < currentNote[0].height){
+      if (currentNote[0].height > 1 &&
+          currentNote[0].pass > 0 &&
+          currentNote[0].pass < currentNote[0].height) {
         padding = currentNote[0].pass * tileHeight;
       }
 
       // calculate offset
-      double offset = (3 - index) * tileHeight
-          - additionalSpace
-          + animation.value * tileHeight
-          + padding
-      ;
+      double offset = (3 - index) * tileHeight -
+          additionalSpace +
+          animation.value * tileHeight +
+          padding;
 
       return Transform.translate(
         offset: Offset(0, offset),
