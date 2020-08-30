@@ -12,6 +12,8 @@ import 'package:piano_tile/views/logged_in_profile.dart';
 import 'package:piano_tile/model/friend.dart';
 import 'package:random_string/random_string.dart';
 
+
+
 String name = "", email = "", imageUrl = "", text = "", id = "";
 
 class Profile extends StatefulWidget {
@@ -482,13 +484,19 @@ Future<FirebaseUser> _handleSignIn(BuildContext context) async {
       ),
     );
   } else {
+    print('[profile] not sign in yet');
+
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    print('[profile] got googleUser');
+
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
+    print('[profile] got googleAuth');
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
     user = (await _auth.signInWithCredential(credential)).user;
+    print('[profile] got user: $user');
 
     database.reference().child("Users").child(user.uid).set({
       "id": user.uid,
@@ -496,6 +504,7 @@ Future<FirebaseUser> _handleSignIn(BuildContext context) async {
       "avatar": user.photoUrl,
       "email": user.email,
     });
+
 
     Navigator.of(context).push(
       MaterialPageRoute(

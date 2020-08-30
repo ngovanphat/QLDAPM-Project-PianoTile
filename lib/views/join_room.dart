@@ -8,6 +8,8 @@ import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play_online.dart';
 import 'package:piano_tile/views/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
+
 
 class JoinRoom extends StatefulWidget {
   final String roomKey;
@@ -40,9 +42,9 @@ class _JoinRoomState extends State<JoinRoom>
   Future<void> savePreferences(
       {String userId, String roomId, bool isHost}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('userId', userId);
-    prefs.setString('roomId', roomId);
-    prefs.setBool('isRoomHost', isHost);
+
+    prefs.setString(sharedPrefKeys.getRoomIdKey(), roomId);
+    prefs.setBool(sharedPrefKeys.getIsRoomHostKey(), isHost);
   }
 
   @override
@@ -63,7 +65,8 @@ class _JoinRoomState extends State<JoinRoom>
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => Home()));
         else if (room.isPlaying == true)
-          Navigator.pushReplacement(context,
+//          Navigator.pushReplacement(context,
+          Navigator.push(context,
               MaterialPageRoute(builder: (context) => GamePlayOnline()));
       });
     } catch (e) {
