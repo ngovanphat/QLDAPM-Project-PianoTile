@@ -119,13 +119,6 @@ class GamePlayState<T extends GamePlay> extends State<T>
   void initState() {
     super.initState();
     song = widget.song;
-    // init notes
-//    initNotes().then((value) {
-//      notes = value;
-//      setState(() {});
-//      print('success loading notes');
-//      print('length: ${notes.length}');
-//    });
     if (song == null) {
       //for home page song
       song = new Song("-1", "Shining The Morning", "abc", 1, " ",
@@ -175,6 +168,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
         }
       }
     });
+
   }
 
   @override

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:marquee_flutter/marquee_flutter.dart';
+import 'package:piano_tile/helper/local_db.dart';
 import 'package:piano_tile/helper/sizes_helpers.dart';
 import 'package:piano_tile/model/room.dart';
 import 'package:piano_tile/model/widget.dart';
@@ -36,52 +37,12 @@ class _CreateRoomState extends State<CreateRoom>
   List<Song> songs = [];
   Timer timer;
 
-  List getSongs() {
-    //TODO fetch data from server
-    //tên bài hát
-    final titles = [
-      'Little Star',
-      'Jingle Bells',
-      'Canon',
-      'Two Tigers',
-      'The Blue Danube',
-      'Happy New Year',
-      'Beyer No. 8',
-      'Bluestone Alley',
-      'Reverie'
-    ];
-    //tên ca sĩ/nhóm nhạc
-    final artists = [
-      'English Folk Music',
-      'James Lord Pierpont',
-      'Johann Pachelbel',
-      'French Folk Music',
-      'Johann Strauss II',
-      'English Folk Music',
-      'Ferdinand Beyer',
-      'Congfei Wei',
-      'Claude Debussy'
-    ];
-    //icons sẽ được thay bằng hình nhạc sau
-    final images = [
-      'assets/images/music-note.png',
-      'assets/images/music-note.png',
-      'assets/images/music-note.png',
-      'assets/images/music-note.png',
-      'assets/images/music-note.png',
-      'assets/images/music-note.png',
-      'assets/images/music-note.png',
-      'assets/images/music-note.png',
-      'assets/images/music-note.png'
-    ];
-    final List<int> difficulties = [1, 1, 1, 2, 3, 4, 4, 5, 5];
+  SongDAO songDAO = new SongDAO();
 
-    final List<Song> musicList = [];
-    for (var i = 0; i < titles.length; i++) {
-      musicList.add(new Song(
-          i.toString(), titles[i], [artists[i]], difficulties[i], images[i]));
-    }
-    return musicList;
+  Future<List<Song>> getSongs() async {
+    List<Song> allSongs = await songDAO.getAllSongs("VN");
+    allSongs.addAll(await songDAO.getAllSongs("NN"));
+    return allSongs;
   }
 
   getUser() async {
@@ -109,7 +70,9 @@ class _CreateRoomState extends State<CreateRoom>
           ..repeat();
     String key = randomString(6, from: 65, to: 90);
     createRoom(key);
-    songs = getSongs();
+    getSongs().then((value) {
+      songs = value;
+    });
 
     // update additional fields: usernameOnePoints, usernameTwoPoints,...
     // for storing user points
@@ -171,6 +134,17 @@ class _CreateRoomState extends State<CreateRoom>
         MaterialPageRoute(
             builder: (context) =>
                 GamePlayOnline()));
+  }
+
+  onChooseMusic(String music){
+    setState(() {
+      musicName = music;
+    });
+    room.musicName = music;
+    room.updateToDatabase(room.keyOfRoom);
+    Navigator.of(context)
+        .pop();
+
   }
 
 
@@ -248,8 +222,8 @@ class _CreateRoomState extends State<CreateRoom>
                                   child: IconButton(
                                     icon: Icon(Icons.arrow_drop_down_circle),
                                     tooltip: 'Open Music List',
-                                    onPressed: () {
-                                      songs = getSongs();
+                                    onPressed: () async {
+                                      songs = await getSongs();
                                       showDialog(
                                           context: context,
                                           builder: (BuildContext context) {
@@ -269,12 +243,7 @@ class _CreateRoomState extends State<CreateRoom>
                                                             (context, index) {
                                                           return GestureDetector(
                                                               onTap: () {
-                                                                setState(() {
-                                                                  musicName = songs[index].getName();
-                                                                });
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
+                                                                onChooseMusic(songs[index].getName());
                                                               },
                                                               child: Card(
                                                                 child: ListTile(

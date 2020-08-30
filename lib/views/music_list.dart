@@ -27,9 +27,15 @@ Từ DB : +DB
 vd :01VN, 01VNDB,...
 */
 
+class Keys{
+  static final tabVNKey=new GlobalKey<_BodyLayoutState>();
+  static final tabNNKey=new GlobalKey<_BodyLayoutState>();
+  static final tabYTKey=new GlobalKey<_BodyLayoutState>();
+}
 Map<int,GlobalKey> bodyKeys ={
-0:GlobalKey(),1:GlobalKey(),2:GlobalKey()
+  0:Keys.tabVNKey,1:Keys.tabNNKey,2:Keys.tabYTKey
 };
+
 
 List<List<Song>> allSongs = new List.filled(3, []);
 List<String> favorites = [];

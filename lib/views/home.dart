@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:marquee_flutter/marquee_flutter.dart';
+import 'package:piano_tile/helper/local_db.dart';
+import 'package:piano_tile/model/Song.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play.dart';
 import 'package:piano_tile/views/game_play_online.dart';
@@ -12,6 +15,7 @@ import 'package:piano_tile/model/room.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
 import 'package:piano_tile/main.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -29,6 +33,15 @@ class _HomeState extends State<Home>
   int nextExp = 0;
   int gem = 0;
   int level = 1;
+  String musicName = "Little Star";
+  List<Song> songs = [];
+  SongDAO songDAO = new SongDAO();
+
+  Future<List<Song>> getSongs() async {
+    List<Song> allSongs = await songDAO.getAllSongs("VN");
+    allSongs.addAll(await songDAO.getAllSongs("NN"));
+    return allSongs;
+  }
 
   FirebaseUser user;
   Future<void> getUser() async {
@@ -46,6 +59,9 @@ class _HomeState extends State<Home>
 
     // update exp, gem,...
     getExpGem();
+    getSongs().then((value){
+      songs = value;
+    });
   }
 
   Future<String> getExpGem() async {
@@ -124,15 +140,133 @@ class _HomeState extends State<Home>
                               },
                               child: Image.asset('assets/images/disk.png'),
                             ),
-                            Container(
-                              margin: EdgeInsets.only(top: 10),
-                              child: Text(
-                                '1. BigCity Boi',
-                                style: TextStyle(
-                                    fontSize: 30,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  margin: EdgeInsets.only(top: 10),
+                                  child: Text(
+                                    '${musicName}',
+                                    style: TextStyle(
+                                        fontSize: 30,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(top: 13),
+                                  child: IconButton(
+                                    icon: Icon(Icons.arrow_drop_down_circle),
+                                    tooltip: 'Open Music List',
+                                    onPressed: () async {
+                                      songs =  await getSongs();
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text('Select song'),
+                                              scrollable: true,
+                                              content: Column(
+                                                  mainAxisSize:
+                                                  MainAxisSize.min,
+                                                  children: <Widget>[
+                                                    Container(
+                                                      height: 700.0,
+                                                      width: 600.0,
+                                                      child: ListView.builder(
+                                                        itemCount: songs.length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          return GestureDetector(
+                                                              onTap: () {
+                                                                setState(() {
+                                                                  musicName = songs[index].getName();
+                                                                });
+                                                                Navigator.of(
+                                                                    context)
+                                                                    .pop();
+                                                              },
+                                                              child: Card(
+                                                                child: ListTile(
+                                                                  isThreeLine:
+                                                                  true,
+                                                                  leading:
+                                                                  Container(
+                                                                    height: double
+                                                                        .infinity,
+                                                                    child:
+                                                                    ImageIcon(
+                                                                      AssetImage(
+                                                                          songs[index]
+                                                                              .getImage()),
+                                                                      size: 50,
+                                                                      color: Color(
+                                                                          0xFF3A5A98),
+                                                                    ), //replaced by image if available
+                                                                  ),
+                                                                  title: Text(songs[
+                                                                  index]
+                                                                      .getName()),
+                                                                  subtitle:
+                                                                  Container(
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                      children: <
+                                                                          Widget>[
+                                                                        Flexible(
+                                                                          flex:
+                                                                          3,
+                                                                          child:
+                                                                          Container(
+                                                                            height:
+                                                                            30,
+                                                                            child:
+                                                                            new MarqueeWidget(
+                                                                              text: songs[index].getArtists(),
+                                                                              textStyle: new TextStyle(fontSize: 16.0),
+                                                                              scrollAxis: Axis.horizontal,
+                                                                            ),
+                                                                            //Text(,overflow: TextOverflow.ellipsis,),
+                                                                          ),
+                                                                        ),
+                                                                        Flexible(
+                                                                          flex:
+                                                                          3,
+                                                                          child:
+                                                                          SmoothStarRating(
+                                                                            rating:
+                                                                            songs[index].getDifficulty().toDouble(),
+                                                                            size:
+                                                                            18,
+                                                                            filledIconData:
+                                                                            Icons.music_note,
+                                                                            defaultIconData:
+                                                                            null,
+                                                                            starCount:
+                                                                            5,
+                                                                            isReadOnly:
+                                                                            true,
+                                                                          ),
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ));
+                                                        },
+                                                      ),
+                                                    )
+                                                  ]),
+                                            );
+                                          });
+                                    },
                                     color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                                  ),
+                                ),
+                              ],
                             ),
                             Container(
                               width: 350,
