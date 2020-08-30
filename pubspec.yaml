@@ -42,8 +42,9 @@ dependencies:
   firebase_storage: ^3.1.6
   path_provider: ^1.6.11
   permissions_plugin: ^1.1.4
-
-  shared_preferences: ^0.5.8
+  cloud_firestore: ^0.13.7
+  sembast: ^2.4.7+6
+  shared_preferences: ^0.5.10
   percent_indicator: "^2.1.5"
 
 

@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/model/widget.dart';
+import 'package:piano_tile/views/all_users.dart';
 import 'package:piano_tile/views/friends_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -275,6 +276,84 @@ class _ProfileState extends State<Profile> {
                                         Flexible(
                                           flex: 2,
                                           child: Text(
+                                            "Manage all of your friends",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 1,
+                      child: Container(
+                        width: double.infinity,
+                        height: 5,
+                        color: const Color(0xff004466),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 3,
+                      child: Container(
+                        width: double.infinity,
+                        height: 90,
+                        child: FlatButton(
+                          onPressed: () {
+                            setState(() {
+                              toFindFriendsList(context);
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              Image.asset('assets/images/add.png',
+                                  fit: BoxFit.cover),
+                              Container(
+                                margin: EdgeInsets.only(left: 20),
+                                width: 5,
+                                height: double.infinity,
+                                color: const Color(0xff00e600),
+                              ),
+                              Container(
+                                width: 5,
+                                height: double.infinity,
+                                color: const Color(0xff00b300),
+                              ),
+                              Container(
+                                width: 5,
+                                height: double.infinity,
+                                color: const Color(0xff008000),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          flex: 2,
+                                          child: Text(
+                                            "FIND FRIENDS",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                        ),
+                                        Flexible(
+                                          flex: 2,
+                                          child: Text(
                                             "More friends more fun",
                                             style: TextStyle(
                                               color: Colors.white,
@@ -390,9 +469,10 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 
 Future<FirebaseUser> _handleSignIn(BuildContext context) async {
   FirebaseUser user;
+  final FirebaseDatabase database = FirebaseDatabase.instance;
   bool isSignedIn = await _googleSignIn.isSignedIn();
 
-  if (isSignedIn) {
+  if (!isSignedIn) {
     user = await _auth.currentUser();
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -409,6 +489,14 @@ Future<FirebaseUser> _handleSignIn(BuildContext context) async {
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
     user = (await _auth.signInWithCredential(credential)).user;
+
+    database.reference().child("Users").child(user.uid).set({
+      "id": user.uid,
+      "name": user.displayName,
+      "avatar": user.photoUrl,
+      "email": user.email,
+    });
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
@@ -439,50 +527,64 @@ void assignUserElements() async {
   }
 }
 
-void updateFireBase() async {
-  final FirebaseDatabase database = FirebaseDatabase.instance;
-  final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
-
-  String key = randomString(6, from: 65, to: 90);
-  Friend f1 = new Friend(key, _user.displayName, "1", _user.photoUrl);
-
-  key = randomString(6, from: 65, to: 90);
-  Friend f2 = new Friend(key, _user.displayName, "2", _user.photoUrl);
-
-  database
-      .reference()
-      .child("Friendships")
-      .child(_user.uid)
-      .child(f1.getFriendUID())
-      .set({
-    "id": f1.getFriendUID(),
-    "name": f1.getName(),
-    "avatar": f1.getAvatar(),
-    "lv": f1.getLevel()
-  });
-
-  database
-      .reference()
-      .child("Friendships")
-      .child(_user.uid)
-      .child(f2.getFriendUID())
-      .set({
-    "id": f2.getFriendUID(),
-    "name": f2.getName(),
-    "avatar": f2.getAvatar(),
-    "lv": f2.getLevel()
-  });
-}
-
 void toFriendsList(BuildContext context) async {
   bool isSignedIn = await _googleSignIn.isSignedIn();
-  //updateFireBase();
 
   if (isSignedIn) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
           return FriendsList();
+        },
+      ),
+    );
+  } else {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.white, width: 1),
+          ),
+          backgroundColor: Colors.black,
+          title: Center(
+            child: Text(
+              "Sorry",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          content: Text(
+            "Please log in to activate this feature!",
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            FlatButton(
+              child: Text(
+                "OK",
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+void toFindFriendsList(BuildContext context) async {
+  bool isSignedIn = await _googleSignIn.isSignedIn();
+
+  if (isSignedIn) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return AllUsers();
         },
       ),
     );

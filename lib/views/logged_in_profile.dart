@@ -17,7 +17,7 @@ class _FirstScreenState extends State<FirstScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         backgroundColor: const Color(0xff004466),
-        title: new Text('PROFILE'),
+        title: new Text('MY PROFILE'),
       ),
       body: SafeArea(
         child: Container(

@@ -95,6 +95,7 @@ class _HomeState extends State<Home>
     return Scaffold(
       backgroundColor: const Color(0xff004466),
       body: SafeArea(
+        top:false,
         child: IndexedStack(index: _currentIndex, children: [
           Container(
             height: double.infinity,

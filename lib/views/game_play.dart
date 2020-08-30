@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // import lib of us
 import 'package:audioplayers/audio_cache.dart';
 import 'package:piano_tile/helper/song_provider.dart';
+import 'package:piano_tile/model/Song.dart';
 import 'package:piano_tile/model/note.dart';
 import 'package:piano_tile/model/line_divider.dart';
 import 'package:piano_tile/model/line.dart';
@@ -16,10 +17,10 @@ import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class GamePlay extends StatefulWidget {
-
+  final Song song;
+  const GamePlay({Key key, this.song}) : super(key: key);
   @override
-  GamePlayState createState() => GamePlayState();
-
+  GamePlayState createState() => GamePlayState(song: song);
 }
 
 class GamePlayState<T extends GamePlay> extends State<T>
@@ -31,13 +32,15 @@ class GamePlayState<T extends GamePlay> extends State<T>
   bool hasStarted = false;
   bool isPlaying = true;
   bool ispause = false;
-
+  Song song;
   // midi player
   FlutterMidi midi = new FlutterMidi();
 
   // notes
   List<Note> notes = null;
   Future<String> statusOfInitNotes = null;
+
+  GamePlayState({this.song});
 
   // song info
 //  String songName = 'canond.mid.txt';
@@ -49,51 +52,48 @@ class GamePlayState<T extends GamePlay> extends State<T>
   SharedPreferences prefs = null;
 
   Future<String> doInitNotes() async {
-
     // first, check if song requires higher level then current level
-    DatabaseReference refSong = FirebaseDatabase
-        .instance
-        .reference()
-        .child('Songs');
+    DatabaseReference refSong =
+        FirebaseDatabase.instance.reference().child('Songs');
 
     DataSnapshot snapshot1 = await refSong.child('NhacViet').once();
-    Map<dynamic,dynamic> songs = snapshot1.value;
+    Map<dynamic, dynamic> songs = snapshot1.value;
     bool isFound = false;
-    songs.forEach((key, value){
-
-      if(value['filename'] == songName){
-        this.levelRequired =  value['levelRequired'];
+    songs.forEach((key, value) {
+      if (value['filename'] == songName) {
+        this.levelRequired = value['levelRequired'];
         this.expReward = value['expReward'];
         this.hard = value['hard'];
         isFound = true;
       }
     });
-    if(isFound == false){
+    if (isFound == false) {
       snapshot1 = await refSong.child('NhacNuocNgoai').once();
       songs = snapshot1.value;
-      songs.forEach((key, value){
-
-        if(value['filename'] == songName){
-          this.levelRequired =  value['levelRequired'];
+      songs.forEach((key, value) {
+        if (value['filename'] == songName) {
+          this.levelRequired = value['levelRequired'];
           this.expReward = value['expReward'];
           this.hard = value['hard'];
           isFound = true;
         }
       });
     }
-    print('[game_play] level need: $levelRequired, expReward: $expReward, hard: $hard');
+    print(
+        '[game_play] level need: $levelRequired, expReward: $expReward, hard: $hard');
 
     // here, already have song info
     prefs = await SharedPreferences.getInstance();
     int currentLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
-    if(currentLevel < this.levelRequired){
+    if (currentLevel < this.levelRequired) {
       // end, not allow to play
 
       showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text("This song requires level ${this.levelRequired} or higher"),
+              title: Text(
+                  "This song requires level ${this.levelRequired} or higher"),
               actions: <Widget>[
                 FlatButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -101,28 +101,36 @@ class GamePlayState<T extends GamePlay> extends State<T>
                 )
               ],
             );
-          }
-      ).then((_) {
-
+          }).then((_) {
         // return to previous page
         Navigator.pop(context);
-
       });
-
 
       return 'fail_level_required';
     }
 
-
     // if ok, then get notes
-    notes = await initNotes(songName);
+    notes = await initNotes(song.getNotes());
     return 'done';
   }
 
   @override
   void initState() {
     super.initState();
-
+    song = widget.song;
+    // init notes
+//    initNotes().then((value) {
+//      notes = value;
+//      setState(() {});
+//      print('success loading notes');
+//      print('length: ${notes.length}');
+//    });
+    if (song == null) {
+      //for home page song
+      song = new Song("-1", "Shining The Morning", "abc", 1, " ",
+          notes_dir:
+              "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/canond.mid.txt?alt=media&token=0d3fbea0-61be-4e9e-832e-dcec4bf16727");
+    }
     statusOfInitNotes = doInitNotes();
 
     // init midi player with sound font
@@ -137,38 +145,32 @@ class GamePlayState<T extends GamePlay> extends State<T>
 
     animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed && isPlaying) {
-
         // animation complete means 1 tileHeight has passed
         notes[currentNoteIndex].pass++;
 
-        if (notes[currentNoteIndex].state != NoteState.tapped
-            && notes[currentNoteIndex].pass == notes[currentNoteIndex].height) {
-
+        if (notes[currentNoteIndex].state != NoteState.tapped &&
+            notes[currentNoteIndex].pass == notes[currentNoteIndex].height) {
           // end game
           setState(() {
             isPlaying = false;
             notes[currentNoteIndex].state = NoteState.missed;
           });
-          animationController.reverse().then((_) => showFinishDialog(status: "game_over"));
-
-        }
-        else {
-
-          if(notes[currentNoteIndex].pass == notes[currentNoteIndex].height){
+          animationController
+              .reverse()
+              .then((_) => showFinishDialog(status: "game_over"));
+        } else {
+          if (notes[currentNoteIndex].pass == notes[currentNoteIndex].height) {
             setState(() {
               ++currentNoteIndex;
             });
           }
 
-          if(currentNoteIndex >= notes.length){
+          if (currentNoteIndex >= notes.length) {
             // song completed here
             showFinishDialog(status: "completed");
-          }
-          else{
+          } else {
             animationController.forward(from: 0);
           }
-
-
         }
       }
     });
@@ -182,10 +184,9 @@ class GamePlayState<T extends GamePlay> extends State<T>
 
   @override
   Widget build(BuildContext context) {
-    
-
     return WillPopScope(
       child: Material(
+
         child: FutureBuilder<String>(
 
           future: statusOfInitNotes,
@@ -227,31 +228,20 @@ class GamePlayState<T extends GamePlay> extends State<T>
               children = <Widget>[
 
               SpinKitWave(
-              color: Colors.blue,
-              size: 50.0,
+                color: Colors.blue,
+                size: 50.0,
               )
-              ];
-
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: children,
-                ),
-
-              );
-
-
-
-
-
-            }
-          },
-
-        )
-
-
-      ),
+          ];
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: children,
+              ),
+            );
+          }
+        },
+      )),
       onWillPop: () async {
         return false;
       },
@@ -273,24 +263,20 @@ class GamePlayState<T extends GamePlay> extends State<T>
   }
 
   void showFinishDialog({String status}) async {
-
-    if(status == "game_over"){
-
+    if (status == "game_over") {
       // ask user if wan to recover game with ads, gems
       showAskRecoveryDialog();
-    }
-    else{
+    } else {
       showResultDialog();
     }
-
-
-
   }
 
-  void showAskRecoveryDialog() async{
-
+  void showAskRecoveryDialog() async {
     // get number of gems for recovering
-    DataSnapshot data = await FirebaseDatabase.instance.reference().child('gemDefinition/continue').once();
+    DataSnapshot data = await FirebaseDatabase.instance
+        .reference()
+        .child('gemDefinition/continue')
+        .once();
     int numGemToRecover = data.value;
 
     showDialog(
@@ -299,11 +285,9 @@ class GamePlayState<T extends GamePlay> extends State<T>
           return AlertDialog(
             title: Text("Score: $points"),
             actions: <Widget>[
-
               FlatButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text("Recover with ads")
-              ),
+                  child: Text("Recover with ads")),
               FlatButton(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -317,19 +301,15 @@ class GamePlayState<T extends GamePlay> extends State<T>
                     Navigator.of(context).pop();
                     showResultDialog();
                   },
-                  child: Text("Exit")
-              ),
+                  child: Text("Exit")),
             ],
           );
-        }
-    );
-
+        });
   }
 
-  void showResultDialog() async{
-
+  void showResultDialog() async {
     // calculate exp, level, gem
-    int expGot = (this.expReward * this.points/notes.length).round();
+    int expGot = (this.expReward * this.points / notes.length).round();
     int newExp = prefs.getInt(sharedPrefKeys.getExpKey()) + expGot;
     int newGem = prefs.getInt(sharedPrefKeys.getGemKey());
     int newLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
@@ -337,7 +317,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
 
     bool isLevelUp = newExp > prefs.getInt(sharedPrefKeys.getNextExpKey());
     int gemReward = 0;
-    if(isLevelUp){
+    if (isLevelUp) {
       // for convient, just increase 1 level
       // maybe increase more...?
 
@@ -345,22 +325,22 @@ class GamePlayState<T extends GamePlay> extends State<T>
       int levelValue = 1;
       int nextExpValue = 0;
       gemReward = 0;
-      DataSnapshot data = await FirebaseDatabase.instance.reference()
+      DataSnapshot data = await FirebaseDatabase.instance
+          .reference()
           .child('levelDefinition')
           .once();
       List<dynamic> levels = data.value;
-      for(int i = 0; i < levels.length; i++){
-
+      for (int i = 0; i < levels.length; i++) {
         Map<dynamic, dynamic> level = levels[i];
-        if(level['expRequired'] > newExp){
+        if (level['expRequired'] > newExp) {
           levelValue = level['level'] - 1;
           nextExpValue = level['expRequired'];
           gemReward = level['gemReward'];
           break;
         }
-
       }
-      print('[main] level: $levelValue, next exp: $nextExpValue, reward: $gemReward');
+      print(
+          '[main] level: $levelValue, next exp: $nextExpValue, reward: $gemReward');
 
       newGem += gemReward;
       newLevel = levelValue;
@@ -374,13 +354,10 @@ class GamePlayState<T extends GamePlay> extends State<T>
     prefs.setInt(sharedPrefKeys.getNextExpKey(), newNextExp);
 
     // save to firebase if user already logged-in
-    if(prefs.getInt(sharedPrefKeys.userType) == sharedPrefValues.USER){
-
+    if (prefs.getInt(sharedPrefKeys.userType) == sharedPrefValues.USER) {
       String id = prefs.getString(sharedPrefKeys.getIdKey());
-      DatabaseReference user = FirebaseDatabase
-          .instance
-          .reference()
-          .child('account/$id');
+      DatabaseReference user =
+          FirebaseDatabase.instance.reference().child('account/$id');
       user.update({'exp': newExp});
       user.update({'gem': newGem});
     }
@@ -389,7 +366,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
 
     // show
     String resultString = "Score: $points\nExp: +$expGot";
-    if(isLevelUp){
+    if (isLevelUp) {
       resultString += "\nNew level: $newLevel\nGem reward: +$gemReward";
     }
 
@@ -400,7 +377,8 @@ class GamePlayState<T extends GamePlay> extends State<T>
             title: Text(resultString),
             actions: <Widget>[
               FlatButton(
-                onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MusicList())),
+                onPressed: () => Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => MusicList())),
                 child: Text("Play another song"),
               ),
               FlatButton(
@@ -419,9 +397,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
               ),
             ],
           );
-        }
-    );
-
+        });
   }
 
   void recoverWithGems(int gemRequired){
@@ -526,18 +502,17 @@ class GamePlayState<T extends GamePlay> extends State<T>
         ++points;
       });
     }
-
   }
 
   _drawLine(int lineNumber) {
     // in case notes are loading
     // just show empty line
-    if(notes == null){
+    if (notes == null) {
       return Container();
     }
 
     int end = currentNoteIndex + 5;
-    if(end > notes.length){
+    if (end > notes.length) {
       // this means notes mostly run out
       end = notes.length;
     }
@@ -574,12 +549,12 @@ class GamePlayState<T extends GamePlay> extends State<T>
     return Align(
       alignment: Alignment.topRight,
       child: PauseButton(
-        pauseCallback: (){
+        pauseCallback: () {
           setState(() {
             isPlaying = true;
           });
         },
-        onResumePressed: (bool resume){
+        onResumePressed: (bool resume) {
           setState(() {
             isPlaying = resume;
           });
@@ -589,13 +564,10 @@ class GamePlayState<T extends GamePlay> extends State<T>
   }
 
   _playNote(Note note) {
-
     // note may contain multiple midi values
     // which can be played at the same time
     note.midiValue.forEach((value) {
       midi.playMidiNote(midi: value);
     });
-
   }
-
 }
