@@ -602,14 +602,25 @@ class GamePlayState<T extends GamePlay> extends State<T>
       child: PauseButton(
         pauseCallback: () {
           setState(() {
-            isPlaying = true;
+//            isPlaying = true;
+            isPlaying = false;
+            animationController.stop();
+
           });
         },
         onResumePressed: (bool resume) {
           setState(() {
             isPlaying = resume;
+
+            if(isPlaying == true){
+              animationController.forward();
+            }
+
           });
         },
+        onRestartPressed: (){
+          restart();
+        }
       ),
     );
   }

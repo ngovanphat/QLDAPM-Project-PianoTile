@@ -1,10 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/views/home.dart';
 
 class PauseButton extends StatelessWidget {
   final VoidCallback pauseCallback;
+  final Function() onRestartPressed;
   final Function(bool) onResumePressed;
-  PauseButton({@required this.onResumePressed, this.pauseCallback});
+  PauseButton({@required this.onResumePressed, this.pauseCallback, this.onRestartPressed});
 
   Color _iconColor = Colors.lightBlue;
 
@@ -62,6 +64,7 @@ class PauseButton extends StatelessWidget {
                             ),
                             onPressed: () {
                               Navigator.of(context).pop();
+                              onRestartPressed();
                             }),
                         Padding(padding: const EdgeInsets.only(top: 30)),
                         new FlatButton(
@@ -79,10 +82,13 @@ class PauseButton extends StatelessWidget {
                               ],
                             ),
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => Home()),
-                              );
+//                              Navigator.push(
+//                                context,
+//                                MaterialPageRoute(builder: (context) => Home()),
+//                              );
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+
                             }),
                       ]),
                 ),
