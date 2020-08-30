@@ -29,13 +29,43 @@ class Line extends AnimatedWidget {
 
     // map note widget
     List<Widget> tiles = thisLineNotes.map((note) {
-      //specify note distance from top
-      int index = currentNote.indexOf(note);
+//      //specify note distance from top
+//      int index = currentNote.indexOf(note);
+//
+//      // to make tile higher
+//      double myTileHeight = 2 * tileHeight;
+//      double offset =
+//          (3 - index + animation.value) * myTileHeight - 2 * myTileHeight;
 
-      // to make tile higher
-      double myTileHeight = 2 * tileHeight;
-      double offset =
-          (3 - index + animation.value) * myTileHeight - 2 * myTileHeight;
+      // relative index are init when init notes
+      int index = note.index - currentNote[0].index;
+//      debugPrint('note order: ${note.orderNumber} , index: $index');
+
+      // in case some tile longer
+      // we need to make room for tile
+      double myTileHeight = note.height * tileHeight;
+      double additionalSpace = 0;
+      if (note.height == 2) {
+        additionalSpace = tileHeight;
+      } else if (note.height == 3) {
+        additionalSpace = 2 * tileHeight;
+      }
+
+      // in case of 2-tile note has not yet passed all
+      // but new animation reset
+      // so need to add padding for each current note
+      double padding = 0;
+      if (currentNote[0].height > 1 &&
+          currentNote[0].pass > 0 &&
+          currentNote[0].pass < currentNote[0].height) {
+        padding = currentNote[0].pass * tileHeight;
+      }
+
+      // calculate offset
+      double offset = (3 - index) * tileHeight -
+          additionalSpace +
+          animation.value * tileHeight +
+          padding;
 
       return Transform.translate(
         offset: Offset(0, offset),
