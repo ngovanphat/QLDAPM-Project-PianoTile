@@ -14,24 +14,27 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permissions_plugin/permissions_plugin.dart';
 
 
-Future<List<Note>> initNotes(String songName) async{
+Future<List<Note>> initNotes(String notedir) async{
 
-  // check if song already in local
-  // ...
-
-  // if not, download file from firebase storage
+  // firebase storage
   var storage = FirebaseStorage.instance;
-//  StorageReference ref = storage.ref().child('canond.mid.txt');
-  StorageReference ref = storage.ref().child(songName);
+  StorageReference ref = await storage.getReferenceFromUrl(notedir);
 
+  // song name
   var dir = await getExternalStorageDirectory();
   var name = await ref.getName();
   String pathToSave = '${dir.path}/${name}';
 
-  await downloadFile(ref, pathToSave);
+  // check if song already in local folder
+  final File tempFile = File(pathToSave);
+  if (tempFile.existsSync() == false) {
+
+    // if not, download song
+    await downloadFile(ref, pathToSave);
+  }
+
 
   // read file data
-//  String content = await loadAsset('assets/song/jingle_bells.mid.txt');
   String content = await loadFile(pathToSave);
 
   // convert data to list of notes
@@ -166,6 +169,28 @@ Future<List<Note>> convertToNotes(String fileContent) async{
     // end of for
   }
 
+
+
+  // calculate heights for all notes
+  // calculate first note
+  Note note = notes[0];
+  note.index = 0;
+  note.height = 1;
+  int velocityThreshold = 55;
+  if(note.velocityValue[0] < velocityThreshold){
+    note.height = 2;    // take 2 tile
+  }
+
+  // the rest notes based on first note
+  for(var i = 1; i < notes.length; i++){
+    Note postNote = notes[i];
+    postNote.height = 1;
+    if(note.velocityValue[0] < velocityThreshold){
+      postNote.height = 2;
+    }
+
+    postNote.index = notes[i - 1].index + notes[i - 1].height;
+  }
 
 
   return notes;

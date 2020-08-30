@@ -1,48 +1,39 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-class Friend {
+class User {
   String myUID;
-  String friendUID;
   String name;
-  String level;
   String avatar;
-  List<Friend> _friends = [];
+  String email;
+  List<User> _users = [];
   final FirebaseDatabase database = FirebaseDatabase.instance;
 
-  Friend(friendUID, name, level, avatar) {
-    this.friendUID = friendUID;
+  User(myUID, name, avatar, email) {
+    this.myUID = myUID;
     this.name = name;
-    this.level = level;
     this.avatar = avatar;
+    this.email = email;
   }
 
-  List<Friend> getFriendList() {
-    return this._friends;
+  List<User> getFriendList() {
+    return this._users;
   }
 
   String getName() {
     return this.name;
   }
 
+  String getEmail() {
+    return this.email;
+  }
+
   String getMyUID() {
     return this.myUID;
   }
 
-  String getFriendUID() {
-    return this.friendUID;
-  }
-
   void setName(String name) {
     this.name = name;
-  }
-
-  String getLevel() {
-    return this.level;
-  }
-
-  void setLevel(String level) {
-    this.level = level;
   }
 
   String getAvatar() {
@@ -53,14 +44,13 @@ class Friend {
     this.avatar = avatar;
   }
 
-  getUserFriendsListByID() async {
-    _friends.clear();
+  getAllUsers() async {
+    _users.clear();
     final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
     myUID = _user.uid;
     await database
         .reference()
-        .child("Friendships")
-        .child(myUID)
+        .child("Users")
         .once()
         .then(((value) => fromSnapshot(value)));
   }
@@ -68,8 +58,8 @@ class Friend {
   fromSnapshot(DataSnapshot snapshot) {
     try {
       for (var value in snapshot.value.values) {
-        _friends.add(new Friend(
-            value["id"], value["name"], value["lv"], value["avatar"]));
+        _users.add(new User(
+            value["id"], value["name"], value["avatar"], value["email"]));
       }
     } catch (e) {
       //print(e);

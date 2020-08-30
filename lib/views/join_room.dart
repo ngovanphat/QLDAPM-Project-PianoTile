@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:piano_tile/model/room.dart';
 import 'package:piano_tile/model/widget.dart';
+import 'package:piano_tile/views/game_play_online.dart';
+import 'package:piano_tile/views/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JoinRoom extends StatefulWidget {
   final String roomKey;
@@ -27,10 +30,18 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
     room =  new Room(key,'','','','','');
     await room.getRoomByID(key);
     user = await FirebaseAuth.instance.currentUser();
+    await savePreferences(userId: user.displayName,roomId: widget.roomKey,isHost: false);
     setState(() {
       print("load done");
       isLoading = false;
     });
+  }
+  Future<void> savePreferences(
+      {String userId, String roomId, bool isHost}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('userId', userId);
+    prefs.setString('roomId', roomId);
+    prefs.setBool('isRoomHost', isHost);
   }
 
   @override
@@ -39,17 +50,6 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
     animationController = new AnimationController(vsync: this, duration: Duration(seconds: 1))..repeat();
     //print(widget.roomKey+" is room key");
     loadRoom(widget.roomKey);
-  }
-
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    room.removeUserByName(user.displayName);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     try
     {
       Timer.periodic(Duration(seconds: 10), (timer) {
@@ -57,10 +57,30 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
         setState(() {
           isInRoom = true;
         });
+        if (room.usernameOne == '')
+          Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) => Home()
+          ));
+        else if (room.isPlaying == true)
+          Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) => GamePlayOnline()
+          ));
       });
     }catch(e){
       print(e);
     }
+  }
+
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    animationController.dispose();
+    room.removeUserByName(user.displayName);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return isLoading ? Container(
       color: Colors.white,
       child: Center(
@@ -78,15 +98,14 @@ class _JoinRoomState extends State<JoinRoom> with SingleTickerProviderStateMixin
           fit: StackFit.passthrough,
           children: [
             Image.asset('assets/images/background.jpg', fit: BoxFit.fill),
-            RowOnTop(context, 0, 0),
             Container(
-                margin: EdgeInsets.only(top: 70),
+                margin: EdgeInsets.only(top: 30),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        margin: EdgeInsets.only(bottom: 20),
+                        margin: EdgeInsets.only(bottom: 50),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[

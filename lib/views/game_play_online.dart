@@ -89,7 +89,7 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
 
       // find  username<order> of me
       currentUsernameKey = findUsernameKey(rows, currentUsername);
-      print('[game_play_online] usernameKey: $currentUsernameKey');
+      print('[game_play_online] usernameKey: $currentUsername');
 
       if(currentUsernameKey == null || currentUsernameKey == ''){
         // this means room is full
@@ -141,8 +141,11 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
       var username = rows[listUsernameKey[i]];
 
       if(username == currentUsername){
+        print(username);
         return listUsernameKey[i];
+
       }
+
     }
     return null;
 
@@ -323,7 +326,7 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
   }
 
   @override
-  void showFinishDialog() {
+  void showFinishDialog({String status}) async {
 
     calculateFinalRank().then((value) {
 
@@ -348,7 +351,10 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
             ),
             actions: <Widget>[
               FlatButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+
+                  Navigator.of(context).pop();
+                },
                 child: Text("OK"),
               )
             ],
@@ -360,6 +366,7 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
         doCleanUp();
 
         // return to previous page
+        refRoom.child(roomName).child("isPlaying").set(false);
         Navigator.pop(context);
 
       });
@@ -373,6 +380,13 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline>{
 
     // un-subscribe listening to room changes
     subscriptionPoints.cancel();
+  }
+
+
+  // disable pause in online-mode
+  @override
+  pauseButton() {
+    return Container();
   }
 
 }
