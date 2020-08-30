@@ -149,6 +149,17 @@ class SongDAO {
           }).toList();
         }
         break;
+      case "Highscore":
+        {
+        final finder = Finder(filter: Filter.greaterThan("highscore", 0),sortOrders: [SortOrder('id')]);
+        final recordSnapshot =
+        await _songFolder.find(await _db, finder: finder);
+        return recordSnapshot.map((snapshot) {
+          final song = Song.fromJson(snapshot.value);
+          return song;
+        }).toList();
+        }
+        break;
       default: //all
         {
           final recordSnapshot = await _songFolder.find(await _db);
@@ -162,32 +173,4 @@ class SongDAO {
   }
 }
 
-class FavoriteDAO {
-  static const String folderName = "favoriteSongs";
-  final _songFolder = intMapStoreFactory.store(folderName);
 
-  Future<Database> get _db async => await AppDatabase.instance.database;
-
-  Future insertSong(Song song) async {
-    await _songFolder.add(await _db, song.toJson());
-    print('Song Inserted successfully !!');
-  }
-
-  Future updateSong(Song song) async {
-    final finder = Finder(filter: Filter.byKey(song.id));
-    await _songFolder.update(await _db, song.toJson(), finder: finder);
-  }
-
-  Future delete(Song song) async {
-    final finder = Finder(filter: Filter.byKey(song.id));
-    await _songFolder.delete(await _db, finder: finder);
-  }
-
-  Future<List<Song>> getAllSongs() async {
-    final recordSnapshot = await _songFolder.find(await _db);
-    return recordSnapshot.map((snapshot) {
-      final song = Song.fromJson(snapshot.value);
-      return song;
-    }).toList();
-  }
-}

@@ -93,10 +93,6 @@ class Song {
         "isFavorited": isFavorited,
       };
 
-  void fetchHighscore(userID) {
-    //TODO get highscore from database
-  }
-  void fetchFavorite(userID) {}
   int getHighscore() {
     return this.highscore;
   }
@@ -105,7 +101,7 @@ class Song {
     return this.isFavorited;
   }
 
-  Future<int> setHighscore(newHighscore) async {
+  Future<int> setDBHighscore(newHighscore) async {
     //TODO write new highscore to database
     if (this.highscore > newHighscore) return 1;
     try {
@@ -114,19 +110,31 @@ class Song {
       songDAO.updateSong(this);
       final FirebaseAuth auth = FirebaseAuth.instance;
       final FirebaseUser user = await auth.currentUser();
-      final uid = user.uid;
-      var db = FirebaseDatabase.instance.reference().child("HighScores/" + uid);
-      await db
-          .child("/" + this.name)
-          .update({'score': this.highscore, 'updateAt': Timestamp.now()});
-
+      if(user!=null){
+        final uid = user.uid;
+        var db = FirebaseDatabase.instance.reference().child("HighScores/" + uid);
+        await db
+            .child(this.id)
+            .update(newHighscore);
+      }
       return 0;
     } catch (e) {
       debugPrint(e.toString());
-      return 0;
+      return -1;
     }
   }
+  void setHighscore(newHighscore){
+    if (this.highscore > newHighscore) return;
+    this.highscore=newHighscore;
+  }
 
+  Future<int> setLocalHighscore(newHighscore) async {
+    //TODO write new highscore to database
+    if (this.highscore >= newHighscore) return 1;
+    this.highscore=newHighscore;
+    await songDAO.updateSong(this);
+    return 0;
+  }
   void setFavorite(bool newState) {
     this.isFavorited = newState;
   }
@@ -139,3 +147,4 @@ class Song {
     else return "";
   }
 }
+
