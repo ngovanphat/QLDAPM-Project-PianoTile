@@ -28,7 +28,8 @@ vd :01VN, 01VNDB,...
 */
 
 Map<int,GlobalKey> bodyKeys ={
-0:GlobalKey(),1:GlobalKey(),2:GlobalKey()};
+0:GlobalKey(),1:GlobalKey(),2:GlobalKey()
+};
 
 List<List<Song>> allSongs = new List.filled(3, []);
 List<String> favorites = [];
@@ -96,10 +97,7 @@ class _MusicListState extends State<MusicList> {
                       child: Stack(fit: StackFit.passthrough, children: [
                         Image.asset('assets/images/background.jpg',
                             fit: BoxFit.cover),
-                        RowOnTop(context, 0, 0),
                         Container(
-                          margin: EdgeInsets.only(
-                              top: displayHeight(context) * 0.08),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -108,14 +106,9 @@ class _MusicListState extends State<MusicList> {
                                 child: TabBarView(
                                   children: [
                                     Container(
-                                        child: BodyLayout(
-
-                                          key:bodyKeys[0],tabIndex: 0,
-                                      songs: allSongs[0],
-                                    )),
+                                        child: BodyLayout(key:bodyKeys[0],tabIndex: 0, songs: allSongs[0],)),
                                     Container(
-                                        child: BodyLayout(
-                                            key:bodyKeys[1],tabIndex: 1, songs: allSongs[1])),
+                                        child: BodyLayout(key:bodyKeys[1],tabIndex: 1, songs: allSongs[1])),
                                     Container(
                                         child: BodyLayout(key:bodyKeys[2],tabIndex: 2, songs: allSongs[2])),
                                   ],

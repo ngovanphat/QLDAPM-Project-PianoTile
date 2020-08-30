@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/all_users.dart';
 import 'package:piano_tile/views/friends_list.dart';
@@ -25,6 +26,7 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIOverlays([]);
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -34,9 +36,7 @@ class _ProfileState extends State<Profile> {
             fit: StackFit.passthrough,
             children: [
               Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
-              RowOnTop(context, 0, 0),
               Container(
-                margin: EdgeInsets.only(top: 50),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,

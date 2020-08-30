@@ -45,6 +45,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
   // song info
 //  String songName = 'canond.mid.txt';
   String songName = 'tim_lai_bau_troi.mid.txt';
+  //TODO: change song to play here
   int levelRequired = 0;
   int expReward = 0;
   int hard = 0;
