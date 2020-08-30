@@ -14,11 +14,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permissions_plugin/permissions_plugin.dart';
 
 
-Future<List<Note>> initNotes(String songName) async{
+Future<List<Note>> initNotes(String notedir) async{
 
   // firebase storage
   var storage = FirebaseStorage.instance;
-  StorageReference ref = storage.ref().child(songName);
+  StorageReference ref = await storage.getReferenceFromUrl(notedir);
 
   // song name
   var dir = await getExternalStorageDirectory();
