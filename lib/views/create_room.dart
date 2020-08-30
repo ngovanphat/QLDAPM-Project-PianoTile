@@ -18,7 +18,6 @@ import 'package:piano_tile/model/custom_expansion_panel.dart'
 import 'package:piano_tile/model/Song.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class CreateRoom extends StatefulWidget {
   @override
@@ -237,7 +236,7 @@ class _CreateRoomState extends State<CreateRoom>
                                 Container(
                                   margin: EdgeInsets.only(top: 10),
                                   child: Text(
-                                    '${musicName}',
+                                    '${room.musicName}',
                                     style: TextStyle(
                                         fontSize: 30,
                                         color: Colors.white,
@@ -271,9 +270,7 @@ class _CreateRoomState extends State<CreateRoom>
                                                           return GestureDetector(
                                                               onTap: () {
                                                                 setState(() {
-                                                                  musicName = songs[
-                                                                          index]
-                                                                      .getName();
+                                                                  musicName = songs[index].getName();
                                                                 });
                                                                 Navigator.of(
                                                                         context)
