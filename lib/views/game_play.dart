@@ -1,8 +1,10 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 
 // import lib of us
 import 'package:audioplayers/audio_cache.dart';
 import 'package:piano_tile/helper/song_provider.dart';
+import 'package:piano_tile/model/ad_manager.dart';
 import 'package:piano_tile/model/Song.dart';
 import 'package:piano_tile/model/note.dart';
 import 'package:piano_tile/model/line_divider.dart';
@@ -32,6 +34,15 @@ class GamePlayState<T extends GamePlay> extends State<T>
   bool hasStarted = false;
   bool isPlaying = true;
   bool ispause = false;
+  bool isRewardedAdReady;
+  bool ad_loaded = false;
+  MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    keywords: <String>['flutterio', 'beautiful apps'],
+    contentUrl: 'https://flutter.io',
+    childDirected: false,
+    testDevices: <String>[], // Android emulators are considered test devices
+  );
+
   Song song;
   // midi player
   FlutterMidi midi = new FlutterMidi();
@@ -118,6 +129,36 @@ class GamePlayState<T extends GamePlay> extends State<T>
   @override
   void initState() {
     super.initState();
+
+    isRewardedAdReady = false;
+
+    // TODO: Set Rewarded Ad event listener
+    RewardedVideoAd.instance.listener = _onRewardedAdEvent;
+
+    // TODO: Load a Rewarded Ad
+    _loadRewardedAd();
+
+    RewardedVideoAd.instance
+        .load(adUnitId: RewardedVideoAd.testAdUnitId, targetingInfo: targetingInfo)
+        .catchError((e) => print("error in loading 1st time"))
+        .then((v) => setState(() => ad_loaded = v));
+
+    // ad listener
+    RewardedVideoAd.instance.listener = (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
+      if (event == RewardedVideoAdEvent.closed) {
+        RewardedVideoAd.instance
+            .load(adUnitId: RewardedVideoAd.testAdUnitId, targetingInfo: targetingInfo)
+            .catchError((e) => print("error in loading again"))
+            .then((v) => setState(() => ad_loaded = v));
+      }
+    };
+    // init notes
+//    initNotes().then((value) {
+//      notes = value;
+//      setState(() {});
+//      print('success loading notes');
+//      print('length: ${notes.length}');
+//    });
     song = widget.song;
     if (song == null) {
       //for home page song
@@ -247,6 +288,41 @@ class GamePlayState<T extends GamePlay> extends State<T>
     animationController.reset();
   }
 
+  void _loadRewardedAd() {
+    RewardedVideoAd.instance.load(
+      targetingInfo: MobileAdTargetingInfo(),
+      adUnitId: AdManager.rewardedAdUnitId,
+    );
+  }
+
+  void _onRewardedAdEvent(RewardedVideoAdEvent event,
+      {String rewardType, int rewardAmount}) {
+    switch (event) {
+      case RewardedVideoAdEvent.loaded:
+        setState(() {
+          isRewardedAdReady = true;
+        });
+        break;
+      case RewardedVideoAdEvent.closed:
+        setState(() {
+          isRewardedAdReady = false;
+        });
+        _loadRewardedAd();
+        break;
+      case RewardedVideoAdEvent.failedToLoad:
+        setState(() {
+          isRewardedAdReady = false;
+        });
+        print('Failed to load a rewarded ad');
+        break;
+      case RewardedVideoAdEvent.rewarded:
+        print('recover');
+        break;
+      default:
+      // do nothing
+    }
+  }
+
   void showFinishDialog({String status}) async {
     if (status == "game_over") {
       // ask user if wan to recover game with ads, gems
@@ -271,8 +347,13 @@ class GamePlayState<T extends GamePlay> extends State<T>
             title: Text("Score: $points"),
             actions: <Widget>[
               FlatButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text("Recover with ads")),
+                  onPressed: () async {
+                  Navigator.pop(context);
+                  await RewardedVideoAd.instance.show().catchError((e) => print("error in showing ad: ${e.toString()}"));
+                  setState(() => ad_loaded = false);
+                  },
+                child: Text("Recover with ads")
+              ),
               FlatButton(
                   onPressed: () {
                     Navigator.of(context).pop();

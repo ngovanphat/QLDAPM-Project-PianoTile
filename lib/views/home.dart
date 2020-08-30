@@ -11,6 +11,8 @@ import 'package:piano_tile/views/logged_in_profile.dart';
 import 'package:piano_tile/views/profile.dart';
 import 'package:piano_tile/views/music_list.dart';
 import 'package:piano_tile/views/create_room.dart';
+import 'package:piano_tile/model/ad_manager.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:piano_tile/model/room.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
@@ -46,6 +48,11 @@ class _HomeState extends State<Home>
   FirebaseUser user;
   Future<void> getUser() async {
     user = await FirebaseAuth.instance.currentUser();
+  }
+
+  Future<void> _initAdMob() {
+    // TODO: Initialize AdMob SDK
+    return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
   }
 
   @override

@@ -13,9 +13,9 @@ class AdManager {
 
   static String get rewardedAdUnitId {
     if (Platform.isAndroid) {
-      return "ca-app-pub-6269523505662670/2054033333";
+      return "ca-app-pub-3940256099942544/8673189370";
     } else if (Platform.isIOS) {
-      return "ca-app-pub-6269523505662670/8459675495";
+      return "ca-app-pub-3940256099942544/7552160883";
     } else {
       throw new UnsupportedError("Unsupported platform");
     }
