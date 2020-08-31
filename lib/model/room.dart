@@ -62,10 +62,12 @@ class Room {
       usernameThree = '';
     else if (usernameFour == username) usernameFour = '';
     updateToDatabase(keyOfRoom);
-    if (usernameOne == '' &&
-        usernameTwo == '' &&
-        usernameThree == '' &&
-        usernameFour == '') removeRoom();
+
+    // no need to delete just leave room there for easier testing
+//    if (usernameOne == '' &&
+//        usernameTwo == '' &&
+//        usernameThree == '' &&
+//        usernameFour == '') removeRoom();
   }
 
   removeRoom() {

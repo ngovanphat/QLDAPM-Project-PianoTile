@@ -480,7 +480,7 @@ class _HomeState extends State<Home>
                                                                       padding: const EdgeInsets
                                                                               .only(
                                                                           top:
-                                                                              40),
+                                                                              20),
                                                                     ),
                                                                     FlatButton(
                                                                       color: Colors
