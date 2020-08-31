@@ -13,6 +13,7 @@ import 'package:piano_tile/model/pause_menu.dart';
 import 'package:flutter_midi/flutter_midi.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:piano_tile/views/home.dart';
 import 'package:piano_tile/views/music_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
@@ -433,7 +434,8 @@ class GamePlayState<T extends GamePlay> extends State<T>
     }
     print('[game_play] Score: $points\nExp: $newExp\nGem: $newGem'
         '\nLevel: $newLevel\nNext exp: $newNextExp');
-
+    song.setDBHighscore(points);
+    song.setLocalHighscore(points);
     // show
     String resultString = "Score: $points\nExp: +$expGot";
     if (isLevelUp) {
@@ -454,7 +456,9 @@ class GamePlayState<T extends GamePlay> extends State<T>
               FlatButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.pop(context);
+                  Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) => Home()
+                  ));
                 },
                 child: Text("Go Home"),
               ),
