@@ -3,190 +3,160 @@
     "id": "00NN",
     "name": "Little Star",
     "artists": "English Folk Song",
-    "dificulty": 1,
+    "difficulty": 1,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/little_star.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/little_star.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "01NN",
     "name": "Canon D",
     "artists": "Pachelbel",
-    "dificulty": 2,
+    "difficulty": 2,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/canond.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/canond.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "02NN",
     "name": "The Blue Danube",
     "artists": "Johann Strauss II",
-    "dificulty": 5,
+    "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/the_blue_danube.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/the_blue_danube.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "03NN",
     "name": "Shining the morning",
     "artists": "Se yong Jang",
-    "dificulty": 4,
+    "difficulty": 4,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/shining_the_morning.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/shining_the_morning.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "04NN",
     "name": "Bluestone Alley",
     "artists": "Congfei Wei",
-    "dificulty": 3,
+    "difficulty": 3,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/bluestone_alley.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/bluestone_alley.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "05NN",
     "name": "Beyer No.8",
     "artists": "Ferdinand Beyer",
-    "dificulty": 3,
+    "difficulty": 3,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/beyer_8.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/beyer_8.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "06NN",
     "name": "Two Tigers",
     "artists": "Chinese children song",
-    "dificulty": 1,
+    "difficulty": 1,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/two_tigers.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/two_tigers.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "07NN",
     "name": "Fur Elise",
     "artists": "Chinese children song",
-    "dificulty": 1,
+    "difficulty": 1,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/elise.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/elise.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "08NN",
-    "name": "We wish you a merry Christmas",
-    "artists": "Christmas Carol",
-    "dificulty": 1,
+    "name": "Happy New Year",
+    "artists": "ABBA",
+    "difficulty": 4,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/we_wish_you_a_merry_christmas.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/happy_new_year.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "09NN",
-    "name": "Jingle Bells",
-    "artists": "James Lord Pierpont",
-    "dificulty": 1,
+    "name": "Reverie",
+    "artists": "C.Debussy",
+    "difficulty": 4,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/jingle_bells.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/reverie.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "10NN",
-    "name": "Happy New Year",
-    "artists": "ABBA",
-    "dificulty": 4,
+    "name": "Love",
+    "artists": "",
+    "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/happy_new_year.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/love.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "11NN",
-    "name": "Reverie",
-    "artists": "C.Debussy",
-    "dificulty": 4,
-    "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/reverie.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
-  },
-  {
-    "id": "12NN",
-    "name": "Love",
-    "artists": "",
-    "dificulty": 5,
-    "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/love.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
-  },
-  {
-    "id": "13NN",
     "name": "November",
     "artists": "",
-    "dificulty": 3,
+    "difficulty": 3,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/november.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/november.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "00VN",
     "name": "Sau Tất Cả",
     "artists": "Erik",
-    "dificulty": 5,
+    "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/sau_tat_ca.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/sau_tat_ca.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "01VN",
     "name": "Tình Thôi Xót Xa",
     "artists": "Lam Trường",
-    "dificulty": 5,
+    "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/tinh_thoi_xot_xa.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/tinh_thoi_xot_xa.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "02VN",
     "name": "Thời Gian Sẽ Trả Lời",
     "artists": "JustAtee, Big Daddy, Tiên Cookie",
-    "dificulty": 5,
+    "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/thoi_gian_se_tra_loi.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/thoi_gian_se_tra_loi.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   },
   {
     "id": "03VN",
     "name": "Người Ấy",
     "artists": "Trịnh Thăng Bình",
-    "dificulty": 5,
+    "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/nguoi_ay.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
-  },
-  {
-    "id": "04VN",
-    "name": "Tìm Lại Bầu Trời",
-    "artists": "Tuấn Hưng",
-    "dificulty": 5,
-    "image": "assets/images/music-note.png",
-    "note_dir": "assets/song/tim_lai_bau_troi.mid.txt",
-    "high_score": 0,
-    "is_favorited": false
+    "notes_dir": "assets/song/nguoi_ay.mid.txt",
+    "highscore": 0,
+    "isFavorited": false
   }
 ]
