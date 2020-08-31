@@ -32,43 +32,6 @@ class PauseButton extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
-                                Icon(Icons.play_arrow,
-                                    color: Colors.white, size: 50),
-                                Text(
-                                  "Resume",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 14),
-                                )
-                              ],
-                            ),
-                            onPressed: () {
-                              onResumePressed(true);
-                              Navigator.of(context).pop();
-                            }),
-                        Padding(padding: const EdgeInsets.only(top: 30)),
-                        new FlatButton(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Icon(Icons.refresh,
-                                    color: Colors.white, size: 50),
-                                Text(
-                                  "Restart",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 14),
-                                )
-                              ],
-                            ),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            }),
-                        Padding(padding: const EdgeInsets.only(top: 30)),
-                        new FlatButton(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
                                 Icon(Icons.clear,
                                     color: Colors.white, size: 50),
                                 Text(
