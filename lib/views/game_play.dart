@@ -175,6 +175,11 @@ class GamePlayState<T extends GamePlay> extends State<T>
     });
 
     // milli-second = time to pass a single tile (1/4 screen)
+    setAnimationController();
+  }
+
+
+  setAnimationController(){
     animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
 
@@ -351,6 +356,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
                   Navigator.pop(context);
                   await RewardedVideoAd.instance.show().catchError((e) => print("error in showing ad: ${e.toString()}"));
                   setState(() => ad_loaded = false);
+                  recoverNoteMissed();
                   },
                 child: Text("Recover with ads")
               ),
@@ -444,13 +450,6 @@ class GamePlayState<T extends GamePlay> extends State<T>
                 onPressed: () => Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => MusicList())),
                 child: Text("Play another song"),
-              ),
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  restart();
-                },
-                child: Text("Restart"),
               ),
               FlatButton(
                 onPressed: () {
