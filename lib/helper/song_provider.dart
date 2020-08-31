@@ -155,7 +155,7 @@ Future<List<Note>> convertToNotes(String fileContent) async {
   Note note = notes[0];
   note.index = 0;
   note.height = 1;
-  int velocityThreshold = 55;
+  int velocityThreshold = 40;
   if (note.velocityValue[0] < velocityThreshold) {
     note.height = 2; // take 2 tile
   }
