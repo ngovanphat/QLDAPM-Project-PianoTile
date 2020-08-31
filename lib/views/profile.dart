@@ -11,7 +11,8 @@ import 'package:piano_tile/views/home.dart';
 import 'package:piano_tile/views/logged_in_profile.dart';
 import 'package:piano_tile/model/friend.dart';
 import 'package:random_string/random_string.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
 
 
 String name = "", email = "", imageUrl = "", text = "", id = "";
@@ -498,14 +499,71 @@ Future<FirebaseUser> _handleSignIn(BuildContext context) async {
     user = (await _auth.signInWithCredential(credential)).user;
     print('[profile] got user: $user');
 
-    database.reference().child("Users").child(user.uid).set({
+//    database.reference().child("Users").child(user.uid).set({
+    database.reference().child("Users").child(user.uid).update({
       "id": user.uid,
       "name": user.displayName,
       "avatar": user.photoUrl,
       "email": user.email,
     });
 
+    // save user info to preferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt(sharedPrefKeys.userType, sharedPrefValues.USER);
+    prefs.setString(sharedPrefKeys.getIdKey(), user.uid);
+    prefs.setString(sharedPrefKeys.getNameKey(), user.displayName);
 
+    // get user's exp, gem
+    DataSnapshot user1 = await FirebaseDatabase.instance
+        .reference()
+        .child('Users/${user.uid}')
+        .once();
+    Map<dynamic, dynamic> rows = user1.value;
+    if(rows['exp'] == null || rows['exp'] == 0){
+
+      print('[profile] new user, adding some first time rewards...');
+      // new user
+      // add some reward exp and gems
+      FirebaseDatabase.instance
+          .reference()
+          .child('Users/${user.uid}')
+          .update({'exp': 100, 'gem': 100});
+    }
+
+    // store to preferences
+    user1 = await FirebaseDatabase.instance
+        .reference()
+        .child('Users/${user.uid}')
+        .once();
+    rows = user1.value;
+    int exp = rows['exp'];
+    int gem = rows['gem'];
+
+    // resolve level and next exp
+    int levelValue = 1;
+    int nextExpValue = 0;
+    DataSnapshot data = await FirebaseDatabase.instance
+        .reference()
+        .child('levelDefinition')
+        .once();
+    List<dynamic> levels = data.value;
+    for (int i = 0; i < levels.length; i++) {
+      Map<dynamic, dynamic> level = levels[i];
+      if (level['expRequired'] > exp) {
+        levelValue = level['level'] - 1;
+        nextExpValue = level['expRequired'];
+        break;
+      }
+    }
+    print('[profile] level: $levelValue, next exp: $nextExpValue');
+
+    prefs.setInt(sharedPrefKeys.getExpKey(), exp);
+    prefs.setInt(sharedPrefKeys.getGemKey(), gem);
+    prefs.setInt(sharedPrefKeys.getLevelKey(), levelValue);
+    prefs.setInt(sharedPrefKeys.getNextExpKey(), nextExpValue);
+
+
+    // show home page
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
@@ -513,6 +571,8 @@ Future<FirebaseUser> _handleSignIn(BuildContext context) async {
         },
       ),
     );
+
+
   }
 
   assignUserElements();

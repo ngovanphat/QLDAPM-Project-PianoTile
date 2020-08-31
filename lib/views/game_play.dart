@@ -424,7 +424,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
     if (prefs.getInt(sharedPrefKeys.userType) == sharedPrefValues.USER) {
       String id = prefs.getString(sharedPrefKeys.getIdKey());
       DatabaseReference user =
-          FirebaseDatabase.instance.reference().child('account/$id');
+          FirebaseDatabase.instance.reference().child('Users/$id');
       user.update({'exp': newExp});
       user.update({'gem': newGem});
     }
@@ -501,7 +501,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
     String userId = prefs.getString(sharedPrefKeys.getIdKey());
     FirebaseDatabase.instance
         .reference()
-        .child('account/$userId')
+        .child('Users/$userId')
         .update({'gem': currentGems});
 
     // show result
