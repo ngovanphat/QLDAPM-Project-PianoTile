@@ -23,7 +23,7 @@ class _AllUsersState extends State<AllUsers> {
   loadUsers() async {
     _users.clear();
     await user.getAllUsers();
-    _users = user.getFriendList();
+    _users = user.getUserList();
 
     _friends.clear();
     await friend.getUserFriendsListByID();
@@ -37,6 +37,32 @@ class _AllUsersState extends State<AllUsers> {
           .removeWhere((item) => item.getMyUID() == _friends[i].getFriendUID());
     }
 
+    for (int i = 0; i < _users.length; i++) {
+      _users[i].setColor(Colors.white24);
+    }
+
+    await database
+        .reference()
+        .child("FriendRequest")
+        .child(myUID)
+        .once()
+        .then((value) {
+      try {
+        for (var val in value.value.values) {
+          String temp = val["request_type"];
+          if (temp == 'received') {
+            for (int i = 0; i < _users.length; i++) {
+              if ('(' + _users[i].getMyUID() + ')' ==
+                  value.value.keys.toString())
+                _users[i].setColor(Color(0xff004d00));
+            }
+          }
+        }
+      } catch (e) {
+        //print(e);
+      }
+    });
+
     return _users;
   }
 
@@ -49,7 +75,13 @@ class _AllUsersState extends State<AllUsers> {
           return AddFriendProfile(user: user, myUID: myUID);
         },
       ),
-    );
+    ).then((value) {
+      setState(() {
+        for (int i = 0; i < _users.length; i++) {
+          _users[i].setColor(Colors.white24);
+        }
+      });
+    });
   }
 
   Widget _buildFriendListTile(BuildContext context, int index) {
@@ -89,7 +121,7 @@ class _AllUsersState extends State<AllUsers> {
           'Profile',
           style: TextStyle(fontSize: 14, color: Colors.white),
         ),
-        color: Colors.white24,
+        color: user.getColor(),
         onPressed: () {
           toProfile(index);
         },

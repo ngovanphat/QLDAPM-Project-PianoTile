@@ -20,7 +20,7 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
   final FirebaseDatabase database = FirebaseDatabase.instance;
 
   Widget requestButton, declineButton;
-  bool isVisible = false;
+  bool isVisibleDec = false, isVisibleAcc = true;
   String state = 'not_friends';
   String text = 'SEND FRIEND REQUEST';
 
@@ -42,14 +42,27 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
           } else if (temp == 'received') {
             state = 'request_received';
             text = 'ACCEPT FRIEND REQUEST';
-            isVisible = true;
+            isVisibleDec = true;
           }
         } catch (e) {
-          //state = 'friends';
-          //text = 'WE ARE FRIENDS!';
           //print(e);
         }
       });
+
+//      await database
+//          .reference()
+//          .child("Friendships")
+//          .child(widget.myUID)
+//          .child(widget.user.getMyUID())
+//          .once()
+//          .then((value) {
+//        try {
+//          String temp = value.value["id"];
+//          if (temp == widget.user.getMyUID()) isVisibleAcc = false;
+//        } catch (e) {
+//          //print(e);
+//        }
+//      });
     } catch (e) {
       //print(e);
     }
@@ -132,6 +145,9 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
 
       state = 'friends';
       text = 'WE ARE FRIENDS!';
+
+      isVisibleAcc = false;
+      isVisibleDec = false;
     }
   }
 
@@ -153,7 +169,7 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
     state = 'not_friends';
     text = 'SEND FRIEND REQUEST';
 
-    isVisible = false;
+    isVisibleDec = false;
   }
 
   @override
@@ -231,29 +247,32 @@ class _AddFriendProfileState extends State<AddFriendProfile> {
                                   fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 40),
-                            requestButton = SizedBox(
-                              width: 300,
-                              height: 50,
-                              child: new FlatButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(2),
+                            requestButton = Visibility(
+                              visible: isVisibleAcc,
+                              child: SizedBox(
+                                width: 300,
+                                height: 50,
+                                child: new FlatButton(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                  child: Text(
+                                    text,
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                  color: Color(0xff004d00),
+                                  onPressed: () {
+                                    setState(() {
+                                      handleFriendRequest();
+                                    });
+                                  },
                                 ),
-                                child: Text(
-                                  text,
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                ),
-                                color: Color(0xff004d00),
-                                onPressed: () {
-                                  setState(() {
-                                    handleFriendRequest();
-                                  });
-                                },
                               ),
                             ),
                             SizedBox(height: 20),
                             declineButton = Visibility(
-                              visible: isVisible,
+                              visible: isVisibleDec,
                               child: SizedBox(
                                 width: 300,
                                 height: 50,

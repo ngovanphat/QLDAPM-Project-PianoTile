@@ -102,45 +102,62 @@ class GemShopState extends State<GemShop> {
 //    );
 
     return Scaffold(
+      appBar: new AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        backgroundColor: const Color(0xff004466),
+        title: new Text('SHOP'),
+      ),
       backgroundColor: const Color(0xff004466),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        child: Stack(
-          fit: StackFit.passthrough,
-          children: [
-            Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
-            Column(
-              children: <Widget>[
-                Row(children: <Widget>[
-                  Image.asset(
-                    'assets/images/basket.png',
-                    width: 70,
-                    height: 70,
+      body: SafeArea(
+        child: Container(
+          height: double.infinity,
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: [
+              Image.asset('assets/images/background.jpg', fit: BoxFit.cover),
+              Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          Image.asset(
+                            'assets/images/basket.png',
+                            width: 70,
+                            height: 70,
+                          ),
+                          Text('GEMS SHOP',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 38,
+                                  color: Colors.white)),
+                        ]),
                   ),
-                  Text('Gem Shop',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 48,
-                          color: Colors.white)),
-                ]),
-                FutureBuilder<String>(
-                    future: taskMakeCard,
-                    builder:
-                        (BuildContext context, AsyncSnapshot<String> snapshot) {
-                      if (snapshot.hasData && snapshot.data == 'done') {
-                        return Column(
-                          children: listCard,
-                        );
-                      } else {
-                        return Center(
-                          child: Text('The Enchanted Nightingale'),
-                        );
-                      }
-                    }),
-              ],
-            ),
-          ],
+                  FutureBuilder<String>(
+                      future: taskMakeCard,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<String> snapshot) {
+                        if (snapshot.hasData && snapshot.data == 'done') {
+                          return Column(
+                            children: listCard,
+                          );
+                        } else {
+                          return Center(
+                            child: Text('The Enchanted Nightingale'),
+                          );
+                        }
+                      }),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

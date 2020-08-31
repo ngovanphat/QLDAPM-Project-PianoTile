@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -6,6 +7,7 @@ class User {
   String name;
   String avatar;
   String email;
+  Color color;
   List<User> _users = [];
   final FirebaseDatabase database = FirebaseDatabase.instance;
 
@@ -16,7 +18,7 @@ class User {
     this.email = email;
   }
 
-  List<User> getFriendList() {
+  List<User> getUserList() {
     return this._users;
   }
 
@@ -30,6 +32,14 @@ class User {
 
   String getMyUID() {
     return this.myUID;
+  }
+
+  void setColor(Color color) {
+    this.color = color;
+  }
+
+  Color getColor() {
+    return this.color;
   }
 
   void setName(String name) {

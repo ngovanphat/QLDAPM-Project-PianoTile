@@ -34,6 +34,7 @@ class PauseButton extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
+
                                 Icon(Icons.play_arrow,
                                     color: Colors.white, size: 50),
                                 Text(
@@ -72,6 +73,7 @@ class PauseButton extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
+
                                 Icon(Icons.clear,
                                     color: Colors.white, size: 50),
                                 Text(

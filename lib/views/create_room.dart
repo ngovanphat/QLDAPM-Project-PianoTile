@@ -157,235 +157,244 @@ class _CreateRoomState extends State<CreateRoom>
             ),
           )
         : Scaffold(
+            appBar: new AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              backgroundColor: const Color(0xff004466),
+              title: new Text('WAITING ROOM'),
+            ),
             backgroundColor: const Color(0xff004466),
-            body: Container(
-              height: MediaQuery.of(context).size.height,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.passthrough,
-                children: [
-                  Image.asset('assets/images/background.jpg', fit: BoxFit.fill),
-                  Container(
-                      margin: EdgeInsets.only(top: 30),
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(bottom: 50),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    'ROOM ID: ${room.keyOfRoom}',
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
-                              ),
-                            ),
-                            AnimatedBuilder(
-                              animation: _animationController,
-                              builder: (_, child) {
-                                return Transform.rotate(
-                                  angle: _animationController.value * 1 * 3.14,
-                                  child: child,
-                                );
-                              },
-                              child: Image.asset('assets/images/disk.png'),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  child: Text(
-                                    '${room.musicName}',
-                                    style: TextStyle(
-                                        fontSize: 30,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
+            body: SafeArea(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.passthrough,
+                  children: [
+                    Image.asset('assets/images/background.jpg',
+                        fit: BoxFit.fill),
+                    Container(
+                        margin: EdgeInsets.only(top: 30),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(bottom: 50),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      'ROOM ID: ${room.keyOfRoom}',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
                                 ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 13),
-                                  child: IconButton(
-                                    icon: Icon(Icons.arrow_drop_down_circle),
-                                    tooltip: 'Open Music List',
-                                    onPressed: () async {
-                                      songs = await getSongs();
-                                      showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              title: Text('Select song'),
-                                              scrollable: true,
-                                              content: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: <Widget>[
-                                                    Container(
-                                                      height: 700.0,
-                                                      width: 600.0,
-                                                      child: ListView.builder(
-                                                        itemCount: songs.length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          return GestureDetector(
-                                                              onTap: () {
-                                                                onChooseMusic(
-                                                                    songs[index]
-                                                                        .getName());
-                                                              },
-                                                              child: Card(
-                                                                child: ListTile(
-                                                                  isThreeLine:
-                                                                      true,
-                                                                  leading:
-                                                                      Container(
-                                                                    height: double
-                                                                        .infinity,
-                                                                    child:
-                                                                        ImageIcon(
-                                                                      AssetImage(
-                                                                          songs[index]
-                                                                              .getImage()),
-                                                                      size: 50,
-                                                                      color: Color(
-                                                                          0xFF3A5A98),
-                                                                    ), //replaced by image if available
-                                                                  ),
-                                                                  title: Text(songs[
-                                                                          index]
-                                                                      .getName()),
-                                                                  subtitle:
-                                                                      Container(
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: <
-                                                                          Widget>[
-                                                                        Flexible(
-                                                                          flex:
-                                                                              3,
-                                                                          child:
-                                                                              Container(
-                                                                            height:
-                                                                                30,
+                              ),
+                              AnimatedBuilder(
+                                animation: _animationController,
+                                builder: (_, child) {
+                                  return Transform.rotate(
+                                    angle:
+                                        _animationController.value * 1 * 3.14,
+                                    child: child,
+                                  );
+                                },
+                                child: Image.asset('assets/images/disk.png'),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.only(top: 10),
+                                    child: Text(
+                                      '${room.musicName}',
+                                      style: TextStyle(
+                                          fontSize: 30,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(top: 13),
+                                    child: IconButton(
+                                      icon: Icon(Icons.arrow_drop_down_circle),
+                                      tooltip: 'Open Music List',
+                                      onPressed: () async {
+                                        songs = await getSongs();
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text('Select song'),
+                                                scrollable: true,
+                                                content: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: <Widget>[
+                                                      Container(
+                                                        height: 700.0,
+                                                        width: 600.0,
+                                                        child: ListView.builder(
+                                                          itemCount:
+                                                              songs.length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            return GestureDetector(
+                                                                onTap: () {
+                                                                  onChooseMusic(
+                                                                      songs[index]
+                                                                          .getName());
+                                                                },
+                                                                child: Card(
+                                                                  child:
+                                                                      ListTile(
+                                                                    isThreeLine:
+                                                                        true,
+                                                                    leading:
+                                                                        Container(
+                                                                      height: double
+                                                                          .infinity,
+                                                                      child:
+                                                                          ImageIcon(
+                                                                        AssetImage(
+                                                                            songs[index].getImage()),
+                                                                        size:
+                                                                            50,
+                                                                        color: Color(
+                                                                            0xFF3A5A98),
+                                                                      ), //replaced by image if available
+                                                                    ),
+                                                                    title: Text(
+                                                                        songs[index]
+                                                                            .getName()),
+                                                                    subtitle:
+                                                                        Container(
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: <
+                                                                            Widget>[
+                                                                          Flexible(
+                                                                            flex:
+                                                                                3,
                                                                             child:
-                                                                                new MarqueeWidget(
-                                                                              text: songs[index].getArtists(),
-                                                                              textStyle: new TextStyle(fontSize: 16.0),
-                                                                              scrollAxis: Axis.horizontal,
+                                                                                Container(
+                                                                              height: 30,
+                                                                              child: new MarqueeWidget(
+                                                                                text: songs[index].getArtists(),
+                                                                                textStyle: new TextStyle(fontSize: 16.0),
+                                                                                scrollAxis: Axis.horizontal,
+                                                                              ),
+                                                                              //Text(,overflow: TextOverflow.ellipsis,),
                                                                             ),
-                                                                            //Text(,overflow: TextOverflow.ellipsis,),
                                                                           ),
-                                                                        ),
-                                                                        Flexible(
-                                                                          flex:
-                                                                              3,
-                                                                          child:
-                                                                              SmoothStarRating(
-                                                                            rating:
-                                                                                songs[index].getDifficulty().toDouble(),
-                                                                            size:
-                                                                                18,
-                                                                            filledIconData:
-                                                                                Icons.music_note,
-                                                                            defaultIconData:
-                                                                                null,
-                                                                            starCount:
-                                                                                5,
-                                                                            isReadOnly:
-                                                                                true,
-                                                                          ),
-                                                                        )
-                                                                      ],
+                                                                          Flexible(
+                                                                            flex:
+                                                                                3,
+                                                                            child:
+                                                                                SmoothStarRating(
+                                                                              rating: songs[index].getDifficulty().toDouble(),
+                                                                              size: 18,
+                                                                              filledIconData: Icons.music_note,
+                                                                              defaultIconData: null,
+                                                                              starCount: 5,
+                                                                              isReadOnly: true,
+                                                                            ),
+                                                                          )
+                                                                        ],
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ));
-                                                        },
-                                                      ),
-                                                    )
-                                                  ]),
-                                            );
-                                          });
-                                    },
-                                    color: Colors.white,
+                                                                ));
+                                                          },
+                                                        ),
+                                                      )
+                                                    ]),
+                                              );
+                                            });
+                                      },
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 23),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: <Widget>[
-                                  userInRoom(context, room.usernameOne),
-                                  room.usernameTwo != ''
-                                      ? userInRoom(context, room.usernameTwo)
-                                      : GestureDetector(
-                                          child: userInRoom(context, '+'),
-                                          onTap: () {
-                                            print("press add button");
-                                          },
-                                        ),
                                 ],
                               ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: <Widget>[
-                                  room.usernameThree != ''
-                                      ? userInRoom(context, room.usernameThree)
-                                      : GestureDetector(
-                                          child: userInRoom(context, '+'),
-                                          onTap: () {
-                                            print("press add button");
-                                          },
-                                        ),
-                                  room.usernameFour != ''
-                                      ? userInRoom(context, room.usernameFour)
-                                      : GestureDetector(
-                                          child: userInRoom(context, '+'),
-                                          onTap: () {
-                                            print("press add button");
-                                          },
-                                        ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width: 350,
-                              height: 55,
-                              margin: EdgeInsets.only(top: 20),
-                              child: FlatButton(
-                                onPressed: () {
-                                  onClickPlayButton(context);
-                                },
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(70),
-                                    side: BorderSide(
-                                        color: Colors.white, width: 3)),
-                                child: Text(
-                                  'Play',
-                                  style: TextStyle(
-                                      fontSize: 25, color: Colors.white),
+                              Container(
+                                margin: EdgeInsets.only(top: 23),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    userInRoom(context, room.usernameOne),
+                                    room.usernameTwo != ''
+                                        ? userInRoom(context, room.usernameTwo)
+                                        : GestureDetector(
+                                            child: userInRoom(context, '+'),
+                                            onTap: () {
+                                              print("press add button");
+                                            },
+                                          ),
+                                  ],
                                 ),
-                                color: Colors.white24,
                               ),
-                            )
-                          ]))
-                ],
+                              Container(
+                                margin: EdgeInsets.only(top: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    room.usernameThree != ''
+                                        ? userInRoom(
+                                            context, room.usernameThree)
+                                        : GestureDetector(
+                                            child: userInRoom(context, '+'),
+                                            onTap: () {
+                                              print("press add button");
+                                            },
+                                          ),
+                                    room.usernameFour != ''
+                                        ? userInRoom(context, room.usernameFour)
+                                        : GestureDetector(
+                                            child: userInRoom(context, '+'),
+                                            onTap: () {
+                                              print("press add button");
+                                            },
+                                          ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 350,
+                                height: 55,
+                                margin: EdgeInsets.only(top: 20),
+                                child: FlatButton(
+                                  onPressed: () {
+                                    onClickPlayButton(context);
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(70),
+                                      side: BorderSide(
+                                          color: Colors.white, width: 3)),
+                                  child: Text(
+                                    'Play',
+                                    style: TextStyle(
+                                        fontSize: 25, color: Colors.white),
+                                  ),
+                                  color: Colors.white24,
+                                ),
+                              )
+                            ]))
+                  ],
+                ),
               ),
             ),
           );
