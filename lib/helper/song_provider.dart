@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:piano_tile/model/note.dart';
 
 import 'dart:async' show Future;
@@ -12,26 +13,36 @@ import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:permissions_plugin/permissions_plugin.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 Future<List<Note>> initNotes(String notedir) async {
-  // firebase storage
-  var storage = FirebaseStorage.instance;
-  StorageReference ref = await storage.getReferenceFromUrl(notedir);
+  String pathToSave="";
+  String content="";
+  debugPrint("notedir"+notedir);
+  if(notedir.contains("assets/song/")){
+    pathToSave=notedir;
+    content=await rootBundle.loadString(notedir);
+  }else{
+    // firebase storage
+    var storage = FirebaseStorage.instance;
+    StorageReference ref = await storage.getReferenceFromUrl(notedir);
 
-  // song name
-  var dir = await getExternalStorageDirectory();
-  var name = await ref.getName();
-  String pathToSave = '${dir.path}/${name}';
+    // song name
+    var dir = await getExternalStorageDirectory();
+    var name = await ref.getName();
+    pathToSave = '${dir.path}/${name}';
+    // check if song already in local folder
+    final File tempFile = File(pathToSave);
+    if (tempFile.existsSync() == false) {
+      // if not, download song
+      await downloadFile(ref, pathToSave);
+    }
 
-  // check if song already in local folder
-  final File tempFile = File(pathToSave);
-  if (tempFile.existsSync() == false) {
-    // if not, download song
-    await downloadFile(ref, pathToSave);
+    // read file data
+    content = await loadFile(pathToSave);
   }
 
-  // read file data
-  String content = await loadFile(pathToSave);
+
 
   // convert data to list of notes
   return await convertToNotes(content);

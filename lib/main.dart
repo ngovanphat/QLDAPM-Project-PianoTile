@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:piano_tile/views/home.dart';
 import 'package:piano_tile/views/game_play.dart';
 import 'package:piano_tile/views/game_play_online.dart';
@@ -80,7 +81,7 @@ void main() async {
   prefs.setInt(sharedPrefKeys.getGemKey(), gem);
   prefs.setInt(sharedPrefKeys.getLevelKey(), levelValue);
   prefs.setInt(sharedPrefKeys.getNextExpKey(), nextExpValue);
-
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(MyApp());
 }
 

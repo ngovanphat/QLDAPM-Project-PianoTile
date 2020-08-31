@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:core';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:marquee/marquee.dart';
 import 'package:piano_tile/helper/local_db.dart';
 import 'package:piano_tile/helper/shared_pref.dart';
 import 'package:piano_tile/helper/sizes_helpers.dart';
@@ -14,7 +17,6 @@ import 'package:piano_tile/model/custom_expansion_panel.dart'
     as CustomExpansionPanel;
 import 'package:piano_tile/model/login_alert_dialog.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
-import 'package:marquee_flutter/marquee_flutter.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:like_button/like_button.dart';
 
@@ -55,6 +57,7 @@ class MusicList extends StatefulWidget {
 
 class _MusicListState extends State<MusicList> with WidgetsBindingObserver {
   AppLifecycleState _lastLifecycleState;
+  var key=GlobalKey();
   @override
   void initState() {
     /*allSongs[0].isEmpty?getSongs(0).then((value){
@@ -94,6 +97,7 @@ class _MusicListState extends State<MusicList> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([]);
     return NotificationListener<OverscrollIndicatorNotification>(
+      key:this.key,
       // để che hiệu ứng glow khi cuộn ở 2 đầu
       onNotification: (OverscrollIndicatorNotification overscroll) {
         overscroll.disallowGlow();
@@ -233,6 +237,7 @@ class BodyLayout extends StatefulWidget {
 
 class _BodyLayoutState extends State<BodyLayout>
     with AutomaticKeepAliveClientMixin {
+  int marqueeFlag=0;
   List<Song> songs = [];
   List<int> listTracker = [-1, -1, -1];
   int expListCounter = 0;
@@ -303,7 +308,7 @@ class _BodyLayoutState extends State<BodyLayout>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return songs.isNotEmpty
+    return (songs!=null&&songs.isNotEmpty)
         ? NotificationListener<OverscrollIndicatorNotification>(
             // tắt hiệu ứng glow khi cuộn tới cuối list/ đầu list
             onNotification: (t) {
@@ -370,6 +375,9 @@ class _BodyLayoutState extends State<BodyLayout>
             selected.toString() +
             "- Song ID: " +
             songs[selected].getId());
+        setState(() {
+          marqueeFlag=selected;
+        });
       },
       children:
           songs.map<CustomExpansionPanel.ExpansionPanelRadio>((Song song) {
@@ -404,12 +412,21 @@ class _BodyLayoutState extends State<BodyLayout>
                         flex: 3,
                         child: Container(
                           height: displayHeight(context) * 0.037,
-                          child: MarqueeWidget(
-                            text: song.getArtists(),
-                            textStyle: TextStyle(
+                          child: AutoSizeText(
+                              song.getArtists(),
+                            maxLines: 1,
+                            style: TextStyle(
                                 fontSize: displayWidth(context) * 0.04),
+                            minFontSize: 15,
+                            overflowReplacement:marqueeFlag==songs.indexOf(song)?Marquee(
+                            text: song.getArtists(),
+                            style: TextStyle(
+                                fontSize: displayWidth(context) * 0.04),
+                            blankSpace: 50.0,
+                            velocity: 30.0,
+                            startPadding: 30.0,
                             scrollAxis: Axis.horizontal,
-                          ),
+                          ):null),
                           //Text(,overflow: TextOverflow.ellipsis,),
                         ),
                       ),
@@ -483,7 +500,7 @@ class _BodyLayoutState extends State<BodyLayout>
 
   Future<List<Song>> fetchFavorites() async {
     debugPrint("favorites.isNotEmpty: " + favorites.isNotEmpty.toString());
-    if (favorites.isNotEmpty) return songs;
+    if (favorites.isNotEmpty) return allSongs[tabIndex];
     final FirebaseAuth auth = FirebaseAuth.instance;
     final FirebaseUser user = await auth.currentUser();
     if (user != null) {
@@ -547,7 +564,7 @@ class _BodyLayoutState extends State<BodyLayout>
           debugPrint("highscore: " + key + " - " + value.toString());
         });
       });
-      if (dbHighscores.isEmpty) return songs;
+      if (dbHighscores.isEmpty) return allSongs[tabIndex];
       //applied to loaded songs
       for (int i = 0; i < allSongs[0].length; i++) {
         //debugPrint("ID: "+allSongs[0][i].getId());
@@ -869,86 +886,41 @@ class _BodyLayoutState extends State<BodyLayout>
   }
 }
 //TODO refine id system for music list
-
+Future<String>_loadFromAsset() async {
+  return await rootBundle.loadString("assets/song_list.json");
+}
 Future<List> getSongs(tabIndex) async {
-  //tên bài hát
-  final titles = [
-    'Little Star',
-    'Jingle Bells',
-    'Canon',
-    'Two Tigers',
-    'The Blue Danube',
-    'Happy New Year',
-    'Beyer No. 8',
-    'Bluestone Alley',
-    'Reverie'
-  ];
-  //tên ca sĩ/nhóm nhạc
-  final artists = [
-    'English Folk Music',
-    'James Lord Pierpont',
-    'Johann Pachelbel',
-    'French Folk Music',
-    'Johann Strauss II',
-    'English Folk Music',
-    'Ferdinand Beyer',
-    'Congfei Wei',
-    'Claude Debussy'
-  ];
-  //icons sẽ được thay bằng hình nhạc sau
-  final images = [
-    'assets/images/music-note.png',
-    'assets/images/music-note.png',
-    'assets/images/music-note.png',
-    'assets/images/music-note.png',
-    'assets/images/music-note.png',
-    'assets/images/music-note.png',
-    'assets/images/music-note.png',
-    'assets/images/music-note.png',
-    'assets/images/music-note.png'
-  ];
-  final List<int> difficulties = [1, 1, 1, 2, 3, 4, 4, 5, 5];
-
+  String jsonString = await _loadFromAsset();
+  Iterable l = json.decode(jsonString);
+  List<Song> localSongs = (json.decode(jsonString) as List).map((i) =>
+      Song.fromJson(i)).toList();
+  localSongs.forEach((element) { debugPrint("ID: "+element.getNotes());});
   if (tabIndex == 1) {
-    final List<Song> musicList = [];
+    List<Song> musicList = [];
     await songDAO.isEmpty("NN").then((value) async {
       if (value) {
-        for (var i = titles.length - 1; i >= 0; i--) {
-          musicList.add(new Song(i.toString().padLeft(2, '0') + "NN", titles[i],
-              artists[i], difficulties[i], images[i],
-              notes_dir:
-                  "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/Shining_the_morning.mid.txt?alt=media&token=052c65bf-f531-40bc-9584-02f9cdb3f306"));
-        }
+        musicList=List<Song>.from(localSongs);
+        musicList.removeWhere((element) => element.getId().contains("VN"));
         for (var i = 0; i < musicList.length; i++) {
           songDAO.insertSong(musicList[i]);
         }
       } else {
         debugPrint("Reading from local ");
-        songDAO
-            .countSongs("NN")
-            .then((value) => debugPrint("Count : " + value.toString()));
         musicList.addAll(await songDAO.getAllSongs("NN"));
       }
     });
     return allSongs[tabIndex] = musicList;
   } else if (tabIndex == 0) {
-    final List<Song> musicList = [];
+    List<Song> musicList = [];
     await songDAO.isEmpty("VN").then((value) async {
       if (value) {
-        for (var i = 0; i < titles.length; i++) {
-          musicList.add(new Song(i.toString().padLeft(2, '0') + "VN", titles[i],
-              artists[i], difficulties[i], images[i],
-              notes_dir:
-                  "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/canond.mid.txt?alt=media&token=0d3fbea0-61be-4e9e-832e-dcec4bf16727"));
-        }
+        musicList=List<Song>.from(localSongs);
+        musicList.removeWhere((element) => element.getId().contains("NN"));
         for (var i = 0; i < musicList.length; i++) {
           songDAO.insertSong(musicList[i]);
         }
       } else {
         debugPrint("Reading from local ");
-        songDAO
-            .countSongs("NN")
-            .then((value) => debugPrint("Count : " + value.toString()));
         musicList.addAll(await songDAO.getAllSongs("VN"));
       }
     });
@@ -979,10 +951,10 @@ Future<int> updateAllHighscores() async {
         key: (s) => s.getId(), value: (s) => s.getHighscore());
     newHighscores.removeWhere(
         (key, value) => newHighscores[key] == localHighscores[key]);
-    newHighscores.updateAll((key, value) =>
-        newHighscores[key] < localHighscores[key]
-            ? value = localHighscores[key]
-            : value = newHighscores[key]);
+    newHighscores.updateAll((key, value) {
+      String keyTemp=key;
+      newHighscores[keyTemp] < localHighscores[keyTemp] ? value = localHighscores[keyTemp] : value = newHighscores[keyTemp];})
+        ;
     newHighscores.forEach((key, value) async {
       await db.child(key).update(value);
     });

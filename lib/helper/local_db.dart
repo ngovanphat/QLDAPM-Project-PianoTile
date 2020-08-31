@@ -116,6 +116,9 @@ class SongDAO {
   }
 
   Future<List<Song>> getAllSongs(String type) async {
+    //List yêu thích ko load là do còn file local mấy bài cũ, bỏ uncomment deleteAll(),
+    //chạy 1 lần r xóa deleteAll() đi là lần sau đó bình thường.
+    //deleteAll();
     switch (type) {
       case "VN":
         {
