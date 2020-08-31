@@ -66,7 +66,7 @@ class _HomeState extends State<Home>
 
     // update exp, gem,...
     getExpGem();
-    getSongs().then((value){
+    getSongs().then((value) {
       songs = value;
     });
   }
@@ -167,7 +167,7 @@ class _HomeState extends State<Home>
                                     icon: Icon(Icons.arrow_drop_down_circle),
                                     tooltip: 'Open Music List',
                                     onPressed: () async {
-                                      songs =  await getSongs();
+                                      songs = await getSongs();
                                       showDialog(
                                           context: context,
                                           builder: (BuildContext context) {
@@ -176,7 +176,7 @@ class _HomeState extends State<Home>
                                               scrollable: true,
                                               content: Column(
                                                   mainAxisSize:
-                                                  MainAxisSize.min,
+                                                      MainAxisSize.min,
                                                   children: <Widget>[
                                                     Container(
                                                       height: 700.0,
@@ -188,22 +188,24 @@ class _HomeState extends State<Home>
                                                           return GestureDetector(
                                                               onTap: () {
                                                                 setState(() {
-                                                                  musicName = songs[index].getName();
+                                                                  musicName = songs[
+                                                                          index]
+                                                                      .getName();
                                                                 });
                                                                 Navigator.of(
-                                                                    context)
+                                                                        context)
                                                                     .pop();
                                                               },
                                                               child: Card(
                                                                 child: ListTile(
                                                                   isThreeLine:
-                                                                  true,
+                                                                      true,
                                                                   leading:
-                                                                  Container(
+                                                                      Container(
                                                                     height: double
                                                                         .infinity,
                                                                     child:
-                                                                    ImageIcon(
+                                                                        ImageIcon(
                                                                       AssetImage(
                                                                           songs[index]
                                                                               .getImage()),
@@ -213,25 +215,25 @@ class _HomeState extends State<Home>
                                                                     ), //replaced by image if available
                                                                   ),
                                                                   title: Text(songs[
-                                                                  index]
+                                                                          index]
                                                                       .getName()),
                                                                   subtitle:
-                                                                  Container(
+                                                                      Container(
                                                                     child: Row(
                                                                       mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
                                                                       children: <
                                                                           Widget>[
                                                                         Flexible(
                                                                           flex:
-                                                                          3,
+                                                                              3,
                                                                           child:
-                                                                          Container(
+                                                                              Container(
                                                                             height:
-                                                                            30,
+                                                                                30,
                                                                             child:
-                                                                            new MarqueeWidget(
+                                                                                new MarqueeWidget(
                                                                               text: songs[index].getArtists(),
                                                                               textStyle: new TextStyle(fontSize: 16.0),
                                                                               scrollAxis: Axis.horizontal,
@@ -241,21 +243,21 @@ class _HomeState extends State<Home>
                                                                         ),
                                                                         Flexible(
                                                                           flex:
-                                                                          3,
+                                                                              3,
                                                                           child:
-                                                                          SmoothStarRating(
+                                                                              SmoothStarRating(
                                                                             rating:
-                                                                            songs[index].getDifficulty().toDouble(),
+                                                                                songs[index].getDifficulty().toDouble(),
                                                                             size:
-                                                                            18,
+                                                                                18,
                                                                             filledIconData:
-                                                                            Icons.music_note,
+                                                                                Icons.music_note,
                                                                             defaultIconData:
-                                                                            null,
+                                                                                null,
                                                                             starCount:
-                                                                            5,
+                                                                                5,
                                                                             isReadOnly:
-                                                                            true,
+                                                                                true,
                                                                           ),
                                                                         )
                                                                       ],
@@ -374,7 +376,10 @@ class _HomeState extends State<Home>
                                                             MaterialPageRoute(
                                                                 builder:
                                                                     (context) =>
-                                                                        CreateRoom()));
+                                                                        CreateRoom())).then(
+                                                            (value) {
+                                                          setState(() {});
+                                                        });
                                                       }
                                                     }),
                                                 Padding(
