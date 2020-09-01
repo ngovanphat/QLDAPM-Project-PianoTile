@@ -105,7 +105,7 @@
     "artists": "",
     "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "notes_dir": "assets/song/love.mid.txt",
+    "notes_dir": "assets/song/love.midi.txt",
     "highscore": 0,
     "isFavorited": false
   },
@@ -115,7 +115,7 @@
     "artists": "",
     "difficulty": 3,
     "image": "assets/images/music-note.png",
-    "notes_dir": "assets/song/november.mid.txt",
+    "notes_dir": "assets/song/november.midi.txt",
     "highscore": 0,
     "isFavorited": false
   },
@@ -125,7 +125,7 @@
     "artists": "Erik",
     "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "notes_dir": "assets/song/sau_tat_ca.mid.txt",
+    "notes_dir": "assets/song/sau_tat_ca.midi.txt",
     "highscore": 0,
     "isFavorited": false
   },
@@ -135,7 +135,7 @@
     "artists": "Lam Trường",
     "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "notes_dir": "assets/song/tinh_thoi_xot_xa.mid.txt",
+    "notes_dir": "assets/song/tinh_thoi_xot_xa.midi.txt",
     "highscore": 0,
     "isFavorited": false
   },
@@ -145,7 +145,7 @@
     "artists": "JustAtee, Big Daddy, Tiên Cookie",
     "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "notes_dir": "assets/song/thoi_gian_se_tra_loi.mid.txt",
+    "notes_dir": "assets/song/thoi_gian_se_tra_loi.midi.txt",
     "highscore": 0,
     "isFavorited": false
   },
@@ -155,7 +155,7 @@
     "artists": "Trịnh Thăng Bình",
     "difficulty": 5,
     "image": "assets/images/music-note.png",
-    "notes_dir": "assets/song/nguoi_ay.mid.txt",
+    "notes_dir": "assets/song/nguoi_ay.midi.txt",
     "highscore": 0,
     "isFavorited": false
   }
