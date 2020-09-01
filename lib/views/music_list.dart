@@ -57,7 +57,7 @@ class MusicList extends StatefulWidget {
 
 class _MusicListState extends State<MusicList> with WidgetsBindingObserver {
   AppLifecycleState _lastLifecycleState;
-  var key=GlobalKey();
+  var key = GlobalKey();
   @override
   void initState() {
     /*allSongs[0].isEmpty?getSongs(0).then((value){
@@ -97,7 +97,7 @@ class _MusicListState extends State<MusicList> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([]);
     return NotificationListener<OverscrollIndicatorNotification>(
-      key:this.key,
+      key: this.key,
       // để che hiệu ứng glow khi cuộn ở 2 đầu
       onNotification: (OverscrollIndicatorNotification overscroll) {
         overscroll.disallowGlow();
@@ -118,7 +118,6 @@ class _MusicListState extends State<MusicList> with WidgetsBindingObserver {
                 });
               }*/
               _isLoading = false;
-              _isVisible = true;
             }
           });
           return Scaffold(
@@ -237,7 +236,7 @@ class BodyLayout extends StatefulWidget {
 
 class _BodyLayoutState extends State<BodyLayout>
     with AutomaticKeepAliveClientMixin {
-  int marqueeFlag=0;
+  int marqueeFlag = 0;
   List<Song> songs = [];
   List<int> listTracker = [-1, -1, -1];
   int expListCounter = 0;
@@ -266,29 +265,39 @@ class _BodyLayoutState extends State<BodyLayout>
           }
         });
       });
+      if (songs.length < 5) {
+        _fetchSongs(tabIndex, pageNumber[tabIndex], itemsPerPage[tabIndex])
+            .then((value) => setState(() {
+                  _isVisible = false;
+                  debugPrint(songs.length.toString());
+                }));
+      }
     } else {
+      _isLoading = false;
+      _isVisible = false;
       fetchFavorites().then((value) async {
         await _fetchSongs(tabIndex, pageNumber, itemsPerPage).then((value) {
           setState(() {
-            songs = value ?? [];
+            songs = allSongs[tabIndex] ?? songs;
           });
         });
       });
     }
     allSongs[tabIndex] = songs;
+
     addIntToSF("tabIndex", gTabIndex);
     _scrollController.addListener(() async {
       if (tabIndex == 2) return;
-      if (_scrollController.position.pixels ==
+      if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent &&
+          !_scrollController.position.outOfRange &&
           _isLoading == false) {
         _isLoading = true;
-        debugPrint('Page reached end of page');
+        debugPrint('Reached end of page');
         var loadedSongs = await _fetchSongs(
             tabIndex, pageNumber[tabIndex], itemsPerPage[tabIndex]);
         setState(() {
-          //TODO show loading for repeated load
-          //TODO save local after first download
+          _isLoading = false;
           _isVisible = false;
           debugPrint(songs.length.toString());
         });
@@ -308,7 +317,7 @@ class _BodyLayoutState extends State<BodyLayout>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return (songs!=null&&songs.isNotEmpty)
+    return (songs != null && songs.isNotEmpty)
         ? NotificationListener<OverscrollIndicatorNotification>(
             // tắt hiệu ứng glow khi cuộn tới cuối list/ đầu list
             onNotification: (t) {
@@ -330,7 +339,10 @@ class _BodyLayoutState extends State<BodyLayout>
                     height: MediaQuery.of(context).size.height * 0.1,
                     child: Align(
                         alignment: Alignment.center,
-                        child: CircularProgressIndicator()),
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              new AlwaysStoppedAnimation<Color>(Colors.white),
+                        )),
                   ),
                 )
               ],
@@ -340,7 +352,9 @@ class _BodyLayoutState extends State<BodyLayout>
             height: MediaQuery.of(context).size.height * 0.1,
             child: Align(
                 alignment: Alignment.center,
-                child: CircularProgressIndicator()));
+                child: CircularProgressIndicator(
+                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+                )));
   }
 
   Widget _buildPanel() {
@@ -376,7 +390,7 @@ class _BodyLayoutState extends State<BodyLayout>
             "- Song ID: " +
             songs[selected].getId());
         setState(() {
-          marqueeFlag=selected;
+          marqueeFlag = selected;
         });
       },
       children:
@@ -412,21 +426,24 @@ class _BodyLayoutState extends State<BodyLayout>
                         flex: 3,
                         child: Container(
                           height: displayHeight(context) * 0.037,
-                          child: AutoSizeText(
-                              song.getArtists(),
-                            maxLines: 1,
-                            style: TextStyle(
-                                fontSize: displayWidth(context) * 0.04),
-                            minFontSize: 15,
-                            overflowReplacement:marqueeFlag==songs.indexOf(song)?Marquee(
-                            text: song.getArtists(),
-                            style: TextStyle(
-                                fontSize: displayWidth(context) * 0.04),
-                            blankSpace: 50.0,
-                            velocity: 30.0,
-                            startPadding: 30.0,
-                            scrollAxis: Axis.horizontal,
-                          ):null),
+                          child: AutoSizeText(song.getArtists(),
+                              maxLines: 1,
+                              style: TextStyle(
+                                  fontSize: displayWidth(context) * 0.04),
+                              minFontSize: 15,
+                              overflowReplacement:
+                                  marqueeFlag == songs.indexOf(song)
+                                      ? Marquee(
+                                          text: song.getArtists(),
+                                          style: TextStyle(
+                                              fontSize:
+                                                  displayWidth(context) * 0.04),
+                                          blankSpace: 50.0,
+                                          velocity: 30.0,
+                                          startPadding: 30.0,
+                                          scrollAxis: Axis.horizontal,
+                                        )
+                                      : null),
                           //Text(,overflow: TextOverflow.ellipsis,),
                         ),
                       ),
@@ -807,8 +824,11 @@ class _BodyLayoutState extends State<BodyLayout>
                 .once()
                 .then((DataSnapshot snapshot) {
               Map<dynamic, dynamic> values = snapshot.value;
-              if (snapshot == null) {
+              if (values == null || values.isEmpty) {
                 debugPrint("No more songs to load");
+                setState(() {
+                  _isVisible = false;
+                });
                 return;
               }
               values.forEach((key, values) {
@@ -861,6 +881,13 @@ class _BodyLayoutState extends State<BodyLayout>
                 .once()
                 .then((DataSnapshot snapshot) {
               Map<dynamic, dynamic> values = snapshot.value;
+              if (values == null || values.isEmpty) {
+                debugPrint("No more songs to load");
+                setState(() {
+                  _isVisible = false;
+                });
+                return;
+              }
               values.forEach((key, values) {
                 Song temp = new Song(
                     key.padLeft(2, '0') + "VNDB",
@@ -885,21 +912,24 @@ class _BodyLayoutState extends State<BodyLayout>
     }
   }
 }
-//TODO refine id system for music list
-Future<String>_loadFromAsset() async {
+
+Future<String> _loadFromAsset() async {
   return await rootBundle.loadString("assets/song_list.json");
 }
+
 Future<List> getSongs(tabIndex) async {
   String jsonString = await _loadFromAsset();
   Iterable l = json.decode(jsonString);
-  List<Song> localSongs = (json.decode(jsonString) as List).map((i) =>
-      Song.fromJson(i)).toList();
-  localSongs.forEach((element) { debugPrint("ID: "+element.getNotes());});
+  List<Song> localSongs =
+      (json.decode(jsonString) as List).map((i) => Song.fromJson(i)).toList();
+  localSongs.forEach((element) {
+    debugPrint("ID: " + element.getNotes());
+  });
   if (tabIndex == 1) {
     List<Song> musicList = [];
     await songDAO.isEmpty("NN").then((value) async {
       if (value) {
-        musicList=List<Song>.from(localSongs);
+        musicList = List<Song>.from(localSongs);
         musicList.removeWhere((element) => element.getId().contains("VN"));
         for (var i = 0; i < musicList.length; i++) {
           songDAO.insertSong(musicList[i]);
@@ -914,7 +944,7 @@ Future<List> getSongs(tabIndex) async {
     List<Song> musicList = [];
     await songDAO.isEmpty("VN").then((value) async {
       if (value) {
-        musicList=List<Song>.from(localSongs);
+        musicList = List<Song>.from(localSongs);
         musicList.removeWhere((element) => element.getId().contains("NN"));
         for (var i = 0; i < musicList.length; i++) {
           songDAO.insertSong(musicList[i]);
@@ -952,9 +982,11 @@ Future<int> updateAllHighscores() async {
     newHighscores.removeWhere(
         (key, value) => newHighscores[key] == localHighscores[key]);
     newHighscores.updateAll((key, value) {
-      String keyTemp=key;
-      newHighscores[keyTemp] < localHighscores[keyTemp] ? value = localHighscores[keyTemp] : value = newHighscores[keyTemp];})
-        ;
+      String keyTemp = key;
+      newHighscores[keyTemp] < localHighscores[keyTemp]
+          ? value = localHighscores[keyTemp]
+          : value = newHighscores[keyTemp];
+    });
     newHighscores.forEach((key, value) async {
       await db.child(key).update(value);
     });
