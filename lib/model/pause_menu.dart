@@ -1,10 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piano_tile/views/home.dart';
 
 class PauseButton extends StatelessWidget {
   final VoidCallback pauseCallback;
+  final Function() onRestartPressed;
   final Function(bool) onResumePressed;
-  PauseButton({@required this.onResumePressed, this.pauseCallback});
+  PauseButton({@required this.onResumePressed, this.pauseCallback, this.onRestartPressed});
 
   Color _iconColor = Colors.lightBlue;
 
@@ -32,6 +34,46 @@ class PauseButton extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
+
+                                Icon(Icons.play_arrow,
+                                    color: Colors.white, size: 50),
+                                Text(
+                                  "Resume",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 14),
+                                )
+                              ],
+                            ),
+                            onPressed: () {
+                              onResumePressed(true);
+                              Navigator.of(context).pop();
+                            }),
+                        Padding(padding: const EdgeInsets.only(top: 30)),
+                        new FlatButton(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(Icons.refresh,
+                                    color: Colors.white, size: 50),
+                                Text(
+                                  "Restart",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 14),
+                                )
+                              ],
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              onRestartPressed();
+                            }),
+                        Padding(padding: const EdgeInsets.only(top: 30)),
+                        new FlatButton(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+
                                 Icon(Icons.clear,
                                     color: Colors.white, size: 50),
                                 Text(
@@ -42,10 +84,13 @@ class PauseButton extends StatelessWidget {
                               ],
                             ),
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => Home()),
-                              );
+//                              Navigator.push(
+//                                context,
+//                                MaterialPageRoute(builder: (context) => Home()),
+//                              );
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+
                             }),
                       ]),
                 ),

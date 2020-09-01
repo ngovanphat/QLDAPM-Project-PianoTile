@@ -54,73 +54,80 @@ class GamePlayState<T extends GamePlay> extends State<T>
 
   GamePlayState({this.song});
 
-  // song info
-//  String songName = 'canond.mid.txt';
-  String songName = 'tim_lai_bau_troi.mid.txt';
-  //TODO: change song to play here
+//  // song info
+////  String songName = 'canond.mid.txt';
+//  String songName = 'tim_lai_bau_troi.mid.txt';
+
   int levelRequired = 0;
   int expReward = 0;
   int hard = 0;
+  bool isCheckLevelRequired = true;
 
   SharedPreferences prefs = null;
 
   Future<String> doInitNotes() async {
-    // first, check if song requires higher level then current level
-    DatabaseReference refSong =
-        FirebaseDatabase.instance.reference().child('Songs');
 
-    DataSnapshot snapshot1 = await refSong.child('NhacViet').once();
-    Map<dynamic, dynamic> songs = snapshot1.value;
-    bool isFound = false;
-    songs.forEach((key, value) {
-      if (value['filename'] == songName) {
-        this.levelRequired = value['levelRequired'];
-        this.expReward = value['expReward'];
-        this.hard = value['hard'];
-        isFound = true;
-      }
-    });
-    if (isFound == false) {
-      snapshot1 = await refSong.child('NhacNuocNgoai').once();
-      songs = snapshot1.value;
+    // first, check if song requires higher level then current level
+    if(isCheckLevelRequired == true){
+
+      DatabaseReference refSong =
+      FirebaseDatabase.instance.reference().child('Songs');
+
+      DataSnapshot snapshot1 = await refSong.child('NhacViet').once();
+      Map<dynamic, dynamic> songs = snapshot1.value;
+      bool isFound = false;
       songs.forEach((key, value) {
-        if (value['filename'] == songName) {
+        if (value['name'] == song.name) {
           this.levelRequired = value['levelRequired'];
           this.expReward = value['expReward'];
           this.hard = value['hard'];
           isFound = true;
         }
       });
+      if (isFound == false) {
+        snapshot1 = await refSong.child('NhacNuocNgoai').once();
+        songs = snapshot1.value;
+        songs.forEach((key, value) {
+          if (value['name'] == song.name) {
+            this.levelRequired = value['levelRequired'];
+            this.expReward = value['expReward'];
+            this.hard = value['hard'];
+            isFound = true;
+          }
+        });
+      }
+      print(
+          '[game_play] level need: $levelRequired, expReward: $expReward, hard: $hard');
+
+      // here, already have song info
+      prefs = await SharedPreferences.getInstance();
+      int currentLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
+      if (currentLevel < this.levelRequired) {
+        // end, not allow to play
+
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text(
+                    "This song requires level ${this.levelRequired} or higher"),
+                actions: <Widget>[
+                  FlatButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text("OK"),
+                  )
+                ],
+              );
+            }).then((_) {
+          // return to previous page
+          Navigator.pop(context);
+        });
+
+        return 'fail_level_required';
+      }
+
     }
-    print(
-        '[game_play] level need: $levelRequired, expReward: $expReward, hard: $hard');
 
-    // here, already have song info
-    prefs = await SharedPreferences.getInstance();
-    int currentLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
-    if (currentLevel < this.levelRequired) {
-      // end, not allow to play
-
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text(
-                  "This song requires level ${this.levelRequired} or higher"),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text("OK"),
-                )
-              ],
-            );
-          }).then((_) {
-        // return to previous page
-        Navigator.pop(context);
-      });
-
-      return 'fail_level_required';
-    }
 
     // if ok, then get notes
     notes = await initNotes(song.getNotes());
@@ -153,19 +160,15 @@ class GamePlayState<T extends GamePlay> extends State<T>
             .then((v) => setState(() => ad_loaded = v));
       }
     };
+
     // init notes
-//    initNotes().then((value) {
-//      notes = value;
-//      setState(() {});
-//      print('success loading notes');
-//      print('length: ${notes.length}');
-//    });
     song = widget.song;
     if (song == null) {
       //for home page song
-      song = new Song("-1", "Shining The Morning", "abc", 1, " ",
+      song = new Song("-1", "Tìm lại bầu trời", "abc", 1, " ",
           notes_dir:
-              "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/canond.mid.txt?alt=media&token=0d3fbea0-61be-4e9e-832e-dcec4bf16727");
+          "https://firebasestorage.googleapis.com/v0/b/melody-tap.appspot.com/o/tim_lai_bau_troi.mid.txt?alt=media&token=45a9745f-aa87-4135-bd15-dfb121347499"
+      );
     }
     statusOfInitNotes = doInitNotes();
 
@@ -428,7 +431,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
     if (prefs.getInt(sharedPrefKeys.userType) == sharedPrefValues.USER) {
       String id = prefs.getString(sharedPrefKeys.getIdKey());
       DatabaseReference user =
-          FirebaseDatabase.instance.reference().child('account/$id');
+          FirebaseDatabase.instance.reference().child('Users/$id');
       user.update({'exp': newExp});
       user.update({'gem': newGem});
     }
@@ -501,7 +504,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
     String userId = prefs.getString(sharedPrefKeys.getIdKey());
     FirebaseDatabase.instance
         .reference()
-        .child('account/$userId')
+        .child('Users/$userId')
         .update({'gem': currentGems});
 
     // show result
@@ -602,14 +605,25 @@ class GamePlayState<T extends GamePlay> extends State<T>
       child: PauseButton(
         pauseCallback: () {
           setState(() {
-            isPlaying = true;
+//            isPlaying = true;
+            isPlaying = false;
+            animationController.stop();
+
           });
         },
         onResumePressed: (bool resume) {
           setState(() {
             isPlaying = resume;
+
+            if(isPlaying == true){
+              animationController.forward();
+            }
+
           });
         },
+        onRestartPressed: (){
+          restart();
+        }
       ),
     );
   }

@@ -23,7 +23,7 @@ void main() async {
     String userId = prefs.getString(sharedPrefKeys.getIdKey());
     DataSnapshot user = await FirebaseDatabase.instance
         .reference()
-        .child('account/$userId')
+        .child('Users/$userId')
         .once();
 
     if (user == null) {
@@ -33,8 +33,8 @@ void main() async {
       print('[main] user: $user');
       Map<dynamic, dynamic> rows = user.value;
       // get exp, gems
-      exp = rows['exp'];
-      gem = rows['gem'];
+      exp = rows['exp'] ?? 0;
+      gem = rows['gem'] ?? 0;
     }
   }
 

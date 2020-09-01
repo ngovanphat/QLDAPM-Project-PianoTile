@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 // import lib of us
 import 'package:audioplayers/audio_cache.dart';
+import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
 import 'package:piano_tile/helper/song_provider.dart';
 import 'package:piano_tile/model/note.dart';
 import 'package:piano_tile/model/line_divider.dart';
@@ -18,6 +19,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piano_tile/model/Song.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class GamePlayOnline extends GamePlay {
   @override
@@ -51,6 +54,9 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline> {
     // include: song name, other players name, points
     await getRoomInfo();
 
+    // disable check level, all guests can play any song
+    super.isCheckLevelRequired = false;
+
     // download note file and make note list
     return await super.doInitNotes();
   }
@@ -58,9 +64,13 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline> {
   Future<String> getMyInfo() async {
     // read from shared preferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    this.currentUsername = prefs.getString('userId') ?? "foo";
-    this.roomName = prefs.getString('roomId') ?? "GENERAL";
+    this.roomName = prefs.getString(sharedPrefKeys.getRoomIdKey());
 
+    // get username
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    this.currentUsername = user.displayName;
+
+    print('[online] room: $roomName, username: $currentUsername');
     return 'done';
   }
 
@@ -94,15 +104,16 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline> {
 
       DataSnapshot snapshot1 = await refSong.child('NhacViet').once();
       Map<dynamic, dynamic> songs = snapshot1.value;
-      super.songName = findSongFileName(songs, nameOfSong);
+      super.song = null;
+      super.song = findSong(songs, nameOfSong);
 
-      if (super.songName == null) {
+      if (super.song == null) {
         // try found in Nhac Nuoc Ngoai
         snapshot1 = await refSong.child('NhacNuocNgoai').once();
         songs = snapshot1.value;
-        super.songName = findSongFileName(songs, nameOfSong);
+        super.song = findSong(songs, nameOfSong);
       }
-      print('[online] filename of song: ${super.songName}');
+      print('[online] filename of song: ${super.song.name}');
 
       // subscribe room to listen point changes
       subscriptionPoints = subscribePointChanges(refRoom.child(roomName));
@@ -141,6 +152,26 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline> {
     });
 
     return filename;
+  }
+
+  // find song from song list
+  Song findSong(Map<dynamic, dynamic> songs, String nameOfSong) {
+    print('[online_findsong] songs: $songs');
+    Song song = null;
+    songs.forEach((key, value) {
+      if (value['name'] == nameOfSong) {
+        song = new Song(key,
+            value['name'],
+            value['artists'],
+            value['difficulty'],
+            value['image'],
+            notes_dir: value['notes_dir']
+        );
+      }
+
+    });
+
+    return song;
   }
 
   // subscribe listener to room data changes

@@ -8,6 +8,8 @@ import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play_online.dart';
 import 'package:piano_tile/views/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class JoinRoom extends StatefulWidget {
   final String roomKey;
@@ -25,6 +27,10 @@ class _JoinRoomState extends State<JoinRoom>
   Room room;
   FirebaseUser user;
 
+  // listener
+  StreamSubscription isPlayingListener;
+  StreamSubscription usernameOneListener;
+
   Future<void> loadRoom(String key) async {
     room = new Room(key, '', '', '', '', '');
     await room.getRoomByID(key);
@@ -35,14 +41,39 @@ class _JoinRoomState extends State<JoinRoom>
       print("load done");
       isLoading = false;
     });
+
+    // listen for room data change
+    isPlayingListener = FirebaseDatabase.instance.reference()
+        .child('Room/${widget.roomKey}/isPlaying').onValue.listen((event) {
+
+      bool isPlaying = event.snapshot.value;
+      if(isPlaying == true){
+        // go to game play online
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => GamePlayOnline()));
+      }
+
+    });
+
+    usernameOneListener = FirebaseDatabase.instance.reference()
+        .child('Room/${widget.roomKey}/usernameOne').onValue.listen((event) {
+
+          String hostname = event.snapshot.value;
+          if(hostname == null || hostname == ''){
+            // return to home page
+            Navigator.pop(context);
+          }
+    });
+
+
   }
 
   Future<void> savePreferences(
       {String userId, String roomId, bool isHost}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('userId', userId);
-    prefs.setString('roomId', roomId);
-    prefs.setBool('isRoomHost', isHost);
+
+    prefs.setString(sharedPrefKeys.getRoomIdKey(), roomId);
+    prefs.setBool(sharedPrefKeys.getIsRoomHostKey(), isHost);
   }
 
   @override
@@ -51,30 +82,44 @@ class _JoinRoomState extends State<JoinRoom>
     animationController =
         new AnimationController(vsync: this, duration: Duration(seconds: 1))
           ..repeat();
+
+
+
     //print(widget.roomKey+" is room key");
     loadRoom(widget.roomKey);
-    try {
-      Timer.periodic(Duration(seconds: 10), (timer) {
-        room.triggerReadFromDB(widget.roomKey);
-        setState(() {
-          isInRoom = true;
-        });
-        if (room.usernameOne == '')
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => Home()));
-        else if (room.isPlaying == true)
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => GamePlayOnline()));
-      });
-    } catch (e) {
-      print(e);
-    }
+
+
+
+//    try {
+//      Timer.periodic(Duration(seconds: 10), (timer) {
+//        room.triggerReadFromDB(widget.roomKey);
+//        setState(() {
+//          isInRoom = true;
+//        });
+//        if (room.usernameOne == '')
+//          Navigator.pushReplacement(
+//              context, MaterialPageRoute(builder: (context) => Home()));
+//        else if (room.isPlaying == true)
+////          Navigator.pushReplacement(context,
+//          Navigator.push(context,
+//              MaterialPageRoute(builder: (context) => GamePlayOnline()));
+//      });
+//    } catch (e) {
+//      print(e);
+//    }
+
+
   }
 
   @override
   void deactivate() {
     super.deactivate();
     animationController.dispose();
+
+    // unsunscribe listener
+    isPlayingListener.cancel();
+    usernameOneListener.cancel();
+
     room.removeUserByName(user.displayName);
   }
 

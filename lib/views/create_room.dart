@@ -14,6 +14,7 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:math' show Random;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
 import 'package:piano_tile/model/custom_expansion_panel.dart'
     as CustomExpansionPanel;
 import 'package:piano_tile/model/Song.dart';
@@ -96,9 +97,9 @@ class _CreateRoomState extends State<CreateRoom>
   Future<void> savePreferences(
       {String userId, String roomId, bool isHost}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('userId', userId);
-    prefs.setString('roomId', roomId);
-    prefs.setBool('isRoomHost', isHost);
+//    prefs.setString('userId', userId);
+    prefs.setString(sharedPrefKeys.getRoomIdKey(), roomId);
+    prefs.setBool(sharedPrefKeys.getIsRoomHostKey(), isHost);
   }
 
   @override

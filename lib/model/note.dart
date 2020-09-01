@@ -23,6 +23,7 @@ class Note {
   // reset method
   void reset() {
     this.state = NoteState.ready;
+    this.pass = 0;
   }
 }
 
