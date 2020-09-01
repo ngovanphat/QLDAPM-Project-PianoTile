@@ -68,7 +68,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
   Future<String> doInitNotes() async {
 
     // first, check if song requires higher level then current level
-    if(isCheckLevelRequired == true){
+    if(isCheckLevelRequired != true){
 
       DatabaseReference refSong =
       FirebaseDatabase.instance.reference().child('Songs');
@@ -100,8 +100,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
           '[game_play] level need: $levelRequired, expReward: $expReward, hard: $hard');
 
       // here, already have song info
-      prefs = await SharedPreferences.getInstance();
-      int currentLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
+      int currentLevel =0;
       if (currentLevel < this.levelRequired) {
         // end, not allow to play
 
@@ -129,6 +128,8 @@ class GamePlayState<T extends GamePlay> extends State<T>
     }
 
 
+    prefs = await SharedPreferences.getInstance();
+    int currentLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
     // if ok, then get notes
     notes = await initNotes(song.getNotes());
     return 'done';
