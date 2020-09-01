@@ -152,80 +152,80 @@ class _ProfileState extends State<Profile> {
                         color: const Color(0xff004466),
                       ),
                     ),
-                    Flexible(
-                      flex: 3,
-                      child: Container(
-                        width: double.infinity,
-                        height: 90,
-                        child: FlatButton(
-                          onPressed: () {},
-                          child: Row(
-                            children: [
-                              Image.asset('assets/images/diamond.png',
-                                  fit: BoxFit.cover),
-                              Container(
-                                margin: EdgeInsets.only(left: 20),
-                                width: 5,
-                                height: double.infinity,
-                                color: const Color(0xffffffb3),
-                              ),
-                              Container(
-                                width: 5,
-                                height: double.infinity,
-                                color: const Color(0xffffff80),
-                              ),
-                              Container(
-                                width: 5,
-                                height: double.infinity,
-                                color: const Color(0xffffff4d),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.only(left: 5),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Flexible(
-                                          flex: 2,
-                                          child: Text(
-                                            "FREE DIAMONDS",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20,
-                                            ),
-                                          ),
-                                        ),
-                                        Flexible(
-                                          flex: 2,
-                                          child: Text(
-                                            "Get 5 free diamonds now",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 1,
-                      child: Container(
-                        width: double.infinity,
-                        height: 5,
-                        color: const Color(0xff004466),
-                      ),
-                    ),
+//                    Flexible(
+//                      flex: 3,
+//                      child: Container(
+//                        width: double.infinity,
+//                        height: 90,
+//                        child: FlatButton(
+//                          onPressed: () {},
+//                          child: Row(
+//                            children: [
+//                              Image.asset('assets/images/diamond.png',
+//                                  fit: BoxFit.cover),
+//                              Container(
+//                                margin: EdgeInsets.only(left: 20),
+//                                width: 5,
+//                                height: double.infinity,
+//                                color: const Color(0xffffffb3),
+//                              ),
+//                              Container(
+//                                width: 5,
+//                                height: double.infinity,
+//                                color: const Color(0xffffff80),
+//                              ),
+//                              Container(
+//                                width: 5,
+//                                height: double.infinity,
+//                                color: const Color(0xffffff4d),
+//                              ),
+//                              Expanded(
+//                                child: Container(
+//                                  margin: EdgeInsets.only(left: 5),
+//                                  child: Padding(
+//                                    padding: const EdgeInsets.all(20.0),
+//                                    child: Column(
+//                                      crossAxisAlignment:
+//                                          CrossAxisAlignment.center,
+//                                      children: [
+//                                        Flexible(
+//                                          flex: 2,
+//                                          child: Text(
+//                                            "FREE DIAMONDS",
+//                                            style: TextStyle(
+//                                              color: Colors.white,
+//                                              fontSize: 20,
+//                                            ),
+//                                          ),
+//                                        ),
+//                                        Flexible(
+//                                          flex: 2,
+//                                          child: Text(
+//                                            "Get 5 free diamonds now",
+//                                            style: TextStyle(
+//                                              color: Colors.white,
+//                                              fontSize: 15,
+//                                            ),
+//                                          ),
+//                                        ),
+//                                      ],
+//                                    ),
+//                                  ),
+//                                ),
+//                              ),
+//                            ],
+//                          ),
+//                        ),
+//                      ),
+//                    ),
+//                    Flexible(
+//                      flex: 1,
+//                      child: Container(
+//                        width: double.infinity,
+//                        height: 5,
+//                        color: const Color(0xff004466),
+//                      ),
+//                    ),
                     Flexible(
                       flex: 3,
                       child: Container(
@@ -382,80 +382,80 @@ class _ProfileState extends State<Profile> {
                         color: const Color(0xff004466),
                       ),
                     ),
-                    Flexible(
-                      flex: 3,
-                      child: Container(
-                        width: double.infinity,
-                        height: 90,
-                        child: FlatButton(
-                          onPressed: () {},
-                          child: Row(
-                            children: [
-                              Image.asset('assets/images/hearts.png',
-                                  fit: BoxFit.cover),
-                              Container(
-                                margin: EdgeInsets.only(left: 20),
-                                width: 5,
-                                height: double.infinity,
-                                color: const Color(0xffff4d4d),
-                              ),
-                              Container(
-                                width: 5,
-                                height: double.infinity,
-                                color: const Color(0xffff1a1a),
-                              ),
-                              Container(
-                                width: 5,
-                                height: double.infinity,
-                                color: const Color(0xffe60000),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.only(left: 5),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Flexible(
-                                          flex: 2,
-                                          child: Text(
-                                            "FAVORITE SONGS",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20,
-                                            ),
-                                          ),
-                                        ),
-                                        Flexible(
-                                          flex: 2,
-                                          child: Text(
-                                            "Save the songs you love",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 1,
-                      child: Container(
-                        width: double.infinity,
-                        height: 5,
-                        color: const Color(0xff004466),
-                      ),
-                    ),
+//                    Flexible(
+//                      flex: 3,
+//                      child: Container(
+//                        width: double.infinity,
+//                        height: 90,
+//                        child: FlatButton(
+//                          onPressed: () {},
+//                          child: Row(
+//                            children: [
+//                              Image.asset('assets/images/hearts.png',
+//                                  fit: BoxFit.cover),
+//                              Container(
+//                                margin: EdgeInsets.only(left: 20),
+//                                width: 5,
+//                                height: double.infinity,
+//                                color: const Color(0xffff4d4d),
+//                              ),
+//                              Container(
+//                                width: 5,
+//                                height: double.infinity,
+//                                color: const Color(0xffff1a1a),
+//                              ),
+//                              Container(
+//                                width: 5,
+//                                height: double.infinity,
+//                                color: const Color(0xffe60000),
+//                              ),
+//                              Expanded(
+//                                child: Container(
+//                                  margin: EdgeInsets.only(left: 5),
+//                                  child: Padding(
+//                                    padding: const EdgeInsets.all(20.0),
+//                                    child: Column(
+//                                      crossAxisAlignment:
+//                                          CrossAxisAlignment.center,
+//                                      children: [
+//                                        Flexible(
+//                                          flex: 2,
+//                                          child: Text(
+//                                            "FAVORITE SONGS",
+//                                            style: TextStyle(
+//                                              color: Colors.white,
+//                                              fontSize: 20,
+//                                            ),
+//                                          ),
+//                                        ),
+//                                        Flexible(
+//                                          flex: 2,
+//                                          child: Text(
+//                                            "Save the songs you love",
+//                                            style: TextStyle(
+//                                              color: Colors.white,
+//                                              fontSize: 15,
+//                                            ),
+//                                          ),
+//                                        ),
+//                                      ],
+//                                    ),
+//                                  ),
+//                                ),
+//                              ),
+//                            ],
+//                          ),
+//                        ),
+//                      ),
+//                    ),
+//                    Flexible(
+//                      flex: 1,
+//                      child: Container(
+//                        width: double.infinity,
+//                        height: 5,
+//                        color: const Color(0xff004466),
+//                      ),
+//                    ),
                   ],
                 ),
               )
