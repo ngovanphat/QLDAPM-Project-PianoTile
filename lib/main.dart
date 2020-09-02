@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+import 'model/Song.dart';
+
 void main() async {
   // if change main to async
   // app needs this line to run properly
@@ -90,6 +92,7 @@ final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  Song song = new Song("00AA","Nothing Music there are","Ngô Văn Phát",1,"");
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -106,7 +109,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => Home(),
         // When navigating to the "/second" route, build the SecondScreen widget.
         '/gameplay': (context) => GamePlay(),
-        '/gameplayonline': (context) => GamePlayOnline(),
+        '/gameplayonline': (context) => GamePlayOnline(song),
       },
       navigatorObservers: [routeObserver],
     );

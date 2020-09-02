@@ -29,7 +29,7 @@ class CreateRoom extends StatefulWidget {
 class _CreateRoomState extends State<CreateRoom>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
-  String musicName = "Tìm lại bầu trời";
+  String musicName = "Nothing Music there are";
   final FirebaseAuth auth = FirebaseAuth.instance;
   String username = '';
   Room room;
@@ -37,7 +37,7 @@ class _CreateRoomState extends State<CreateRoom>
   bool isLoading = false;
   List<Song> songs = [];
   Timer timer;
-
+  Song song = new Song("00AA","Nothing Music there are","Ngô Văn Phát",1,"");
   SongDAO songDAO = new SongDAO();
 
   Future<List<Song>> getSongs() async {
@@ -46,6 +46,9 @@ class _CreateRoomState extends State<CreateRoom>
     return allSongs;
   }
 
+  Future<Song> getFirstSong(String songID) async {
+    return await songDAO.getSongById(songID);
+  }
   getUser() async {
     FirebaseUser user = await auth.currentUser();
     username = user.displayName;
@@ -71,6 +74,10 @@ class _CreateRoomState extends State<CreateRoom>
           ..repeat();
     String key = randomString(6, from: 65, to: 90);
     createRoom(key);
+    getFirstSong("01NN").then((val) {
+      song = val;
+      room.musicName=val.name;
+    });
     getSongs().then((value) {
       songs = value;
     });
@@ -129,7 +136,7 @@ class _CreateRoomState extends State<CreateRoom>
     room.isPlaying = true;
     room.updateToDatabase(room.keyOfRoom);
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => GamePlayOnline()));
+        context, MaterialPageRoute(builder: (context) => GamePlayOnline(song)));
   }
 
   onChooseMusic(String music) {
@@ -253,6 +260,9 @@ class _CreateRoomState extends State<CreateRoom>
                                                                   onChooseMusic(
                                                                       songs[index]
                                                                           .getName());
+                                                                  setState(() {
+                                                                    song = songs[index];
+                                                                  });
                                                                 },
                                                                 child: Card(
                                                                   child:

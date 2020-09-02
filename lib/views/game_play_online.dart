@@ -23,6 +23,8 @@ import 'package:piano_tile/model/Song.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class GamePlayOnline extends GamePlay {
+  final Song song;
+  GamePlayOnline(this.song);
   @override
   GamePlayOnlineState createState() => GamePlayOnlineState();
 }
@@ -92,8 +94,10 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline> {
         // show dialog to exit
         // ...
       }
-
-      // get song name (.mid.txt)
+      //TODO: change here to play onl
+      // get song name (.mid.txt)\
+      //this block of code to load onl
+      /*
       String nameOfSong = findSongName(rows, 'musicName');
       print('[game_play_online] found song: ${nameOfSong}');
 
@@ -114,7 +118,8 @@ class GamePlayOnlineState extends GamePlayState<GamePlayOnline> {
         super.song = findSong(songs, nameOfSong);
       }
       print('[online] filename of song: ${super.song.name}');
-
+      */
+      song=widget.song;
       // subscribe room to listen point changes
       subscriptionPoints = subscribePointChanges(refRoom.child(roomName));
     }

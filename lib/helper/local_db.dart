@@ -115,6 +115,15 @@ class SongDAO {
     return null;
   }
 
+  Future<Song> getSongByName(String name) async {
+    final finder =
+    Finder(filter: Filter.equals('name', name));
+    final recordSnapshot =
+    await _songFolder.findFirst(await _db, finder: finder);
+    debugPrint("Finding name " + name);
+    if (recordSnapshot != null) return Song.fromJson(recordSnapshot.value);
+    return null;
+  }
   Future<List<Song>> getAllSongs(String type) async {
     //List yêu thích ko load là do còn file local mấy bài cũ, bỏ uncomment deleteAll(),
     //chạy 1 lần r xóa deleteAll() đi là lần sau đó bình thường.

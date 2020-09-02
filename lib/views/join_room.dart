@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:piano_tile/helper/local_db.dart';
+import 'package:piano_tile/model/Song.dart';
 import 'package:piano_tile/model/room.dart';
 import 'package:piano_tile/model/widget.dart';
 import 'package:piano_tile/views/game_play_online.dart';
 import 'package:piano_tile/views/home.dart';
+import 'package:piano_tile/views/music_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:piano_tile/helper/sharedPreferencesDefinition.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -30,7 +33,11 @@ class _JoinRoomState extends State<JoinRoom>
   // listener
   StreamSubscription isPlayingListener;
   StreamSubscription usernameOneListener;
+  SongDAO songDAO = new SongDAO();
 
+  Future<Song> loadSong(String songName) async{
+    return await songDAO.getSongByName(songName);
+  }
   Future<void> loadRoom(String key) async {
     room = new Room(key, '', '', '', '', '');
     await room.getRoomByID(key);
@@ -41,7 +48,7 @@ class _JoinRoomState extends State<JoinRoom>
       print("load done");
       isLoading = false;
     });
-
+    Song song = await loadSong(room.musicName);
     // listen for room data change
     isPlayingListener = FirebaseDatabase.instance.reference()
         .child('Room/${widget.roomKey}/isPlaying').onValue.listen((event) {
@@ -50,7 +57,7 @@ class _JoinRoomState extends State<JoinRoom>
       if(isPlaying == true){
         // go to game play online
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => GamePlayOnline()));
+            MaterialPageRoute(builder: (context) => GamePlayOnline(song)));
       }
 
     });
