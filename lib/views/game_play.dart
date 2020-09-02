@@ -385,7 +385,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
 
   void showResultDialog() async {
     // calculate exp, level, gem
-    int expGot = (this.expReward * this.points / notes.length).round();
+    int expGot = (this.expReward * this.points).round();
     int newExp = prefs.getInt(sharedPrefKeys.getExpKey()) + expGot;
     int newGem = prefs.getInt(sharedPrefKeys.getGemKey());
     int newLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
