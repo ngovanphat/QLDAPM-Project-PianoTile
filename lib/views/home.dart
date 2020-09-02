@@ -38,6 +38,7 @@ class _HomeState extends State<Home>
   String musicName = "Little Star";
   List<Song> songs = [];
   SongDAO songDAO = new SongDAO();
+  Song song =  new Song("00AA","Nothing Music there are","Ngô Văn Phát",1,"");
 
   Future<List<Song>> getSongs() async {
     List<Song> allSongs = await songDAO.getAllSongs("VN");
@@ -55,6 +56,10 @@ class _HomeState extends State<Home>
     return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
   }
 
+  Future<Song> getFirstSong(String songID) async {
+    return await songDAO.getSongById(songID);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -63,7 +68,9 @@ class _HomeState extends State<Home>
           ..repeat();
 
     getUser();
-
+    getFirstSong("01NN").then((val) {
+      song = val;
+    });
     // update exp, gem,...
     getExpGem();
     getSongs().then((value) {
@@ -154,7 +161,7 @@ class _HomeState extends State<Home>
                                 Container(
                                   margin: EdgeInsets.only(top: 10),
                                   child: Text(
-                                    '${musicName}',
+                                    '${song.getName()}',
                                     style: TextStyle(
                                         fontSize: 30,
                                         color: Colors.white,
@@ -191,6 +198,7 @@ class _HomeState extends State<Home>
                                                                   musicName = songs[
                                                                           index]
                                                                       .getName();
+                                                                  song = songs[index];
                                                                 });
                                                                 Navigator.of(
                                                                         context)
@@ -286,7 +294,7 @@ class _HomeState extends State<Home>
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => GamePlay()));
+                                          builder: (context) => GamePlay(song: song,)));
                                 },
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(70),

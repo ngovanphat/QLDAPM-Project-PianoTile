@@ -130,6 +130,7 @@ class GamePlayState<T extends GamePlay> extends State<T>
 
     prefs = await SharedPreferences.getInstance();
     int currentLevel = prefs.getInt(sharedPrefKeys.getLevelKey());
+    expReward = song.getDifficulty();
     // if ok, then get notes
     notes = await initNotes(song.getNotes());
     return 'done';
