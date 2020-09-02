@@ -92,7 +92,8 @@ final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
-  Song song = new Song("00AA","Nothing Music there are","Ngô Văn Phát",1,"");
+  Song song = new Song("00NN","Little Star","English Folk Song",1,
+      "assets/images/music-note.png",notes_dir: "assets/song/little_star.mid.txt");
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

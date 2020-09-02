@@ -38,7 +38,8 @@ class _HomeState extends State<Home>
   String musicName = "Little Star";
   List<Song> songs = [];
   SongDAO songDAO = new SongDAO();
-  Song song =  new Song("00AA","Nothing Music there are","Ngô Văn Phát",1,"");
+  Song song =  new Song("00NN","Little Star","English Folk Song",1,
+      "assets/images/music-note.png",notes_dir: "assets/song/little_star.mid.txt");
 
   Future<List<Song>> getSongs() async {
     List<Song> allSongs = await songDAO.getAllSongs("VN");
@@ -56,9 +57,7 @@ class _HomeState extends State<Home>
     return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
   }
 
-  Future<Song> getFirstSong(String songID) async {
-    return await songDAO.getSongById(songID);
-  }
+
 
   @override
   void initState() {
@@ -68,9 +67,6 @@ class _HomeState extends State<Home>
           ..repeat();
 
     getUser();
-    getFirstSong("01NN").then((val) {
-      song = val;
-    });
     // update exp, gem,...
     getExpGem();
     getSongs().then((value) {

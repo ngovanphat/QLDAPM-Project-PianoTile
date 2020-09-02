@@ -37,7 +37,8 @@ class _CreateRoomState extends State<CreateRoom>
   bool isLoading = false;
   List<Song> songs = [];
   Timer timer;
-  Song song = new Song("00AA","Nothing Music there are","Ngô Văn Phát",1,"");
+  Song song = new Song("00NN","Little Star","English Folk Song",1,
+      "assets/images/music-note.png",notes_dir: "assets/song/little_star.mid.txt");
   SongDAO songDAO = new SongDAO();
 
   Future<List<Song>> getSongs() async {
@@ -63,6 +64,7 @@ class _CreateRoomState extends State<CreateRoom>
     setState(() {
       isLoading = true;
     });
+    room.musicName = song.name;
   }
 
   @override
@@ -74,10 +76,7 @@ class _CreateRoomState extends State<CreateRoom>
           ..repeat();
     String key = randomString(6, from: 65, to: 90);
     createRoom(key);
-    getFirstSong("01NN").then((val) {
-      song = val;
-      room.musicName=val.name;
-    });
+
     getSongs().then((value) {
       songs = value;
     });
