@@ -177,7 +177,7 @@ Future<List<Note>> convertToNotes(String fileContent) async {
   for (var i = 1; i < notes.length; i++) {
     Note postNote = notes[i];
     postNote.height = 1;
-    if (note.velocityValue[0] < velocityThreshold) {
+    if (postNote.velocityValue[0] < velocityThreshold) {
       postNote.height = 2;
     }
 
